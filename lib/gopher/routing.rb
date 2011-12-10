@@ -1,59 +1,82 @@
 module Gopher
+  #
   # The routing module. Sanitizes selectors, routes requests and does awesome shit
+#
   module Routing
-    # Add a shortcut to the route map to instances of +klass+
-    def self.extended(klass)
-      klass.class_eval { def router; self.class.router.with(self); end }
+    def route(path, *args, &block)
+      selector = Gopher::Utils.sanitize_selector(path)
+
+      # @todo toss *args or do something with it
+      sig = compile!(selector, block, {})
+
+      puts sig.inspect
+
+      @routes << sig
     end
 
-    # The route map for this server / gophlet
-    def router
-      @router ||= RouteMap.new(self)
+    class << self
+      def generate_method(method_name, &block)
+        define_method(method_name, &block)
+        method = instance_method method_name
+        remove_method method_name
+        method
+      end
     end
 
-    # Define the routes for this server / gophlet
-    def routing(&block)
-      router.instance_eval(&block)
-    end
-
-    # The route map itself
-    class RouteMap # nodoc
-      attr_accessor :routes, :owner
-
-      # Route +selector+ to +gophlet+ or define behaviour inline through +block+
-      def route(raw, gophlet = nil, *args, &block)
-        selector = Gopher::Utils.sanitize_selector(raw)
-
-        if gophlet # Route to an gophlet
-puts gophlet.expected_arguments
-          matcher = %r{^\/?#{selector}(\/?#{gophlet.expected_arguments})$}
-puts matcher.inspect
-          routes[matcher] = gophlet.new(raw, *args)
-        elsif block_given? # Create an InlineGophlet for this route
-          matcher = %r{^\/?#{selector}$}
-          routes[matcher] = InlineGophlet.new(owner, &block)
-        else
-          raise ArgumentError.new('Route to an gophlet or define behaviour inline through a block')
+    private
+    def compile_route(path)
+      keys = []
+      if path.respond_to? :to_str
+        pattern = path.to_str.gsub(/[^\?\%\\\/\:\*\w]/) { |c| encoded(c) }
+        pattern.gsub!(/((:\w+)|\*)/) do |match|
+          if match == "*"
+            keys << 'splat'
+            "(.*?)"
+          else
+            keys << $2[1..-1]
+            "([^/?#]+)"
+          end
         end
-      end
-
-      def initialize(gophlet) # nodoc
-        @owner = gophlet
-        @routes = {}
-      end
-
-      def with(gophlet) # nodoc
-        @owner = gophlet; self
-      end
-
-      # Grab the gophlet tied to +selector+ in the route map
-      def lookup(raw)
-        selector = Gopher::Utils.sanitize_selector(raw)
-        routes.find do |k, v|
-          return v, *$~[1..-1] if k=~ selector
-        end
-        raise NotFound
+        [/^#{pattern}$/, keys]
       end
     end
+
+    def compile!(path, block, options = {})
+      options.each_pair { |option, args| send(option, *args) }
+      method_name             = path
+      unbound_method          = Routing.generate_method(method_name, &block)
+      pattern, keys           = compile path
+      conditions, @conditions = @conditions, []
+
+      [ pattern, keys, conditions, block.arity != 0 ?
+        proc { |a,p| unbound_method.bind(a).call(*p) } :
+        proc { |a,p| unbound_method.bind(a).call } ]
+    end
+
+    def compile(path)
+      keys = []
+      if path.respond_to? :to_str
+        pattern = path.to_str.gsub(/[^\?\%\\\/\:\*\w]/) { |c| encoded(c) }
+        pattern.gsub!(/((:\w+)|\*)/) do |match|
+          if match == "*"
+            keys << 'splat'
+            "(.*?)"
+          else
+            keys << $2[1..-1]
+            "([^/?#]+)"
+          end
+        end
+        [/^#{pattern}$/, keys]
+      elsif path.respond_to?(:keys) && path.respond_to?(:match)
+        [path, path.keys]
+      elsif path.respond_to?(:names) && path.respond_to?(:match)
+        [path, path.names]
+      elsif path.respond_to? :match
+        [path, keys]
+      else
+        raise TypeError, path
+      end
+    end
+
   end
 end
