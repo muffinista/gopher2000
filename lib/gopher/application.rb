@@ -1,35 +1,29 @@
 module Gopher
-  class Application < Base
-#    include Configuration
+  class Application
+
     include Routing
-#    include Templating # mmm
-#    include Dispatching
-#    include Helpers
+    include Dispatching
+    include Templating
+    include Helpers
 
-    # def self.host; config[:host] || '0.0.0.0' end # Shortcut for getting the server host
-    # def self.port; config[:port] || 70 end # Shortcut for getting the server port
+    attr_accessor :routes, :templates, :menus, :config
 
-    # def self.reload!
-    #   if config[:reload].class == String
-    #     config[:reload] = [ config[:reload] ]
-    #   end
+    def reset!
+      @routes = []
+      @templates = {}
+      @menus = {}
+      @config = {}
 
-    #   config[:reload].each do |f|
-    #     load f if File.mtime(f) > @last_reload
-    #     @last_reload = Time.now
-    #   end
-    # end
+      self
+    end
 
-    def self.run
-      return if ::EM.reactor_running?
-      trap("INT") { exit }
-
-      ::EM.run do
-        @last_reload = Time.now
-        ::EM.start_server(host, port, Gopher::Connection) do |c|
-          reload! if config[:reload]
-        end
-      end
+    if ARGV.any?
+      require 'optparse'
+      OptionParser.new { |op|
+        op.on('-p port',   'set the port (default is 4567)')                { |val| set :port, Integer(val) }
+        op.on('-o addr',   'set the host (default is 0.0.0.0)')             { |val| set :bind, val }
+        op.on('-e env',    'set the environment (default is development)')  { |val| set :environment, val.to_sym }
+      }.parse!(ARGV.dup)
     end
   end
 end

@@ -1,29 +1,18 @@
 module Gopher
-  #
-  # The routing module. Sanitizes selectors, routes requests and does awesome shit
-#
   module Routing
+
     def route(path, *args, &block)
-      selector = Gopher::Utils.sanitize_selector(path)
+      selector = self.sanitize_selector(path)
 
       # @todo toss *args or do something with it
       sig = compile!(selector, block, {})
 
-      puts sig.inspect
+      #puts sig.inspect
 
+      @routes ||= []
       @routes << sig
     end
 
-    class << self
-      def generate_method(method_name, &block)
-        define_method(method_name, &block)
-        method = instance_method method_name
-        remove_method method_name
-        method
-      end
-    end
-
-    private
     def compile_route(path)
       keys = []
       if path.respond_to? :to_str
@@ -44,13 +33,15 @@ module Gopher
     def compile!(path, block, options = {})
       options.each_pair { |option, args| send(option, *args) }
       method_name             = path
-      unbound_method          = Routing.generate_method(method_name, &block)
+      unbound_method          = Dispatching.generate_method(method_name, &block)
+     # unbound_method          = generate_method(method_name, &block)
       pattern, keys           = compile path
-      conditions, @conditions = @conditions, []
 
-      [ pattern, keys, conditions, block.arity != 0 ?
-        proc { |a,p| unbound_method.bind(a).call(*p) } :
-        proc { |a,p| unbound_method.bind(a).call } ]
+#      [ pattern, keys, conditions, block.arity != 0 ?
+#        proc { |a,p| puts "A: #{a}, P: #{p}"; unbound_method.bind(a).call(*p) } :
+#        proc { |a,p| unbound_method.bind(a).call } ]
+
+      [ pattern, keys, unbound_method ]
     end
 
     def compile(path)
@@ -78,5 +69,14 @@ module Gopher
       end
     end
 
+    # Sanitizes a gopher selector
+    def sanitize_selector(raw)
+      selector = raw.to_s.dup
+      selector.strip! # Strip whitespace
+      selector.sub!(/\/$/, '') # Strip last rslash
+      selector.sub!(/^\/*/, '/') # Strip extra lslashes
+      selector.gsub!(/\.+/, '.') # Don't want consecutive dots!
+      selector
+    end
   end
 end

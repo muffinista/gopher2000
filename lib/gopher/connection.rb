@@ -1,21 +1,13 @@
 module Gopher
-  module Connection
+  class Connection
     def receive_data(selector)
+      port, ip = Socket.unpack_sockaddr_in(get_peername)
+      puts "got #{data.inspect} from #{ip}:#{port}"
+
       begin
-        raise InvalidRequest, "Message too long" if selector.length >= 255
+        request = Request.new(selector, ip)
+        send_response application.dispatch(request)
 
-        Gopher.logger.info "Dispatching to #{selector}"
-
-        response = Gopher::Server.dispatch(selector)
-
-        case response
-        when String then send_data(response)
-        when StringIO then send_data(response.read)
-        when File
-          while chunk = response.read(8192) do
-            send_data(chunk)
-          end
-        end
       rescue Gopher::NotFound => e
         Gopher.logger.error "Unknown selector. #{e}"
       rescue Gopher::InvalidRequest => e
@@ -25,6 +17,17 @@ module Gopher
         raise e
       ensure
         close_connection_after_writing
+      end
+    end
+
+    def send_response(response)
+      case response
+      when String then send_data(response)
+      when StringIO then send_data(response.read)
+      when File
+        while chunk = response.read(8192) do
+          send_data(chunk)
+        end
       end
     end
   end

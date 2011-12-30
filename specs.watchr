@@ -32,10 +32,9 @@ end
 # Watchr Rules
 # --------------------------------------------------
 watch('^spec/(.*)_spec\.rb') { |m| run_spec_matching(m[1]) }
-#watch('^spec/controllers/(.*)_spec\.rb') { |m| run_spec_matching(m[1]) }
 
-watch("^lib/chatterbot/(.*)\.rb") { |m| run_spec_matching(m[1]) }
-#watch('^spec/spec_helper\.rb') { run_all_specs }
+watch("^lib/gopher/(.*)\.rb") { |m| run_spec_matching(m[1]) }
+watch('^spec/spec_helper\.rb') { run_all_specs }
 
 # --------------------------------------------------
 # Signal Handling

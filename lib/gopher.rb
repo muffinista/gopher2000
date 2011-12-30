@@ -1,33 +1,24 @@
-require "gopher/version"
-
-require 'ext/object'
+#require 'ext/object'
 require 'ext/string'
 
-#require 'jcode'
 require 'logger'
 require 'eventmachine'
 require 'stringio'
 
-require 'gopher/base'
-
-require 'gopher/utils'
-# require 'gopher/errors'
-# require 'gopher/configuration'
+require "gopher/version"
 require 'gopher/routing'
+require 'gopher/templating'
+require 'gopher/helpers'
+require 'gopher/dispatching'
 
-# require 'gopher/templating'
-# require 'gopher/rendering'
-# require 'gopher/dispatching'
 
-# require 'gopher/helpers'
+require 'gopher/rendering'
+
+require 'gopher/request'
+require 'gopher/response'
+require 'gopher/dsl'
 
 require 'gopher/application'
-
-# #require 'gopher/gophlet'
-
-# require 'gopher/connection'
-
-# require 'gophlets/file_browser'
 
 module Gopher
 
@@ -36,7 +27,11 @@ module Gopher
   #   Gopher::Server.instance_eval(&block) if block_given?
   # end
 
-  # def self.logger
-  #   @logger ||= Logger.new('gopher.log')
-  # end
+#  def self.logger
+#    @logger ||= Logger.new('gopher.log')
+#  end
+
+#  at_exit { Application.run! if $!.nil? && Application.run? }
 end
+
+include Gopher::DSL

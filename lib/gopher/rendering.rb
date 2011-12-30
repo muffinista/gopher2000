@@ -68,12 +68,22 @@ module Gopher
 
     # The MenuContext is for rendering gopher menus
     class MenuContext < RenderContext
+
+      # Sanitizes text for use in gopher menus
+      def sanitize_text(raw)
+        text = raw.dup
+        text.rstrip! # Remove excess whitespace
+        text.gsub!(/\t/, ' ' * 8) # Tabs to spaces
+        text.gsub!(/\n/, '') # Get rid of newlines (\r as well?)
+        text
+      end
+
       # Creates a gopher menu line from +type+, +text+, +selector+, +host+ and +port+
       # +host+ and +post+ will default to the current host and port of the running Gopher server
       # (by default 0.0.0.0 and 70)
       # +text+ will be sanitized according to a few simple rules (see Gopher::Utils)
       def line(type, text, selector, host=Gopher::Server.host, port=Gopher::Server.port)
-        text = Gopher::Utils.sanitize_text(text)
+        text = sanitize_text(text)
 
         self << ["#{type}#{text}", selector, host, port].join("\t")
         self << "\r\n" # End the gopher line
@@ -84,7 +94,7 @@ module Gopher
       end
 
       def link(text, selector, *args)
-        type = Gopher::Utils.determine_type(selector)
+        type = determine_type(selector)
         line type, text, selector, *args
       end
 
@@ -95,6 +105,16 @@ module Gopher
 
       def menu(text, selector, *args)
         line '1', text, selector, *args
+      end
+
+      # Determines the gopher type for +selector+ based on the extension
+      def determine_type(selector)
+        ext = File.extname(selector).downcase
+        case ext
+        when '.jpg', '.png' then 'I'
+        when '.mp3', '.wav' then 's'
+        else '0'
+        end
       end
     end
 

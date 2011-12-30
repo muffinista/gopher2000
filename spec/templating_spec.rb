@@ -1,23 +1,27 @@
 require File.join(File.dirname(__FILE__), '/spec_helper')
 
+class MockServer
+  attr_accessor :templates, :menus
+  include Gopher::Templating
+end
+
 describe Gopher::Templating do
   before(:all) do
-    @klass = Class.new
-    @klass.extend(Gopher::Templating)
-
-    @klass.templates do
-      menu :index do
-        "foo"
-      end
-    end
-    @obj = @klass.new
+    @klass = MockServer.new
   end
 
   it 'should store templates' do
-    @klass.templates.should include(:index)
-  end  
+    @klass.menu :index do
+      "foo"
+    end
+
+    @klass.menus.should include(:index)
+  end
 
   it 'should find templates' do
-    @obj.find_template(:index).should_not be_empty
-  end  
+    @klass.template :index do
+      "foo"
+    end
+    @klass.templates.should include(:index)
+  end
 end
