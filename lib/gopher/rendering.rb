@@ -2,20 +2,30 @@ module Gopher
   module Rendering
     # All rendering of templates (inline and otherwise) is done inside a RenderContext
     class RenderContext
-      attr_accessor :result
+      attr_accessor :result, :spacing
 
       def initialize(host=nil) # nodoc
         @_host = host
         @result = ""
+        @spacing = 1
       end
 
       def <<(string); @result << string.to_s; end
 
       # Adds +text+ to the result
-      def text(text); self << text; end
+      def text(text)
+        self << text
+        add_spacing
+      end
+
+      def spacing(n)
+        @spacing = n.to_i
+      end
 
       # Adds +n+ empty lines
-      def br(n=1); n.times { text '' } end
+      def br(n=1)
+        self << ("\n" * n)
+      end
 
       # Wraps +text+ to +width+ characters
       def block(text, width=80)
@@ -24,47 +34,42 @@ module Gopher
         end
       end
 
-      # Experimental! No specs! Ayeee!
-      def partial(partial, *args)
-        args.flatten!
-        partial = @_host.find_partial(partial)
-        if args.empty?
-          self.instance_exec(*args, &partial)
-        else
-          args.each do |a|
-            self.instance_exec(a, &partial)
-          end
-        end
-      end
+#      def url(selector)
+#        _host ? "#{_host.base}#{selector}" : selector
+#      end
 
-      def url(selector)
-        _host ? "#{_host.base}#{selector}" : selector
+      def to_s
+        @result
       end
 
       private
+      def add_spacing
+        br(@spacing)
+      end
+
       def _host
         @_host.host rescue nil
       end
     end
 
-    # Render text files
-    class TextContext < RenderContext
-      def link(txt, *args)
-        text "#{txt}"
-      end
+    # # Render text files
+    # class TextContext < RenderContext
+    #   def link(txt, *args)
+    #     text "#{txt}"
+    #   end
 
-      def menu(txt, *args)
-        text "#{txt}"
-      end
+    #   def menu(txt, *args)
+    #     text "#{txt}"
+    #   end
 
-      def search(*args); end
-      alias input search
+    #   def search(*args); end
+    #   alias input search
 
-      def text(text)
-        self << text
-        self << "\n"
-      end
-    end
+    #   def text(text)
+    #     self << text
+    #     self << "\n"
+    #   end
+    # end
 
     # The MenuContext is for rendering gopher menus
     class MenuContext < RenderContext
