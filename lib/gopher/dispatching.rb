@@ -3,6 +3,20 @@ module Gopher
 
     attr_accessor :params
 
+    def lookup(selector)
+      routes.each do |pattern, keys, block|
+        if match = pattern.match(selector)
+          match = match.to_a
+          url = match.shift
+
+          params = to_params_hash(keys, match)
+
+          @params = params
+          return params, block
+        end
+      end
+    end
+
     #
     # find and run routes which match the incoming request
     #
@@ -14,24 +28,6 @@ module Gopher
       @response.body = block.bind(self).call
 
       @response
-    end
-
-    def lookup(selector)
-      routes.each do |pattern, keys, conditions, block|
-        if match = pattern.match(selector)
-          #puts "**** #{keys} #{conditions}"
-          match = match.to_a
-          url = match.shift
-          #puts "MATCH #{match.inspect}"
-
-          params = to_params_hash(keys, match)
-
-          #puts "PARAMS #{params.inspect}"
-
-          @params = params
-          return params, conditions, block
-        end
-      end
     end
 
     #

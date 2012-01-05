@@ -8,7 +8,7 @@ end
 
 
 describe Gopher::Dispatching do
-  before(:all) do
+  before(:each) do
     @server = MockServer.new
   end
 
@@ -19,7 +19,7 @@ describe Gopher::Dispatching do
       end
       @request = Gopher::Request.new("/about")
 
-      keys, conditions, block = @server.lookup(@request.selector)
+      keys, block = @server.lookup(@request.selector)
       keys.should == {}
 
 #      block.call(@server).should == "mr. gopher loves you"
@@ -31,7 +31,7 @@ describe Gopher::Dispatching do
       end
       @request = Gopher::Request.new("/about/x/y")
 
-      keys, conditions, block = @server.lookup(@request.selector)
+      keys, block = @server.lookup(@request.selector)
       keys.should == {:foo => 'x', :bar => 'y'}
 
  #     block.call(@server).should == "x y"
@@ -42,8 +42,7 @@ describe Gopher::Dispatching do
     before(:each) do
       #@server.should_receive(:lookup).and_return({})
       @server.route '/about' do
-        puts "WTFFFFFFFF #{params}"
-        'mr. gopher loves you'
+        'GOPHERTRON'
       end
 
       @request = Gopher::Request.new("/about")
@@ -51,8 +50,25 @@ describe Gopher::Dispatching do
 
     it "should run the block" do
       @response = @server.dispatch(@request)
-      puts @response.body
+      @response.body.should == "GOPHERTRON"
+      #puts @response.body
+    end
+  end
+  
+  describe "dispatch, with params" do
+    before(:each) do
+      @server.route '/about/:x/:y' do
+        params.to_a.join("/")
+      end
+
+      @request = Gopher::Request.new("/about/a/b")
     end
 
+    it "should use incoming params" do
+      @response = @server.dispatch(@request)
+      @response.body.should == "x/a/y/b"
+    end
   end
+
+  pending "globs"
 end
