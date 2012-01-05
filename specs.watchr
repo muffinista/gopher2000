@@ -10,6 +10,7 @@ def all_spec_files
 end
 
 def run_spec_matching(thing_to_match)
+	puts "run #{thing_to_match}"
   matches = all_spec_files.grep(/#{thing_to_match}/i)
   if matches.empty?
     puts "Sorry, thanks for playing, but there were no matches for #{thing_to_match}"

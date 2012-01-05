@@ -14,27 +14,19 @@ describe Gopher::Dispatching do
 
   describe "lookup" do
     it "should work with simple route" do
-      @server.route '/about' do
-        'mr. gopher loves you'
-      end
+      @server.route '/about' do; end
       @request = Gopher::Request.new("/about")
 
       keys, block = @server.lookup(@request.selector)
       keys.should == {}
-
-#      block.call(@server).should == "mr. gopher loves you"
     end
 
     it "should translate path" do
-      @server.route '/about/:foo/:bar' do
-        "#{params[:foo]} #{params[:bar]}"
-      end
+      @server.route '/about/:foo/:bar' do;  end
       @request = Gopher::Request.new("/about/x/y")
 
       keys, block = @server.lookup(@request.selector)
       keys.should == {:foo => 'x', :bar => 'y'}
-
- #     block.call(@server).should == "x y"
     end
   end
 
@@ -51,10 +43,9 @@ describe Gopher::Dispatching do
     it "should run the block" do
       @response = @server.dispatch(@request)
       @response.body.should == "GOPHERTRON"
-      #puts @response.body
     end
   end
-  
+
   describe "dispatch, with params" do
     before(:each) do
       @server.route '/about/:x/:y' do

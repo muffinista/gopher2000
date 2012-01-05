@@ -10,21 +10,18 @@ describe Gopher::Routing do
     @klass = MockServer.new
   end
 
-  pending "test something real"
 
-  it "should work with text output" do
-    @klass.route '/about' do
-      'mr. gopher loves you'
-    end
+  pending "should work with text output" do
+    @klass.route '/about' do; end
   end
 
-  it "should work with input" do
+  pending "should work with input" do
     @klass.route '/name' do
       render :hello, input.strip
     end
   end
 
-  it "should work with templates" do
+  pending "should work with templates" do
     @klass.route '/' do
       render :index
     end
