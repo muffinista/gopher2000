@@ -1,25 +1,22 @@
 module Gopher
-  class Connection
+  class Connection < EventMachine::Connection
     def receive_data(selector)
-      port, ip = Socket.unpack_sockaddr_in(get_peername)
-      puts "got #{data.inspect} from #{ip}:#{port}"
+      ip = remote_ip
+      puts "got #{selector} from #{ip}"
 
       begin
-        request = Request.new(selector, ip)
-        send_response application.dispatch(request)
-
-      rescue Gopher::NotFound => e
-        Gopher.logger.error "Unknown selector. #{e}"
-      rescue Gopher::InvalidRequest => e
-        Gopher.logger.error "Invalid request. #{e}"
-      rescue => e
-        Gopher.logger.error "Bad juju afoot. #{e}"; puts e
-        raise e
+        handler = Handler.new
+        send_response handler.handle(selector, ip)
       ensure
         close_connection_after_writing
       end
     end
 
+    def remote_ip
+      #      port, ip =
+      Socket.unpack_sockaddr_in(get_peername).last
+    end
+    
     def send_response(response)
       case response
       when String then send_data(response)
