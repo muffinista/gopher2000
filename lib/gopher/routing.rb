@@ -34,7 +34,6 @@ module Gopher
       options.each_pair { |option, args| send(option, *args) }
       method_name             = path
       unbound_method          = Dispatching.generate_method(method_name, &block)
-     # unbound_method          = generate_method(method_name, &block)
       pattern, keys           = compile path
 
 #      [ pattern, keys, conditions, block.arity != 0 ?
