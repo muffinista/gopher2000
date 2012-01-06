@@ -21,7 +21,7 @@ module Gopher
         text = sanitize_text(text)
 
         self << ["#{type}#{text}", selector, host, port].join("\t")
-        self << "\r\n" # End the gopher line
+#        self << "\r\n" # End the gopher line
       end
 
       def text(text)

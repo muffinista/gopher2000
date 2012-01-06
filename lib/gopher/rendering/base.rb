@@ -1,5 +1,10 @@
 module Gopher
   module Rendering
+
+    # "A CR LF denotes the end of the item." RFC 1436
+    # @see http://www.faqs.org/rfcs/rfc1436.html
+    LINE_ENDING = "\r\n"
+
     # All rendering of templates (inline and otherwise) is done inside a RenderContext
     class Base
       attr_accessor :result, :spacing
@@ -24,7 +29,7 @@ module Gopher
 
       # Adds +n+ empty lines
       def br(n=1)
-        self << ("\n" * n)
+        self << (LINE_ENDING * n)
       end
 
       # Wraps +text+ to +width+ characters
