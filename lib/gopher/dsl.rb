@@ -17,8 +17,8 @@ module Gopher
       application.config[key] = value
     end
 
-    def route(path, *args, &block)
-      application.route(path, args, &block)
+    def route(path, &block)
+      application.route(path, &block)
     end
 
     def menu(name, &block)
@@ -30,9 +30,7 @@ module Gopher
     end
 
     def helpers(&block)
-      puts "define some helpers"
       application.helpers(&block)
     end
   end
 end
-

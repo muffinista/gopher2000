@@ -27,6 +27,7 @@ module Gopher
       # call the block that handles this lookup
       @response.body = block.bind(self).call
 
+      puts "&****************** #{@response.inspect}"
       @response
     end
 

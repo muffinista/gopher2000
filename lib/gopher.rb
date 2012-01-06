@@ -13,6 +13,7 @@ require 'gopher/templating'
 require 'gopher/helpers'
 require 'gopher/dispatching'
 
+require 'gopher/rendering'
 require 'gopher/rendering/base'
 require 'gopher/rendering/menu'
 

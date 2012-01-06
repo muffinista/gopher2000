@@ -11,7 +11,7 @@ module Gopher
 
     def handle
       begin
-        application.dispatch(request)
+        return application.dispatch(request)
 
       rescue Gopher::NotFound => e
 #        Gopher.logger.error "Unknown selector. #{e}"

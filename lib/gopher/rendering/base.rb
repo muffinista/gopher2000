@@ -74,12 +74,5 @@ end
     # end
 
 
-    # Find the right template (with context) and instance_exec it inside the context
-#    def render(template, *arguments)
-#      block, context = find_template(template)
-#      ctx = context.new(self)
-#      ctx.instance_exec(*arguments, &block)
-#      ctx.result
-#    end
 #  end
 #end

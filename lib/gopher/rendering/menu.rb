@@ -16,7 +16,8 @@ module Gopher
       # +host+ and +post+ will default to the current host and port of the running Gopher server
       # (by default 0.0.0.0 and 70)
       # +text+ will be sanitized according to a few simple rules (see Gopher::Utils)
-      def line(type, text, selector, host=Gopher::Server.host, port=Gopher::Server.port)
+#      def line(type, text, selector, host=Gopher::Server.host, port=Gopher::Server.port)
+      def line(type, text, selector, host=application.host, port=application.port)
         text = sanitize_text(text)
 
         self << ["#{type}#{text}", selector, host, port].join("\t")

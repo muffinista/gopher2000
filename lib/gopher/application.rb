@@ -5,6 +5,7 @@ module Gopher
     include Dispatching
     include Templating
     include Helpers
+    include Rendering
 
     attr_accessor :routes, :templates, :menus, :config
 
@@ -16,6 +17,39 @@ module Gopher
 
       self
     end
+
+#    def self.reload!
+#      config[:reload].each do |f|
+#        load f if File.mtime(f) > @last_reload
+#        @last_reload = Time.now
+#      end
+#    end
+
+    def host
+      config[:host]
+    end
+
+    def port
+      config[:port]
+    end
+
+    def run!
+      return if ::EM.reactor_running?
+      trap("INT") { exit }
+
+      ::EM.run do
+        @last_reload = Time.now
+
+        puts "HOST #{config[:host]}"
+        puts "PORT #{config[:port]}"
+        puts "CONN #{Gopher::Connection.inspect}"
+
+        ::EM.start_server(config[:host], config[:port], Gopher::Connection) do |c|
+#          reload! if config[:reload]
+        end
+      end
+    end
+
 
     if ARGV.any?
       require 'optparse'
