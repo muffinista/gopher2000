@@ -8,18 +8,18 @@ describe Gopher::Rendering::Base do
   it 'should add text' do
     @ctx.text("line 1")
     @ctx.text("line 2")
-    @ctx.result.should == "line 1\nline 2\n"
+    @ctx.result.should == "line 1\r\nline 2\r\n"
   end
 
   it "should add breaks correctly" do
     @ctx.spacing 2
     @ctx.text("line 1")
     @ctx.text("line 2")
-    @ctx.result.should == "line 1\n\nline 2\n\n"
+    @ctx.result.should == "line 1\r\n\r\nline 2\r\n\r\n"
   end
 
   it "br outputs a bunch of newlines" do
-    @ctx.br(2).should == "\n\n"
+    @ctx.br(2).should == "\r\n\r\n"
   end
 
   it "uses to_s to output result" do

@@ -22,15 +22,14 @@ module Gopher
     #
     def dispatch(request)
       @params, block = lookup(request.selector)
-      @response = Response.new
-
+      @response = Response.new     
+      
       # call the block that handles this lookup
       @response.body = block.bind(self).call
-
-      puts "&****************** #{@response.inspect}"
       @response
     end
 
+    
     #
     # zip up two arrays of keys and values from an incoming request
     #
