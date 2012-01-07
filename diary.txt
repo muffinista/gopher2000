@@ -1,0 +1,33 @@
+step one -- research
+
+step two -- refine code base
+
+step three -- largely start over from scratch
+-- pull routing from sintatra
+-- request model
+-- lots of specs
+
+simplify output code -- remove craziness that doesn't need to be there
+
+split EM out as much as possible for better testing/future modifications
+
+tweak output code to work, be clean and simple and DSL'ish
+
+proper line endings, more refactoring
+
+=========
+
+testing
+input/output sanitizing
+directory mounter
+
+mount '/files' => '/home/colin/foo', :filter => '*.jpg'
+catchall route?
+
+404 handler
+
+general error handling
+
+
+
+
