@@ -15,6 +15,12 @@ tweak output code to work, be clean and simple and DSL'ish
 
 proper line endings, more refactoring
 
+THEN... A long break to attend to other things
+
+dispatching updates:
+-- glob routes
+
+
 =========
 
 testing
@@ -29,5 +35,4 @@ catchall route?
 general error handling
 
 
-
-
+========

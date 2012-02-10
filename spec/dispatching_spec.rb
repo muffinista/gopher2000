@@ -28,6 +28,14 @@ describe Gopher::Dispatching do
       keys, block = @server.lookup(@request.selector)
       keys.should == {:foo => 'x', :bar => 'y'}
     end
+
+    pending "should return default route if no other route found, and default is defined" do
+
+    end
+
+    pending "should throw error if no route found" do
+
+    end
   end
 
   describe "dispatch" do
@@ -61,5 +69,17 @@ describe Gopher::Dispatching do
     end
   end
 
-  pending "globs"
+  describe "globs" do
+    before(:each) do
+      @server.route '/about/*' do
+        params[:splat]
+      end
+    end
+
+    it "should put wildcard into param[:splat]" do
+      @request = Gopher::Request.new("/about/a/b")
+      @response = @server.dispatch(@request)
+      @response.body.should == "a/b"
+    end
+  end
 end

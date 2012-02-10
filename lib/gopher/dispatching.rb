@@ -3,6 +3,22 @@ module Gopher
 
     attr_accessor :params
 
+    #
+    # find and run routes which match the incoming request
+    #
+    def dispatch(request)
+      @params, block = lookup(request.selector)
+      @response = Response.new
+
+      # call the block that handles this lookup
+      @response.body = block.bind(self).call
+
+      @response
+    end
+
+    #
+    # lookup an incoming path
+    #
     def lookup(selector)
       routes.each do |pattern, keys, block|
         if match = pattern.match(selector)
@@ -15,21 +31,11 @@ module Gopher
           return params, block
         end
       end
+
+      raise Gopher::NotFoundError
     end
 
-    #
-    # find and run routes which match the incoming request
-    #
-    def dispatch(request)
-      @params, block = lookup(request.selector)
-      @response = Response.new     
-      
-      # call the block that handles this lookup
-      @response.body = block.bind(self).call
-      @response
-    end
 
-    
     #
     # zip up two arrays of keys and values from an incoming request
     #

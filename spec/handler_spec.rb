@@ -5,7 +5,7 @@ describe Gopher::Handler do
     before(:each) do
       @handler = Gopher::Handler.new("/foo", "ip_address")
       @request = Gopher::Request.new("/foo")
-      @handler.should_receive(:request).with.and_return(@request)
+      @handler.should_receive(:request).and_return(@request)
     end
 
     it 'should call dispatch with request' do
@@ -18,8 +18,18 @@ describe Gopher::Handler do
       @handler.handle.should == "foo"
     end
 
-    pending "not found, errors"
+    describe "not found" do
+      it "should raise error" do
+        expect{application.dispatch(@request)}.to raise_error(Gopher::NotFoundError)
+
+        @handler.handle
+      end
+    end
+
+    pending "other errors"
   end
+
+
 
   describe "#request" do
     before(:each) do
