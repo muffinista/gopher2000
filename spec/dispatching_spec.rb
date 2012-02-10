@@ -29,8 +29,13 @@ describe Gopher::Dispatching do
       keys.should == {:foo => 'x', :bar => 'y'}
     end
 
-    pending "should return default route if no other route found, and default is defined" do
-
+    it "should return default route if no other route found, and default is defined" do
+      @server.default_route do
+        "DEFAULT ROUTE"
+      end
+      @request = Gopher::Request.new("/about/x/y")
+      @response = @server.dispatch(@request)
+      @response.body.should == "DEFAULT ROUTE"
     end
 
     pending "should throw error if no route found" do

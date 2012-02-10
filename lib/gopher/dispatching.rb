@@ -32,6 +32,10 @@ module Gopher
         end
       end
 
+      unless @default_route.nil?
+        return {}, @default_route
+      end
+
       raise Gopher::NotFoundError
     end
 

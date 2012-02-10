@@ -1,7 +1,9 @@
 module Gopher
   module Routing
 
-    # @todo toss *args or do something with it
+    #
+    # define a route
+    #
     def route(path, &block)
       selector = self.sanitize_selector(path)
       sig = compile!(selector, &block)
@@ -10,8 +12,13 @@ module Gopher
       @routes << sig
     end
 
-#    def compile!(path, block, options = {})
-#      options.each_pair { |option, args| send(option, *args) }
+    def default_route(&block)
+      # make sure we initialize the routes array
+      @routes ||= []
+
+      @default_route = Dispatching.generate_method("DEFAULT_ROUTE", &block)
+    end
+
     def compile!(path, &block)
       method_name = path
       route_method = Dispatching.generate_method(method_name, &block)
