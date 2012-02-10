@@ -38,8 +38,11 @@ describe Gopher::Dispatching do
       @response.body.should == "DEFAULT ROUTE"
     end
 
-    pending "should throw error if no route found" do
+    it "should throw error if no route found" do
+      @server.route '/about/:foo/:bar' do;  end
+      @request = Gopher::Request.new("/junk/x/y")
 
+      expect{@server.dispatch(@request)}.to raise_error(Gopher::NotFoundError)
     end
   end
 

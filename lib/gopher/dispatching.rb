@@ -20,15 +20,17 @@ module Gopher
     # lookup an incoming path
     #
     def lookup(selector)
-      routes.each do |pattern, keys, block|
-        if match = pattern.match(selector)
-          match = match.to_a
-          url = match.shift
+      unless routes.nil?
+        routes.each do |pattern, keys, block|
+          if match = pattern.match(selector)
+            match = match.to_a
+            url = match.shift
 
-          params = to_params_hash(keys, match)
+            params = to_params_hash(keys, match)
 
-          @params = params
-          return params, block
+            @params = params
+            return params, block
+          end
         end
       end
 

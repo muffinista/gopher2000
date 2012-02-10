@@ -10,6 +10,9 @@ describe Gopher::Routing do
     @router = MockServer.new
   end
 
+  pending "route"
+  pending "default_route"
+
   describe "compile" do
     it "should generate a basic string for routes without keys" do
       lookup, keys, block = @router.compile! "/foo" do; end

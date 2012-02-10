@@ -14,7 +14,6 @@ module Gopher
 
     def default_route(&block)
       # make sure we initialize the routes array
-      @routes ||= []
 
       @default_route = Dispatching.generate_method("DEFAULT_ROUTE", &block)
     end
