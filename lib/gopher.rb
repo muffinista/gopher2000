@@ -25,6 +25,7 @@ require 'gopher/handler'
 require 'gopher/connection'
 require 'gopher/application'
 
+require 'gopher/handlers/base_handler'
 require 'gopher/handlers/directory_handler'
 
 module Gopher

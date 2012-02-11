@@ -23,7 +23,7 @@ module Gopher
     def send_response(response)
       puts "SENDING #{response}"
       case response
-      when Gopher::Response then send_data(response.body + end_of_transmission)
+      when Gopher::Response then send_response(response.body)
       when String then send_data(response + end_of_transmission)
       when StringIO then send_data(response.read + end_of_transmission)
       when File
@@ -37,11 +37,11 @@ module Gopher
     #
     # Add the period on a line by itself that closes the connection
     #
-    # @todo don't add an extra line ending here if we don't need it   
+    # @todo don't add an extra line ending here if we don't need it
     def end_of_transmission
       [Gopher::Rendering::LINE_ENDING, ".", Gopher::Rendering::LINE_ENDING].join
     end
-    
+
 
   end
 end
