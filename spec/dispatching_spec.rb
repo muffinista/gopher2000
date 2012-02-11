@@ -77,6 +77,30 @@ describe Gopher::Dispatching do
     end
   end
 
+  describe "dispatch to mount" do
+    before(:each) do
+      @h = mock(Gopher::Handlers::DirectoryHandler)
+      Gopher::Handlers::DirectoryHandler.should_receive(:new).with({:bar => :baz}).and_return(@h)
+
+      @server.mount "/foo", :bar => :baz
+    end
+
+    it "should work for root path" do
+      @h.should_receive(:call).with(:splat => "")
+
+      @request = Gopher::Request.new("/foo")
+      @response = @server.dispatch(@request)
+    end
+
+    it "should work for subdir" do
+      @h.should_receive(:call).with(:splat => "bar")
+
+      @request = Gopher::Request.new("/foo/bar")
+      @response = @server.dispatch(@request)
+    end
+  end
+
+
   describe "globs" do
     before(:each) do
       @server.route '/about/*' do

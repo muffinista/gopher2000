@@ -2,6 +2,23 @@ module Gopher
   module Routing
 
     #
+    # mount '/files' => '/home/colin/foo', :filter => '*.jpg'
+    #
+    def mount(path, opts = {}, klass = Gopher::Handlers::DirectoryHandler)
+      handler = klass.new(opts)
+      route(globify(path)) do
+        handler.call(params)
+      end
+    end
+
+    #
+    # add a glob to the end of this string, if there's not one already
+    #
+    def globify(p)
+      p =~ /\*/ ? p : "#{p}/?*".gsub("//", "/")
+    end
+
+    #
     # define a route
     #
     def route(path, &block)
@@ -22,13 +39,6 @@ module Gopher
       method_name = path
       route_method = Dispatching.generate_method(method_name, &block)
       pattern, keys = compile path
-
-
-      # sinatra does some arity checks when making routes -- not sure we need them
-
-      #      [ pattern, keys, conditions, block.arity != 0 ?
-      #        proc { |a,p| puts "A: #{a}, P: #{p}"; route_method.bind(a).call(*p) } :
-      #        proc { |a,p| route_method.bind(a).call } ]
 
       [ pattern, keys, route_method ]
     end

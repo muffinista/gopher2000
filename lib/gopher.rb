@@ -25,6 +25,8 @@ require 'gopher/handler'
 require 'gopher/connection'
 require 'gopher/application'
 
+require 'gopher/handlers/directory_handler'
+
 module Gopher
 
   # # Defines the Gopher server through the +block+

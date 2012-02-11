@@ -13,6 +13,31 @@ describe Gopher::Routing do
   pending "route"
   pending "default_route"
 
+  describe "globify" do
+    it "should add glob if none yet" do
+      @router.globify("/foo").should == "/foo/?*"
+    end
+
+    it "should be ok with trailing slashes" do
+      @router.globify("/foo/").should == "/foo/?*"
+    end
+
+    it "shouldn't add glob if there is one already" do
+      @router.globify("/foo/*").should == "/foo/*"
+    end
+  end
+
+  describe "mount" do
+    before(:each) do
+      @h = mock(Gopher::Handlers::DirectoryHandler)
+      Gopher::Handlers::DirectoryHandler.should_receive(:new).with({:bar => :baz}).and_return(@h)
+    end
+
+    it "should work" do
+      @router.mount("/foo", :bar => :baz)
+    end
+  end
+
   describe "compile" do
     it "should generate a basic string for routes without keys" do
       lookup, keys, block = @router.compile! "/foo" do; end

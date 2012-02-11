@@ -19,6 +19,10 @@ THEN... A long break to attend to other things
 
 dispatching updates:
 -- glob routes
+-- default route
+-- some more specs
+
+NEXT: templating/menu code
 
 
 =========
@@ -28,11 +32,7 @@ input/output sanitizing
 directory mounter
 
 mount '/files' => '/home/colin/foo', :filter => '*.jpg'
-catchall route?
 
-404 handler
-
-general error handling
-
+banners via test gem / http://www.figlet.org/
 
 ========
