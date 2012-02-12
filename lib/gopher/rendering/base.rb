@@ -32,10 +32,22 @@ module Gopher
         self << (LINE_ENDING * n)
       end
 
+      #
+      # borrowed and modified from ActionView -- wrap text at specified width
+      # returning an array of lines for now in case we want to do nifty processing with them
+      #
+      # File actionpack/lib/action_view/helpers/text_helper.rb, line 217
+      def word_wrap(text, width=80*args)
+
+        text.split("\n").collect do |line|
+          line.length > width ? line.gsub(/(.{1,#{width}})(\s+|$)/, "\\1\n").strip : line
+        end# * "\n"
+      end
+
       # Wraps +text+ to +width+ characters
       def block(text, width=80)
-        text.each_line do |line|
-          line.wrap(width) { |chunk| text chunk.rstrip }
+        word_wrap(text, width).each do |line|
+          text line
         end
       end
 

@@ -22,6 +22,9 @@ dispatching updates:
 -- default route
 -- some more specs
 
+people like browsing files, right? so, wrote a directory/file browser
+as an external class so it can be extended easily
+
 NEXT: templating/menu code
 
 
@@ -29,10 +32,11 @@ NEXT: templating/menu code
 
 testing
 input/output sanitizing
-directory mounter
 
-mount '/files' => '/home/colin/foo', :filter => '*.jpg'
+banners via test gem / http://www.figlet.org/ ??? maybe someday
 
-banners via test gem / http://www.figlet.org/
+headers -- simple text with borders/etc
+
+
 
 ========

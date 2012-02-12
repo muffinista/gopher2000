@@ -1,6 +1,3 @@
-#require 'ext/object'
-require 'ext/string'
-
 require 'logger'
 require 'eventmachine'
 require 'stringio'

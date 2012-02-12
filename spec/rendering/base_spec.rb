@@ -28,7 +28,12 @@ describe Gopher::Rendering::Base do
     @ctx.to_s.should == @ctx.result
   end
 
-  pending "block"
+  describe "block" do
+    it "wraps text" do
+      @ctx.should_receive(:text).with "a\na"
+      @ctx.block("a a",1)
+    end
+  end
 
 #  it "should make urls" do
 #    @ctx.url("foo").should == "foo"
