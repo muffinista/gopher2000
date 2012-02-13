@@ -17,4 +17,14 @@ describe Gopher::Request do
     request = Gopher::Request.new("foo", "bar")
     request.ip_address.should == "bar"
   end
+
+  it "valid? == true for valid selectors" do
+    request = Gopher::Request.new("x" * 255, "bar")
+    request.valid?.should == true
+  end
+
+  it "valid? == false for invalid selectors" do
+    request = Gopher::Request.new("x" * 256, "bar")
+    request.valid?.should == false
+  end
 end
