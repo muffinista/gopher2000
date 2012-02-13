@@ -19,16 +19,36 @@ describe Gopher::Handler do
     end
 
     describe "not found" do
-      it "should raise error" do
+      it "should raise not found error" do
+        @handler.should_receive(:handle_not_found)
         expect{application.dispatch(@request)}.to raise_error(Gopher::NotFoundError)
-
         @handler.handle
       end
     end
 
-    pending "other errors"
+    describe "error" do
+      it "should raise invalid request" do
+        @handler.should_receive(:handle_invalid_request)
+
+        @request.selector = "x" * 256
+        expect{application.dispatch(@request)}.to raise_error(Gopher::InvalidRequest)
+
+        @handler.handle
+      end
+    end
   end
 
+
+  describe "#handle_not_found" do
+    before(:each) do
+      @handler = Gopher::Handler.new("/foo", "ip_address")
+      @request = Gopher::Request.new("/foo")
+      @handler.should_receive(:request).and_return(@request)
+    end
+
+
+
+  end
 
 
   describe "#request" do

@@ -44,6 +44,11 @@ describe Gopher::Dispatching do
 
       expect{@server.dispatch(@request)}.to raise_error(Gopher::NotFoundError)
     end
+
+    it "should throw error for invalid requests" do
+      @request = Gopher::Request.new("x" * 256)
+      expect{@server.dispatch(@request)}.to raise_error(Gopher::InvalidRequest)
+    end
   end
 
   describe "dispatch" do

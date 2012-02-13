@@ -30,8 +30,16 @@ module Gopher
         self << ["#{type}#{text}", selector, host, port].join("\t")
       end
 
-      def text(text)
-        line 'i', text, 'null', NO_HOST, NO_PORT
+      def text(text, type = 'i')
+        line type, text, 'null', NO_HOST, NO_PORT
+      end
+
+      def error(msg)
+        text(msg, '3')
+      end
+
+      def directory(name)
+        link(name, '1')
       end
 
       def link(text, selector, *args)
@@ -52,6 +60,8 @@ module Gopher
       def determine_type(selector)
         ext = File.extname(selector).downcase
         case ext
+        when '.zip', '.gz', '.bz2' then '5'
+        when '.gif' then 'g'
         when '.jpg', '.png' then 'I'
         when '.mp3', '.wav' then 's'
         else '0'

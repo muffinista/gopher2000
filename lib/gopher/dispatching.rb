@@ -7,6 +7,9 @@ module Gopher
     # find and run routes which match the incoming request
     #
     def dispatch(request)
+
+      raise Gopher::InvalidRequest if ! request.valid?
+
       @params, block = lookup(request.selector)
       @response = Response.new
 
