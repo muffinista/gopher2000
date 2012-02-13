@@ -1,11 +1,7 @@
 require 'simplecov'
-SimpleCov.start
-
-#$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-#$LOAD_PATH.unshift(File.dirname(__FILE__))
-
-# Grab the gophlet tied to +selector+ in the route map
-
+SimpleCov.start do
+  add_filter "/spec/"
+end
 
 require 'bundler/setup'
 Bundler.require
