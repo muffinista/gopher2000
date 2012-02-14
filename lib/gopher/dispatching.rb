@@ -1,22 +1,37 @@
 module Gopher
   module Dispatching
 
-    attr_accessor :params
+    attr_accessor :params, :request
 
     #
     # find and run routes which match the incoming request
     #
-    def dispatch(request)
+    def dispatch(req)
+      response = Response.new
+      @request = req
 
-      raise Gopher::InvalidRequest if ! request.valid?
+      if ! @request.valid?
+        response.body = handle_invalid_request(@request)
+        response.code = :error
+        return response
+      end
 
-      @params, block = lookup(request.selector)
-      @response = Response.new
+      begin
+        @params, block = lookup(@request.selector)
 
-      # call the block that handles this lookup
-      @response.body = block.bind(self).call
+        # call the block that handles this lookup
+        response.body = block.bind(self).call
+        response.code = :success
 
-      @response
+      rescue Gopher::NotFoundError => e
+        response.body = handle_not_found(@request)
+        response.code = :missing
+      # rescue Exception => e
+      #   response.body = handle_error(@request, e)
+      #   response.code = :error
+      end
+
+      response
     end
 
     #
@@ -53,6 +68,31 @@ module Gopher
       keys.size.times { |i| hash[ keys[i].to_sym ] = values[i] }
       hash
     end
+
+    def not_found_template
+      t = find_template('not_found')
+      if t.nil?
+        menu :'internal/not_found' do
+          text "bummer"
+        end
+        find_template(:'internal/not_found')
+      end
+    end
+
+    def handle_not_found(request)
+      not_found_template.bind(self).call
+    end
+
+    # def handle_invalid_request(request)
+    #   unless @error_request.nil?
+    #     @error_request.bind(self).call
+    #   else
+    #     Proc.new {
+    #       text "hi"
+    #     }.call
+    #   end
+    # end
+
 
 
     class << self

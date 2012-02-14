@@ -4,6 +4,12 @@ class MockServer
   attr_accessor :routes
   include Gopher::Routing
   include Gopher::Dispatching
+  include Gopher::Templating
+  include Gopher::Rendering
+
+  def initialize
+    @menus = {}
+  end
 end
 
 
@@ -36,20 +42,46 @@ describe Gopher::Dispatching do
       @request = Gopher::Request.new("/about/x/y")
       @response = @server.dispatch(@request)
       @response.body.should == "DEFAULT ROUTE"
+      @response.code.should == :success
     end
 
-    it "should throw error if no route found" do
+    it "should respond with error if no route found" do
       @server.route '/about/:foo/:bar' do;  end
       @request = Gopher::Request.new("/junk/x/y")
 
-      expect{@server.dispatch(@request)}.to raise_error(Gopher::NotFoundError)
+      @response = @server.dispatch(@request)
+      @response.code.should == :missing
     end
 
-    it "should throw error for invalid requests" do
+    pending "should respond with error if invalid request" do
+      @server.route '/about/:foo/:bar' do;  end
       @request = Gopher::Request.new("x" * 256)
-      expect{@server.dispatch(@request)}.to raise_error(Gopher::InvalidRequest)
+
+      @response = @server.dispatch(@request)
+      @response.code.should == :error
     end
   end
+
+
+    # describe "not found" do
+    #   it "should raise not found error" do
+    #     @handler.should_receive(:handle_not_found)
+    #     expect{application.dispatch(@request)}.to raise_error(Gopher::NotFoundError)
+    #     @handler.handle
+    #   end
+    # end
+
+    # describe "error" do
+    #   it "should raise invalid request" do
+    #     @handler.should_receive(:handle_invalid_request)
+
+    #     @request.selector =
+    #     expect{application.dispatch(@request)}.to raise_error(Gopher::InvalidRequest)
+
+    #     @handler.handle
+    #   end
+    # end
+
 
   describe "dispatch" do
     before(:each) do

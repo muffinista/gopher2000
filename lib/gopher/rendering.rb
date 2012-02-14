@@ -15,7 +15,6 @@ module Gopher
       #
       block = find_template(template)
       ctx = Gopher::Rendering::Menu.new
-
       ctx.instance_exec(*arguments, &block)
     end
 

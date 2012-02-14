@@ -20,7 +20,7 @@ describe Gopher::Rendering do
     end
   end
 
-  describe "render" do
+  pending "render" do
 
   end
 end

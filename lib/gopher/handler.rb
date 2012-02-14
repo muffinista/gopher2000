@@ -9,24 +9,8 @@ module Gopher
       @_request ||= Request.new(@selector, @ip)
     end
 
-    def handle_not_found(ex)
-      # look for a 404 template
-
-      # if none, spit out default text
-    end
-
-    def handle_invalid_request(ex)
-
-    end
-
     def handle
       application.dispatch(request)
-    rescue Gopher::NotFoundError => e
-      handle_not_found(e)
-      #        Gopher.logger.error "Unknown selector. #{e}"
-    rescue Gopher::InvalidRequest => e
-      handle_invalid_request(e)
-      #        Gopher.logger.error "Invalid request. #{e}"
     rescue => e
       #        Gopher.logger.error "Bad juju afoot. #{e}"; puts e
       raise e
