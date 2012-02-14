@@ -41,9 +41,25 @@ module Gopher
       @menus.include?(:not_found) ? :not_found : :'internal/not_found'
     end
 
+    def error_template
+      @menus.include?(:error) ? :error : :'internal/error'
+    end
+
+    def invalid_request_template
+      @menus.include?(:invalid_request) ? :invalid_request : :'internal/invalid_request'
+    end
+
     def register_defaults
       menu :'internal/not_found' do
         text "Sorry, #{@request.selector} was not found"
+      end
+
+      menu :'internal/error' do |details|
+        text "Sorry, there was an error #{details}"
+      end
+
+      menu :'internal/invalid_request' do
+        text "invalid request"
       end
     end
 

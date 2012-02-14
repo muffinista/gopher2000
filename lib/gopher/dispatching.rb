@@ -11,7 +11,7 @@ module Gopher
       @request = req
 
       if ! @request.valid?
-        response.body = handle_invalid_request(@request)
+        response.body = handle_invalid_request
         response.code = :error
         return response
       end
@@ -26,11 +26,10 @@ module Gopher
       rescue Gopher::NotFoundError => e
         response.body = handle_not_found
         response.code = :missing
-      # rescue Exception => e
-      #   response.body = handle_error(@request, e)
-      #   response.code = :error
+      rescue Exception => e
+        response.body = handle_error(e)
+        response.code = :error
       end
-
       response
     end
 
@@ -69,28 +68,17 @@ module Gopher
       hash
     end
 
-    # def not_found_template
-    #   t = find_template('not_found')
-    #   if t.nil?
-    #     find_template(:'internal/not_found')
-    #   end
-    # end
-
     def handle_not_found
       render not_found_template
     end
 
-    # def handle_invalid_request(request)
-    #   unless @error_request.nil?
-    #     @error_request.bind(self).call
-    #   else
-    #     Proc.new {
-    #       text "hi"
-    #     }.call
-    #   end
-    # end
+    def handle_error(e)
+      render error_template(e)
+    end
 
-
+    def handle_invalid_request
+      render invalid_request_template
+    end
 
     class << self
       def generate_method(method_name, &block)

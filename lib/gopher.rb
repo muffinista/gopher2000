@@ -6,7 +6,6 @@ require "gopher/version"
 
 require "gopher/errors"
 require 'gopher/routing'
-require 'gopher/templating'
 require 'gopher/helpers'
 require 'gopher/dispatching'
 

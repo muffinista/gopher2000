@@ -18,6 +18,7 @@ end
 describe Gopher::Dispatching do
   before(:each) do
     @server = MockServer.new
+    @server.register_defaults
   end
 
   describe "lookup" do
@@ -55,35 +56,22 @@ describe Gopher::Dispatching do
       @response.code.should == :missing
     end
 
-    pending "should respond with error if invalid request" do
+    it "should respond with error if invalid request" do
       @server.route '/about/:foo/:bar' do;  end
       @request = Gopher::Request.new("x" * 256)
 
       @response = @server.dispatch(@request)
       @response.code.should == :error
     end
+
+    it "should respond with error if there's an exception" do
+      @server.route '/about/:foo/:bar' do; raise Exception; end
+      @request = Gopher::Request.new("x" * 256)
+
+      @response = @server.dispatch(@request)
+      @response.code.should == :error
+    end
   end
-
-
-    # describe "not found" do
-    #   it "should raise not found error" do
-    #     @handler.should_receive(:handle_not_found)
-    #     expect{application.dispatch(@request)}.to raise_error(Gopher::NotFoundError)
-    #     @handler.handle
-    #   end
-    # end
-
-    # describe "error" do
-    #   it "should raise invalid request" do
-    #     @handler.should_receive(:handle_invalid_request)
-
-    #     @request.selector =
-    #     expect{application.dispatch(@request)}.to raise_error(Gopher::InvalidRequest)
-
-    #     @handler.handle
-    #   end
-    # end
-
 
   describe "dispatch" do
     before(:each) do

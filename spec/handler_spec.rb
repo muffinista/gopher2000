@@ -19,8 +19,6 @@ describe Gopher::Handler do
     end
   end
 
-
-
   describe "#request" do
     before(:each) do
       @handler = Gopher::Handler.new("/foo", "ip_address")
