@@ -24,7 +24,7 @@ module Gopher
         response.code = :success
 
       rescue Gopher::NotFoundError => e
-        response.body = handle_not_found(@request)
+        response.body = handle_not_found
         response.code = :missing
       # rescue Exception => e
       #   response.body = handle_error(@request, e)
@@ -69,18 +69,15 @@ module Gopher
       hash
     end
 
-    def not_found_template
-      t = find_template('not_found')
-      if t.nil?
-        menu :'internal/not_found' do
-          text "bummer"
-        end
-        find_template(:'internal/not_found')
-      end
-    end
+    # def not_found_template
+    #   t = find_template('not_found')
+    #   if t.nil?
+    #     find_template(:'internal/not_found')
+    #   end
+    # end
 
-    def handle_not_found(request)
-      not_found_template.bind(self).call
+    def handle_not_found
+      render not_found_template
     end
 
     # def handle_invalid_request(request)

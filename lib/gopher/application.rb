@@ -3,7 +3,6 @@ module Gopher
 
     include Routing
     include Dispatching
-    include Templating
     include Helpers
     include Rendering
 
@@ -15,15 +14,10 @@ module Gopher
       @menus = {}
       @config = {}
 
+      register_defaults
+
       self
     end
-
-#    def self.reload!
-#      config[:reload].each do |f|
-#        load f if File.mtime(f) > @last_reload
-#        @last_reload = Time.now
-#      end
-#    end
 
     def host
       config[:host]

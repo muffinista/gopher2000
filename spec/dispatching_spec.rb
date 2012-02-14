@@ -4,11 +4,13 @@ class MockServer
   attr_accessor :routes
   include Gopher::Routing
   include Gopher::Dispatching
-  include Gopher::Templating
+#  include Gopher::Templating
   include Gopher::Rendering
 
   def initialize
     @menus = {}
+
+    register_defaults
   end
 end
 
