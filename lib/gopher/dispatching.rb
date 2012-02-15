@@ -73,7 +73,7 @@ module Gopher
     end
 
     def handle_error(e)
-      render error_template(e)
+      render error_template, e
     end
 
     def handle_invalid_request

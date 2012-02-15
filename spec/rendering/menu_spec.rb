@@ -40,6 +40,20 @@ describe Gopher::Rendering::Menu do
     end
   end
 
+  describe "error" do
+    it "should call text with right selector" do
+      @ctx.should_receive(:text).with("foo", '3')
+      @ctx.error("foo")
+    end
+  end
+
+  describe "directory" do
+    it "should call link with right selector" do
+      @ctx.should_receive(:link).with("foo", '1')
+      @ctx.directory("foo")
+    end
+  end
+
   describe "link" do
     it "should get type with determine_type" do
       @ctx.should_receive(:determine_type).with("foo.txt").and_return("A")
@@ -59,5 +73,21 @@ describe Gopher::Rendering::Menu do
     end
   end
 
-  pending "determine_type"
+  context "determine_type" do
+    {
+      "foo.zip" => '5',
+      "foo.gz" => '5',
+      "foo.bz2" => '5',
+      "foo.gif" => 'g',
+      "foo.jpg" => 'I',
+      "foo.png" => 'I',
+      "foo.mp3" => 's',
+      "foo.wav" => 's',
+      "foo.random-file" => "0"
+    }.each do |file, expected|
+      it "should have right selector for #{file}" do
+        @ctx.determine_type(file).should == expected
+      end
+    end
+  end
 end

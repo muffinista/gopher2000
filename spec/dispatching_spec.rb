@@ -64,8 +64,8 @@ describe Gopher::Dispatching do
     end
 
     it "should respond with error if there's an exception" do
-      @server.route '/about/:foo/:bar' do; raise Exception; end
-      @request = Gopher::Request.new("x" * 256)
+      @server.route '/x' do; raise Exception; end
+      @request = Gopher::Request.new("/x")
 
       @response = @server.dispatch(@request)
       @response.code.should == :error
