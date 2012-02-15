@@ -25,18 +25,23 @@ dispatching updates:
 people like browsing files, right? so, wrote a directory/file browser
 as an external class so it can be extended easily
 
-NEXT: templating/menu code
+
+THEN:
+- working on request/response objects -- put a response code into Response
+- work on rendering/templating, make sure that params/request objects are available, etc
+- added default error handlers and ability to add custom handlers
+- implemented 404 handling and so on
+- lots of specs
+
+
+NEXT:
+- logging
+- docs
+- working examples
+- input/output sanitizing
 
 
 =========
 
-testing
-input/output sanitizing
-
 banners via test gem / http://www.figlet.org/ ??? maybe someday
-
 headers -- simple text with borders/etc
-
-
-
-========
