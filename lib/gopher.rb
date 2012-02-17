@@ -17,7 +17,6 @@ require 'gopher/request'
 require 'gopher/response'
 require 'gopher/dsl'
 
-require 'gopher/handler'
 require 'gopher/connection'
 require 'gopher/application'
 
