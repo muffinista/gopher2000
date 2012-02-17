@@ -1,3 +1,5 @@
+require 'pathname'
+
 module Gopher
   module Handlers
     #
@@ -22,11 +24,22 @@ module Gopher
         @filter = opts[:filter]
       end
 
+      def sanitize(p)
+        Pathname.new(p).cleanpath.to_s
+      end
+
+      def contained?(p)
+        (p =~ /^#{@path}/) != nil
+      end
+
       #
       # handle a request
       #
       def call(params = {})
         lookup = request_path(params)
+
+        raise Gopher::InvalidRequest if ! contained?(lookup)
+
 
         if File.directory?(lookup)
           directory(lookup)
@@ -59,7 +72,7 @@ module Gopher
       # take the incoming parameters, and turn them into a path
       #
       def request_path(params)
-        File.join(@path, params[:splat])
+        File.join(@path, sanitize(params[:splat]))
       end
 
     end

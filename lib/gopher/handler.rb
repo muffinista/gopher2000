@@ -10,10 +10,12 @@ module Gopher
     end
 
     def handle
-      application.dispatch(request)
-    rescue => e
-      #        Gopher.logger.error "Bad juju afoot. #{e}"; puts e
-      raise e
+      puts request.inspect
+      dispatch(request)
+    rescue Exception => e
+      "Sorry, there was an error"
+
+      # todo logging etc
     end
   end
 end

@@ -16,13 +16,13 @@ module Gopher
         return response
       end
 
+
       begin
         @params, block = lookup(@request.selector)
 
         # call the block that handles this lookup
         response.body = block.bind(self).call
         response.code = :success
-
       rescue Gopher::NotFoundError => e
         response.body = handle_not_found
         response.code = :missing
@@ -31,31 +31,6 @@ module Gopher
         response.code = :error
       end
       response
-    end
-
-    #
-    # lookup an incoming path
-    #
-    def lookup(selector)
-      unless routes.nil?
-        routes.each do |pattern, keys, block|
-          if match = pattern.match(selector)
-            match = match.to_a
-            url = match.shift
-
-            params = to_params_hash(keys, match)
-
-            @params = params
-            return params, block
-          end
-        end
-      end
-
-      unless @default_route.nil?
-        return {}, @default_route
-      end
-
-      raise Gopher::NotFoundError
     end
 
 

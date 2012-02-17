@@ -1,6 +1,8 @@
 module Gopher
   module Routing
 
+    attr_accessor :routes
+
     #
     # mount '/files' => '/home/colin/foo', :filter => '*.jpg'
     #
@@ -42,6 +44,33 @@ module Gopher
 
       [ pattern, keys, route_method ]
     end
+
+    #
+    # lookup an incoming path
+    #
+    def lookup(selector)
+      unless @routes.nil?
+        @routes.each do |pattern, keys, block|
+
+          if match = pattern.match(selector)
+            match = match.to_a
+            url = match.shift
+
+            params = to_params_hash(keys, match)
+
+            @params = params
+            return params, block
+          end
+        end
+      end
+
+      unless @default_route.nil?
+        return {}, @default_route
+      end
+
+      raise Gopher::NotFoundError
+    end
+
 
     protected
     def compile(path)

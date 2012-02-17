@@ -32,5 +32,15 @@ module Gopher
     def helpers(&block)
       application.helpers(&block)
     end
+
+    unless ENV['gopher_test']
+      at_exit do
+        unless @@application.nil?
+          s = Gopher::Server.new(@@application, @@application.host, @@application.port)
+          s.run!
+        end
+      end
+    end
   end
+
 end
