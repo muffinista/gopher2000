@@ -35,8 +35,8 @@ module Gopher
 
     unless ENV['gopher_test']
       at_exit do
-        unless @@application.nil?
-          s = Gopher::Server.new(@@application, @@application.host, @@application.port)
+        unless application.nil?
+          s = Gopher::Server.new(application, application.host, application.port)
           s.run!
         end
       end
