@@ -1,6 +1,5 @@
 ENV['gopher_test'] = "1"
 
-
 require 'simplecov'
 SimpleCov.start do
   add_filter "/spec/"
@@ -30,7 +29,7 @@ class FakeSocketClient < EventMachine::Connection
   end
 
   def receive_data(data)
-    puts "RECV: #{data}"
+    #puts "RECV: #{data}"
     @data << data
     if @state == :new
       @onopen.call if @onopen
@@ -43,4 +42,9 @@ class FakeSocketClient < EventMachine::Connection
   def unbind
     @onclose.call if @onclose
   end
+end
+
+
+class FakeSocketServer < FakeSocketClient
+  attr_accessor :application
 end

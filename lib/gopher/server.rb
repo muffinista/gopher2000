@@ -1,11 +1,13 @@
 module Gopher
   class Server
     attr_accessor :application, :config
-    def initialize(app, host = '0.0.0.0', port = 70)
+    def initialize(app, host = '0.0.0.0', port = 70, handler = Gopher::Connection)
       @application = app
       @config = {}
       @config[:host] = host
       @config[:port] = port
+
+      @handler = handler
     end
 
     def host
@@ -31,8 +33,8 @@ module Gopher
       #end
 
       ::EM.run do
-        puts "start server at #{config[:host]} #{config[:port]}"
-        ::EM.start_server(config[:host], config[:port], Gopher::Connection) do |conn|
+        puts "start server at #{host} #{port}"
+        ::EM.start_server(host, port, @handler) do |conn|
           conn.application = @application
         end
       end
