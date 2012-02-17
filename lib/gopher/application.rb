@@ -9,7 +9,10 @@ module Gopher
     attr_accessor :templates, :menus, :routes, :config
 
     def initialize(c={})
-      @config = c
+      @config = {
+        :host => '0.0.0.0',
+        :port => 70
+      }.merge(c)
       reset!
     end
 

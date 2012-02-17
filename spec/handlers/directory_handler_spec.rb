@@ -9,8 +9,23 @@ describe Gopher::Handlers::DirectoryHandler do
     it "should join existing path with incoming path" do
       @h.request_path(:splat => "bar/baz").should == "/tmp/bar/baz"
     end
+  end
 
-    pending "sanitize"
+  describe "contained?" do
+    it "should be false if not under base path" do
+      @h.contained?("/home/gopher").should == false
+    end
+    it "should be true if under base path" do
+      @h.contained?("/tmp/gopher").should == true
+    end
+  end
+
+  describe "safety checks" do
+    it "should raise exception for invalid directory" do
+      lambda {
+        @h.call(:splat => "../../../home/foo/bar/baz").to_s.should == "0a\t/tmp/bar/baz/a\t0.0.0.0\t70"
+     }.should raise_error(Gopher::InvalidRequest)
+    end
   end
 
   describe "directories" do
@@ -19,10 +34,8 @@ describe Gopher::Handlers::DirectoryHandler do
       Dir.should_receive(:glob).with("/tmp/bar/baz/*.*").and_return(["/tmp/bar/baz/a"])
     end
 
-    pending "application/host"
-
     it "should work" do
-      @h.call(:splat => "bar/baz").to_s.should == "0a\t/tmp/bar/baz/a\t\t"
+      @h.call(:splat => "bar/baz").to_s.should == "0a\t/tmp/bar/baz/a\t0.0.0.0\t70"
     end
   end
 

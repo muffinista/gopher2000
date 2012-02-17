@@ -25,12 +25,22 @@ module Gopher
       end
 
       def sanitize(p)
+#        File.absolute_path(Pathname.new(p).cleanpath.to_s)
         Pathname.new(p).cleanpath.to_s
       end
 
       def contained?(p)
         (p =~ /^#{@path}/) != nil
       end
+
+      #
+      # take the incoming parameters, and turn them into a path
+      #
+      def request_path(params)
+        File.absolute_path(sanitize(params[:splat]), @path)
+        #File.join(@path, sanitize(params[:splat]))
+      end
+
 
       #
       # handle a request
@@ -66,13 +76,6 @@ module Gopher
       #
       def file(f)
         File.new(f)
-      end
-
-      #
-      # take the incoming parameters, and turn them into a path
-      #
-      def request_path(params)
-        File.join(@path, sanitize(params[:splat]))
       end
 
     end

@@ -1,6 +1,7 @@
 module Gopher
   #
-  # very basic DSL to handle the common stuff you would want to do with a bot.
+  # very basic DSL to handle the common stuff you would want to do
+  #
   module DSL
     def self.included(mod)
       @@application = nil
@@ -33,6 +34,9 @@ module Gopher
       application.helpers(&block)
     end
 
+    #
+    # don't run this code if we're running specs
+    #
     unless ENV['gopher_test']
       at_exit do
         unless application.nil?
