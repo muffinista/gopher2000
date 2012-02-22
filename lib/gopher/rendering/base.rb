@@ -7,10 +7,10 @@ module Gopher
 
     # All rendering of templates (inline and otherwise) is done inside a RenderContext
     class Base
-      attr_accessor :result, :spacing, :request, :params
+      attr_accessor :result, :spacing, :request, :params, :application
 
-      def initialize(host=nil) # nodoc
-        @_host = host
+      def initialize(app=nil) # nodoc
+        @application = app
         @result = ""
         @spacing = 1
       end

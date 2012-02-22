@@ -2,10 +2,11 @@ require File.join(File.dirname(__FILE__), '/../spec_helper')
 
 describe Gopher::Rendering::Menu do
   before(:each) do
-    @ctx = Gopher::Rendering::Menu.new
+    app = mock(Gopher::Application,
+      :host => "host",
+      :port => 1234)
 
-    application.stub!(:host).and_return("host")
-    application.stub!(:port).and_return(1234)
+    @ctx = Gopher::Rendering::Menu.new(app)
   end
 
   it 'should add text as a gopher line' do
@@ -31,7 +32,6 @@ describe Gopher::Rendering::Menu do
 
   describe "line" do
     it "should work" do
-      #def line(type, text, selector, host=application.host, port=application.port)
       @ctx.line("type", "text", "selector", "host", "port").should == "typetext\tselector\thost\tport"
     end
 

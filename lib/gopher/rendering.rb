@@ -30,7 +30,7 @@ module Gopher
 
       raise TemplateNotFound if block.nil?
 
-      ctx = Gopher::Rendering::Menu.new
+      ctx = Gopher::Rendering::Menu.new(application)
       ctx.params = @params
       ctx.request = @request
 

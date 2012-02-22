@@ -13,6 +13,17 @@ module Gopher
         :host => '0.0.0.0',
         :port => 70
       }.merge(c)
+
+      #
+      # don't run this code if we're running specs
+      #
+      unless ENV['gopher_test']
+        at_exit do
+          s = Gopher::Server.new(self, self.host, self.port)
+          s.run!
+        end
+      end
+
       reset!
     end
 

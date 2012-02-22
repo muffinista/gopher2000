@@ -7,6 +7,8 @@ module Gopher
     # @todo request sanitation here?
     #
     class BaseHandler
+      attr_accessor :application
+
       include Rendering
     end
   end

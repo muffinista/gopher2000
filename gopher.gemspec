@@ -5,6 +5,7 @@ require "gopher/version"
 Gem::Specification.new do |s|
   s.name        = "gopher"
   s.version     = Gopher::VERSION
+  s.platform    = Gem::Platform::RUBY
   s.authors     = ["Colin Mitchell"]
   s.email       = ["colin@muffinlabs.com"]
   s.homepage    = "http://muffinlabs.com"
@@ -20,6 +21,7 @@ Gem::Specification.new do |s|
 
   # specify any dependencies here; for example:
   s.add_development_dependency "rspec"
+  s.add_development_dependency "rdoc"
   s.add_runtime_dependency "eventmachine"
   s.add_runtime_dependency "logger"
 

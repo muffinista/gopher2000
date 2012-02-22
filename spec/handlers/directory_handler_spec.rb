@@ -2,7 +2,12 @@ require File.join(File.dirname(__FILE__), '..', '/spec_helper')
 
 describe Gopher::Handlers::DirectoryHandler do
   before(:each) do
+    app = mock(Gopher::Application,
+      :host => "host",
+      :port => 1234)
+
     @h = Gopher::Handlers::DirectoryHandler.new(:path => "/tmp")
+    @h.application = app
   end
 
   describe "request_path" do
@@ -23,7 +28,7 @@ describe Gopher::Handlers::DirectoryHandler do
   describe "safety checks" do
     it "should raise exception for invalid directory" do
       lambda {
-        @h.call(:splat => "../../../home/foo/bar/baz").to_s.should == "0a\t/tmp/bar/baz/a\t0.0.0.0\t70"
+        @h.call(:splat => "../../../home/foo/bar/baz").to_s.should == "0a\t/tmp/bar/baz/a\thost\t1234"
      }.should raise_error(Gopher::InvalidRequest)
     end
   end
@@ -35,7 +40,7 @@ describe Gopher::Handlers::DirectoryHandler do
     end
 
     it "should work" do
-      @h.call(:splat => "bar/baz").to_s.should == "0a\t/tmp/bar/baz/a\t0.0.0.0\t70"
+      @h.call(:splat => "bar/baz").to_s.should == "0a\t/tmp/bar/baz/a\thost\t1234"
     end
   end
 

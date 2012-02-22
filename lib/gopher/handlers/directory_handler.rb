@@ -64,7 +64,7 @@ module Gopher
       # generate a directory listing
       #
       def directory(dir)
-        m = Menu.new
+        m = Menu.new(@application)
         Dir.glob("#{dir}/#{filter}").each do |x|
           m.link File.basename(x), x
         end
