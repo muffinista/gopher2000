@@ -13,6 +13,7 @@ module Gopher
     end
 
     def set(key, value = nil)
+      puts "SET #{key} #{value}"
       application.config[key] = value
     end
 
@@ -30,6 +31,23 @@ module Gopher
 
     def helpers(&block)
       application.helpers(&block)
+    end
+
+    def watch(f)
+      application.scripts << f
+    end
+
+    def run(script, opts = {})
+      opts.each { |k, v|
+        set k, v
+      }
+
+      if application.config[:debug] == true
+        puts "you should watch #{script}"
+        watch script
+      end
+
+      load script
     end
 
   end

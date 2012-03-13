@@ -6,7 +6,7 @@ module Gopher
     include Helpers
     include Rendering
 
-    attr_accessor :templates, :menus, :routes, :config
+    attr_accessor :templates, :menus, :routes, :config, :scripts
 
     def initialize(c={})
       @config = {
@@ -39,6 +39,7 @@ module Gopher
       @routes = []
       @templates = {}
       @menus = {}
+      @scripts = []
 
       register_defaults
 

@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+#
+# get rid of errors when running via bundle
+# @see https://github.com/ddollar/foreman/issues/94
+#
+$stdout.sync = true
+
+require 'gopher'
+require 'optparse'
+
+#
+# pull in any arguments and set them as env variables
+#
+opts = OptionParser.new
+opts.banner = <<-EOS
+
+Run a gopher server!
+
+Usage: #{File.basename($0)} [options]
+EOS
+
+opts.separator ""
+opts.separator "Options:"
+
+params = {
+  :debug => false,
+  :port => 70,
+  :host => '0.0.0.0',
+  :env => :production
+}
+
+opts.on('-d', '--debug', "run in debug mode")    { params[:debug] = true }
+opts.on('-p port',   'set the port (default is 70)')                { |val| params[:port] = Integer(val) }
+opts.on('-o addr',   'set the host (default is 0.0.0.0)')             { |val| params[host] = val }
+opts.on('-e env',    'set the environment (default is development)')  { |val| params[:env] = val.to_sym }
+
+
+opts.on_tail("-h", "--help", "Show this message") do
+  puts opts
+  exit
+end
+
+extra = opts.parse!(ARGV)
+
+script = extra.shift
+
+puts "RUNNING #{script}"
+
+run script, params
