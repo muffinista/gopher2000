@@ -19,18 +19,17 @@ module Gopher
     end
 
     def run!
-      trap("INT") { exit }
+      trap("INT") {
+        puts "It's a trap!"
+        exit!
+      }
 
       ::EM.run do
         puts "start server at #{host} #{port}"
         ::EM.start_server(host, port, @handler) do |conn|
-          application.scripts.each do |f|
-            if ! @last_reload.nil? && File.mtime(f) > @last_reload
-              puts "reloading #{f}"
-              load f
-            end
-          end
-          @last_reload = Time.now
+          @application.set :host, host
+          @application.set :port, port
+          @application.reload_stale
           conn.application = @application
         end
       end

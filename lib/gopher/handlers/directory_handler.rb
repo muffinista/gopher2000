@@ -45,11 +45,14 @@ module Gopher
       #
       # handle a request
       #
-      def call(params = {})
+      def call(params = {}, request = nil)
+        puts "call #{params.inspect}, #{request.inspect}"
+
         lookup = request_path(params)
 
-        raise Gopher::InvalidRequest if ! contained?(lookup)
+        puts "*** #{lookup}"
 
+        raise Gopher::InvalidRequest if ! contained?(lookup)
 
         if File.directory?(lookup)
           directory(lookup)
@@ -68,7 +71,7 @@ module Gopher
         Dir.glob("#{dir}/#{filter}").each do |x|
           m.link File.basename(x), x
         end
-        m
+        m.to_s
       end
 
       #

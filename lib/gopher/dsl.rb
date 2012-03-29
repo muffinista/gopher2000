@@ -5,20 +5,27 @@ module Gopher
   # very basic DSL to handle the common stuff you would want to do
   #
   module DSL
+
+    include Logging
+
     def application
       return @application unless @application.nil?
-
       @application = Gopher::Application.new
       @application.reset!
     end
 
     def set(key, value = nil)
-      puts "SET #{key} #{value}"
+      debug_log "SET #{key} #{value}"
       application.config[key] = value
     end
 
     def route(path, &block)
       application.route(path, &block)
+    end
+
+    def mount(path, opts = {})
+      route, folder = path.first
+      application.mount(route, opts.merge({:path => folder}))
     end
 
     def menu(name, &block)
@@ -43,7 +50,7 @@ module Gopher
       }
 
       if application.config[:debug] == true
-        puts "you should watch #{script}"
+        debug_log "watching #{script} for changes"
         watch script
       end
 

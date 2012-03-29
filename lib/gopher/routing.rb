@@ -7,9 +7,17 @@ module Gopher
     # mount '/files' => '/home/colin/foo', :filter => '*.jpg'
     #
     def mount(path, opts = {}, klass = Gopher::Handlers::DirectoryHandler)
+      debug_log "MOUNT #{path} #{opts.inspect}"
       handler = klass.new(opts)
+      handler.application = self
+
+      #
+      # add a route for the mounted class
+      #
       route(globify(path)) do
-        handler.call(params)
+        # when we call, pass the params and request object for this
+        # particular request
+        handler.call(params, request)
       end
     end
 
@@ -26,6 +34,8 @@ module Gopher
     def route(path, &block)
       selector = self.sanitize_selector(path)
       sig = compile!(selector, &block)
+
+      debug_log("Add route for #{selector}")
 
       @routes ||= []
       @routes << sig
@@ -75,27 +85,17 @@ module Gopher
     protected
     def compile(path)
       keys = []
-#      if path.respond_to? :to_str
-        pattern = path.to_str.gsub(/[^\?\%\\\/\:\*\w]/) { |c| encoded(c) }
-        pattern.gsub!(/((:\w+)|\*)/) do |match|
-          if match == "*"
-            keys << 'splat'
-            "(.*?)"
-          else
-            keys << $2[1..-1]
-            "([^/?#]+)"
-          end
+      pattern = path.to_str.gsub(/[^\?\%\\\/\:\*\w]/) { |c| encoded(c) }
+      pattern.gsub!(/((:\w+)|\*)/) do |match|
+        if match == "*"
+          keys << 'splat'
+          "(.*?)"
+        else
+          keys << $2[1..-1]
+          "([^/?#]+)"
         end
-        [/^#{pattern}$/, keys]
-      # elsif path.respond_to?(:keys) && path.respond_to?(:match)
-      #   [path, path.keys]
-      # elsif path.respond_to?(:names) && path.respond_to?(:match)
-      #   [path, path.names]
-      # elsif path.respond_to? :match
-      #   [path, keys]
-#      else
-#        raise TypeError, path
-#      end
+      end
+      [/^#{pattern}$/, keys]
     end
 
     # Sanitizes a gopher selector

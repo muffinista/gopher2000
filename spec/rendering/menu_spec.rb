@@ -11,9 +11,7 @@ describe Gopher::Rendering::Menu do
 
   it 'should add text as a gopher line' do
     @ctx.text("gopher forever")
-
-    # note that there's no line ending here because Base#<< will add that
-    @ctx.result.should == "igopher forever\tnull\t(FALSE)\t0"
+    @ctx.result.should == "igopher forever\tnull\t(FALSE)\t0\r\n"
   end
 
   describe "sanitize_text" do
@@ -32,11 +30,11 @@ describe Gopher::Rendering::Menu do
 
   describe "line" do
     it "should work" do
-      @ctx.line("type", "text", "selector", "host", "port").should == "typetext\tselector\thost\tport"
+      @ctx.line("type", "text", "selector", "host", "port").should == "typetext\tselector\thost\tport\r\n"
     end
 
     it "should use application host/port as defaults" do
-      @ctx.line("type", "text", "selector").should == "typetext\tselector\thost\t1234"
+      @ctx.line("type", "text", "selector").should == "typetext\tselector\thost\t1234\r\n"
     end
   end
 
@@ -57,19 +55,19 @@ describe Gopher::Rendering::Menu do
   describe "link" do
     it "should get type with determine_type" do
       @ctx.should_receive(:determine_type).with("foo.txt").and_return("A")
-      @ctx.link("FILE", "foo.txt").should == "AFILE\tfoo.txt\thost\t1234"
+      @ctx.link("FILE", "foo.txt").should == "AFILE\tfoo.txt\thost\t1234\r\n"
     end
   end
 
   describe "search" do
     it "should output link type/text" do
-      @ctx.search("FIND", "search").should == "7FIND\tsearch\thost\t1234"
+      @ctx.search("FIND", "search").should == "7FIND\tsearch\thost\t1234\r\n"
     end
   end
 
   describe "menu" do
     it "should output link type/text" do
-      @ctx.menu("MENU ITEM", "item").should == "1MENU ITEM\titem\thost\t1234"
+      @ctx.menu("MENU ITEM", "item").should == "1MENU ITEM\titem\thost\t1234\r\n"
     end
   end
 

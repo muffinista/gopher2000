@@ -51,10 +51,6 @@ module Gopher
         end
       end
 
-#      def url(selector)
-#        _host ? "#{_host.base}#{selector}" : selector
-#      end
-
       def to_s
         @result
       end
@@ -63,33 +59,6 @@ module Gopher
       def add_spacing
         br(@spacing)
       end
-
-#      def _host
-#        @_host.host rescue nil
-#      end
     end
   end
 end
-
-# # Render text files
-    # class TextContext < RenderContext
-    #   def link(txt, *args)
-    #     text "#{txt}"
-    #   end
-
-    #   def menu(txt, *args)
-    #     text "#{txt}"
-    #   end
-
-    #   def search(*args); end
-    #   alias input search
-
-    #   def text(text)
-    #     self << text
-    #     self << "\n"
-    #   end
-    # end
-
-
-#  end
-#end

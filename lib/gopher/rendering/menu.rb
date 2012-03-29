@@ -30,11 +30,17 @@ module Gopher
         port = application.port if port.nil?
 
         # no need to add a line-ending here, Base will handle that
-        self << ["#{type}#{text}", selector, host, port].join("\t")
+        self << ["#{type}#{text}", selector, host, port].join("\t") + LINE_ENDING
       end
 
       def text(text, type = 'i')
         line type, text, 'null', NO_HOST, NO_PORT
+      end
+
+      def br(n=1)
+        1.upto(n) do
+          text 'i', ""
+        end
       end
 
       def error(msg)

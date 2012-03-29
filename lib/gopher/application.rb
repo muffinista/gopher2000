@@ -5,8 +5,9 @@ module Gopher
     include Dispatching
     include Helpers
     include Rendering
+    include Logging
 
-    attr_accessor :templates, :menus, :routes, :config, :scripts
+    attr_accessor :templates, :menus, :routes, :config, :scripts, :last_reload
 
     def initialize(c={})
       @config = {
@@ -35,7 +36,19 @@ module Gopher
       config[:port]
     end
 
+    def reload_stale
+      self.scripts.each do |f|
+        if ! @last_reload.nil? && File.mtime(f) > @last_reload
+          debug_log "reload #{f}"
+          load f
+        end
+      end
+      @last_reload = Time.now
+    end
+
     def reset!
+      @last_reload = nil
+
       @routes = []
       @templates = {}
       @menus = {}

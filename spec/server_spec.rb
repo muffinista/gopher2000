@@ -13,7 +13,7 @@ describe Gopher::Server do
     @response.body = "hi"
     @response.code = :success
     @application.should_receive(:dispatch).with(any_args).and_return(@response)
-
+    @application.should_receive(:reload_stale)
 
     ::EM.run {
       server = Gopher::Server.new(@application, @host, @port)
@@ -32,7 +32,7 @@ describe Gopher::Server do
 
   it "should handle string results" do
     @application.should_receive(:dispatch).with(any_args).and_return("hi")
-
+    @application.should_receive(:reload_stale)
 
     ::EM.run {
       server = Gopher::Server.new(@application, @host, @port)
@@ -56,6 +56,7 @@ describe Gopher::Server do
 
 
     @application.should_receive(:dispatch).with(any_args).and_return(File.new(file))
+    @application.should_receive(:reload_stale)
 
     ::EM.run {
       server = Gopher::Server.new(@application, @host, @port)
@@ -74,6 +75,7 @@ describe Gopher::Server do
 
   it "should handle StringIO results" do
     @application.should_receive(:dispatch).with(any_args).and_return(StringIO.new("hi"))
+    @application.should_receive(:reload_stale)
 
     ::EM.run {
       server = Gopher::Server.new(@application, @host, @port)

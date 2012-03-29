@@ -7,10 +7,13 @@ module Gopher
     # find and run routes which match the incoming request
     #
     def dispatch(req)
+      debug_log(req)
+
       response = Response.new
       @request = req
 
       if ! @request.valid?
+        debug_log("sorry, request wasn't valid")
         response.body = handle_invalid_request
         response.code = :error
         return response
@@ -18,15 +21,26 @@ module Gopher
 
 
       begin
+        debug_log("do lookup for #{@request.selector}")
         @params, block = lookup(@request.selector)
 
+        #
         # call the block that handles this lookup
+        #
         response.body = block.bind(self).call
         response.code = :success
+
+        #debug_log response.body
+
       rescue Gopher::NotFoundError => e
+        debug_log("#{@request.selector} -- not found")
         response.body = handle_not_found
         response.code = :missing
       rescue Exception => e
+        debug_log("#{@request.selector} -- error")
+        debug_log(e.inspect)
+        debug_log(e.backtrace)
+
         response.body = handle_error(e)
         response.code = :error
       end

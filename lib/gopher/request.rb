@@ -3,7 +3,7 @@ module Gopher
     attr_accessor :selector, :input, :ip_address
 
     def initialize(raw, ip_addr=nil)
-      @selector, @input = raw.split("\t")
+      @selector, @input = raw.chomp.split("\t")
       @ip_address = ip_addr
     end
 
