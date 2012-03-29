@@ -1,9 +1,10 @@
-require 'logger'
+require 'logging'
 require 'eventmachine'
 require 'stringio'
 
 module Gopher
   require "gopher/version"
+  require "gopher/logging"
 
   require "gopher/errors"
   require 'gopher/routing'

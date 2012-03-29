@@ -4,6 +4,7 @@ source "http://rubygems.org"
 gemspec
 
 gem "rake"
+gem "logging"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
