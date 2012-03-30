@@ -10,6 +10,8 @@ describe Gopher::Handlers::DirectoryHandler do
     @h.application = app
   end
 
+  pending "filtering"
+
   describe "request_path" do
     it "should join existing path with incoming path" do
       @h.request_path(:splat => "bar/baz").should == "/tmp/bar/baz"

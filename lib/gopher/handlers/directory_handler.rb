@@ -29,6 +29,12 @@ module Gopher
         Pathname.new(p).cleanpath.to_s
       end
 
+      #
+      # make sure that the requested file is actually contained within our mount point. this
+      # prevents requests like the below from working:
+      #
+      # echo "/files/../../../../../tmp/foo" | nc localhost 7070
+      #
       def contained?(p)
         (p =~ /^#{@path}/) != nil
       end
@@ -52,6 +58,11 @@ module Gopher
       #
       # handle a request
       #
+      # params - the params as parsed during the dispatching process - the main thing
+      # here should be :splat, which will basically be the path requested.
+      #
+      # request - the Request object for this session -- not currently used?
+      #
       def call(params = {}, request = nil)
         debug_log "DirectoryHandler: call #{params.inspect}, #{request.inspect}"
 
@@ -74,21 +85,23 @@ module Gopher
       def directory(dir)
         m = Menu.new(@application)
 
+        #
+        # iterate through the contents of this directory
+        #
         Dir.glob("#{dir}/#{filter}").each do |x|
+          # if this is a directory, then generate a directory link for it
           if File.directory?(x)
-            debug_log "dir! #{x}"
             m.directory File.basename(x), to_selector(x)
           else
-            debug_log x
+            # otherwise, it's a normal file link
             m.link File.basename(x), to_selector(x)
           end
         end
-        debug_log(m.to_s)
         m.to_s
       end
 
       #
-      # return a file handle -- this will be sent as the request response
+      # return a file handle -- Connection will take this and send it back to the client
       #
       def file(f)
         File.new(f)
