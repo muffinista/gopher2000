@@ -33,6 +33,13 @@ describe Gopher::DSL do
     pending "test block?"
   end
 
+  describe "mount" do
+    it "should pass a route, path, and some opts to the app" do
+      @app.should_receive(:mount).with('/foo', {:path => "/bar"})
+      @server.mount "/foo" => "/bar"
+    end
+  end
+
   describe "menu" do
     it "should pass a menu key and block to the app" do
       @app.should_receive(:menu).with('/foo')
@@ -57,6 +64,36 @@ describe Gopher::DSL do
       @server.helpers do
         "hi"
       end
+    end
+  end
+
+  describe "watch" do
+    it "should pass a script app for watching" do
+      @app.scripts.should_receive(:<<).with("foo")
+      @server.watch("foo")
+    end
+  end
+
+  describe "run" do
+    it "should set any incoming opts" do
+      @server.should_receive(:set).with(:x, 1)
+      @server.should_receive(:set).with(:y, 2)
+      @server.stub!(:load)
+
+      @server.run("foo", {:x => 1, :y => 2})
+    end
+
+    it "should turn on script watching if in debug mode" do
+      @app.config[:debug] = true
+      @server.should_receive(:watch).with("foo.rb")
+      @server.should_receive(:load).with("foo.rb")
+
+      @server.run("foo.rb")
+    end
+
+    it "should load the script" do
+      @server.should_receive(:load).with("foo.rb")
+      @server.run("foo.rb")
     end
   end
 

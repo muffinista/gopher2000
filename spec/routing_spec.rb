@@ -30,7 +30,9 @@ describe Gopher::Routing do
   describe "mount" do
     before(:each) do
       @h = mock(Gopher::Handlers::DirectoryHandler)
-      Gopher::Handlers::DirectoryHandler.should_receive(:new).with({:bar => :baz}).and_return(@h)
+      @h.should_receive(:application=).with(@router)
+
+      Gopher::Handlers::DirectoryHandler.should_receive(:new).with({:bar => :baz, :mount_point => "/foo"}).and_return(@h)
     end
 
     it "should work" do

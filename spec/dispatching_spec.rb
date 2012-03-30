@@ -107,7 +107,7 @@ describe Gopher::Dispatching do
     before(:each) do
       @h = mock(Gopher::Handlers::DirectoryHandler)
       @h.should_receive(:application=).with(@server)
-      Gopher::Handlers::DirectoryHandler.should_receive(:new).with({:bar => :baz}).and_return(@h)
+      Gopher::Handlers::DirectoryHandler.should_receive(:new).with({:bar => :baz, :mount_point => "/foo"}).and_return(@h)
 
       @server.mount "/foo", :bar => :baz
     end

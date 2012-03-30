@@ -6,13 +6,21 @@ describe Gopher::Handlers::DirectoryHandler do
       :host => "host",
       :port => 1234)
 
-    @h = Gopher::Handlers::DirectoryHandler.new(:path => "/tmp")
+    @h = Gopher::Handlers::DirectoryHandler.new(:path => "/tmp", :mount_point => "/xyz/123")
     @h.application = app
   end
 
   describe "request_path" do
     it "should join existing path with incoming path" do
       @h.request_path(:splat => "bar/baz").should == "/tmp/bar/baz"
+    end
+  end
+
+  describe "to_selector" do
+    it "should work" do
+      @h.to_selector("/tmp/foo/bar.html").should == "/xyz/123/foo/bar.html"
+      @h.to_selector("/tmp/foo/baz").should == "/xyz/123/foo/baz"
+      @h.to_selector("/tmp").should == "/xyz/123"
     end
   end
 
@@ -40,7 +48,7 @@ describe Gopher::Handlers::DirectoryHandler do
     end
 
     it "should work" do
-      @h.call(:splat => "bar/baz").to_s.should == "0a\t/tmp/bar/baz/a\thost\t1234"
+      @h.call(:splat => "bar/baz").to_s.should == "0a\t/xyz/123/bar/baz/a\thost\t1234\r\n"
     end
   end
 

@@ -8,6 +8,8 @@ module Gopher
     #
     def mount(path, opts = {}, klass = Gopher::Handlers::DirectoryHandler)
       debug_log "MOUNT #{path} #{opts.inspect}"
+      opts[:mount_point] = path
+
       handler = klass.new(opts)
       handler.application = self
 

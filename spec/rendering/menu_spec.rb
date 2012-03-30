@@ -71,6 +71,23 @@ describe Gopher::Rendering::Menu do
     end
   end
 
+  describe "br" do
+    it "should generate an empty text line" do
+      @ctx.should_receive(:text).with("i", "")
+      @ctx.br
+    end
+
+    it "should call #text multiple times" do
+      @ctx.should_receive(:text).twice.with("i", "")
+      @ctx.br(2)
+    end
+
+    it "should output an empty menu item" do
+      @ctx.br
+      @ctx.result.should == "i\tnull\t(FALSE)\t0\r\n"
+    end
+  end
+
   context "determine_type" do
     {
       "foo.zip" => '5',

@@ -7,7 +7,7 @@ module Gopher
     #
     class DirectoryHandler < BaseHandler
 
-      attr_accessor :path, :filter
+      attr_accessor :path, :filter, :mount_point
 
       #
       # opts:
@@ -22,10 +22,10 @@ module Gopher
 
         @path = opts[:path]
         @filter = opts[:filter]
+        @mount_point = opts[:mount_point]
       end
 
       def sanitize(p)
-#        File.absolute_path(Pathname.new(p).cleanpath.to_s)
         Pathname.new(p).cleanpath.to_s
       end
 
@@ -41,16 +41,21 @@ module Gopher
         #File.join(@path, sanitize(params[:splat]))
       end
 
+      #
+      # take the path to a file and turn it into a selector which will match up when
+      # a gopher client makes requests
+      #
+      def to_selector(path)
+        path.gsub(/^#{@path}/, @mount_point)
+      end
 
       #
       # handle a request
       #
       def call(params = {}, request = nil)
-        puts "call #{params.inspect}, #{request.inspect}"
+        debug_log "DirectoryHandler: call #{params.inspect}, #{request.inspect}"
 
         lookup = request_path(params)
-
-        puts "*** #{lookup}"
 
         raise Gopher::InvalidRequest if ! contained?(lookup)
 
@@ -69,7 +74,7 @@ module Gopher
       def directory(dir)
         m = Menu.new(@application)
         Dir.glob("#{dir}/#{filter}").each do |x|
-          m.link File.basename(x), x
+          m.link File.basename(x), to_selector(x)
         end
         m.to_s
       end
