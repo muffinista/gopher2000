@@ -47,8 +47,8 @@ describe Gopher::Rendering::Menu do
 
   describe "directory" do
     it "should call link with right selector" do
-      @ctx.should_receive(:link).with("foo", '1')
-      @ctx.directory("foo")
+      @ctx.should_receive(:line).with("1", "foo", "/bar/foo")
+      @ctx.directory("foo", "/bar/foo")
     end
   end
 

@@ -22,6 +22,7 @@ module Gopher
     # @todo work on end_of_transmission call
     #
     def send_response(response)
+      debug_log "RESPONSE #{response.class}"
       case response
       when Gopher::Response then send_response(response.body)
       when String then send_data(response + end_of_transmission)

@@ -44,6 +44,7 @@ describe Gopher::Handlers::DirectoryHandler do
   describe "directories" do
     before(:each) do
       File.should_receive(:directory?).with("/tmp/bar/baz").and_return(true)
+      File.should_receive(:directory?).with("/tmp/bar/baz/a").and_return(false)
       Dir.should_receive(:glob).with("/tmp/bar/baz/*.*").and_return(["/tmp/bar/baz/a"])
     end
 

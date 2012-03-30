@@ -47,8 +47,8 @@ module Gopher
         text(msg, '3')
       end
 
-      def directory(name)
-        link(name, '1')
+      def directory(name, selector)
+        line '1', name, selector
       end
 
       def link(text, selector, *args)

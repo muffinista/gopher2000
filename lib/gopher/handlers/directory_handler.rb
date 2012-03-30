@@ -73,9 +73,17 @@ module Gopher
       #
       def directory(dir)
         m = Menu.new(@application)
+
         Dir.glob("#{dir}/#{filter}").each do |x|
-          m.link File.basename(x), to_selector(x)
+          if File.directory?(x)
+            debug_log "dir! #{x}"
+            m.directory File.basename(x), to_selector(x)
+          else
+            debug_log x
+            m.link File.basename(x), to_selector(x)
+          end
         end
+        debug_log(m.to_s)
         m.to_s
       end
 
