@@ -36,12 +36,18 @@ module Gopher
       config[:port]
     end
 
+    #
+    # check if our script has been updated since the last reload
+    #
     def should_reload?
       ! @last_reload.nil? && self.scripts.any? do |f|
         File.mtime(f) > @last_reload
       end
     end
 
+    #
+    # reload scripts if needed
+    #
     def reload_stale
       reload_check = should_reload?
       @last_reload = Time.now
