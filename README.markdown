@@ -22,7 +22,7 @@ Features
 * Dynamic requests via named parameters on request paths.
 * built on Event Machine.
 * Easy to mount directories and serve up files.
-* built in Logging/Stats.
+* built in logging and stats.
 * Runs on Ruby 1.9.2 with all the modern conveniences.
 
 Examples
@@ -66,9 +66,13 @@ end
 
 You can see more working examples in the examples/ folder
 
+Running a script
+----------------
 
-Getting Started
----------------
+```
+bundle exec bin/gopher2000 -d examples/simple.rb
+```
+
 
 Logging
 -------
