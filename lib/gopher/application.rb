@@ -36,23 +36,30 @@ module Gopher
       config[:port]
     end
 
-    def reload_stale
-      self.scripts.each do |f|
-        if ! @last_reload.nil? && File.mtime(f) > @last_reload
-          debug_log "reload #{f}"
-          load f
-        end
+    def should_reload?
+      ! @last_reload.nil? && self.scripts.any? do |f|
+        File.mtime(f) > @last_reload
       end
+    end
+
+    def reload_stale
+      reload_check = should_reload?
       @last_reload = Time.now
+
+      return if ! reload_check
+      reset!
+
+      self.scripts.each do |f|
+        debug_log "reload #{f}"
+        load f
+      end
     end
 
     def reset!
-      @last_reload = nil
-
       @routes = []
       @templates = {}
       @menus = {}
-      @scripts = []
+      @scripts ||= []
 
       register_defaults
 
