@@ -20,7 +20,7 @@ module Gopher
       #
       unless ENV['gopher_test']
         at_exit do
-          s = Gopher::Server.new(self, self.host, self.port)
+          s = Gopher::Server.new(self)
           s.run!
         end
       end

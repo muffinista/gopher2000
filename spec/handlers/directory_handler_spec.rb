@@ -47,11 +47,12 @@ describe Gopher::Handlers::DirectoryHandler do
     before(:each) do
       File.should_receive(:directory?).with("/tmp/bar/baz").and_return(true)
       File.should_receive(:directory?).with("/tmp/bar/baz/a").and_return(false)
-      Dir.should_receive(:glob).with("/tmp/bar/baz/*.*").and_return(["/tmp/bar/baz/a"])
+      File.should_receive(:directory?).with("/tmp/bar/baz/dir2").and_return(true)
+      Dir.should_receive(:glob).with("/tmp/bar/baz/*.*").and_return(["/tmp/bar/baz/a", "/tmp/bar/baz/dir2"])
     end
 
     it "should work" do
-      @h.call(:splat => "bar/baz").to_s.should == "0a\t/xyz/123/bar/baz/a\thost\t1234\r\n"
+      @h.call(:splat => "bar/baz").to_s.should == "0a\t/xyz/123/bar/baz/a\thost\t1234\r\n1dir2\t/xyz/123/bar/baz/dir2\thost\t1234\r\n"
     end
   end
 

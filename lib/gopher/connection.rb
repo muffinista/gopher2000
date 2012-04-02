@@ -4,14 +4,19 @@ module Gopher
     attr_accessor :application
 
     def receive_data(selector)
-      ip = remote_ip
+      # parse out the request
+      @request = Request.new(selector, remote_ip)
 
-      begin
-        @request = Request.new(selector, ip)
-        send_response @application.dispatch(@request)
-      ensure
-        close_connection_after_writing
-      end
+      # route/run it
+      resp = @application.dispatch(@request)
+
+      # log it
+      @application.access_log(@request, resp)
+
+      # send it back!
+      send_response resp
+    ensure
+      close_connection_after_writing
     end
 
     def remote_ip
@@ -22,7 +27,6 @@ module Gopher
     # @todo work on end_of_transmission call
     #
     def send_response(response)
-      debug_log "RESPONSE #{response.class}"
       case response
       when Gopher::Response then send_response(response.body)
       when String then send_data(response + end_of_transmission)

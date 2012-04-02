@@ -5,18 +5,21 @@ describe Gopher::Server do
   before(:each) do
     @host = "0.0.0.0"
     @port = 12345
-    @application = mock(Gopher::Application)
+    @application = mock(Gopher::Application, :config => {:host => @host, :port => @port})
+
+    @request = Gopher::Request.new("foo", "bar")
+
+    @response = Gopher::Response.new(@request)
+    @response.code = :success
+    @response.body = "hi"
   end
 
   it "should handle Gopher::Response results" do
-    @response = Gopher::Response.new
-    @response.body = "hi"
-    @response.code = :success
     @application.should_receive(:dispatch).with(any_args).and_return(@response)
     @application.should_receive(:reload_stale)
 
     ::EM.run {
-      server = Gopher::Server.new(@application, @host, @port)
+      server = Gopher::Server.new(@application)
       server.run!
 
       # opens the socket client connection
@@ -31,11 +34,11 @@ describe Gopher::Server do
   end
 
   it "should handle string results" do
-    @application.should_receive(:dispatch).with(any_args).and_return("hi")
+    @application.should_receive(:dispatch).with(any_args).and_return(@response)
     @application.should_receive(:reload_stale)
 
     ::EM.run {
-      server = Gopher::Server.new(@application, @host, @port)
+      server = Gopher::Server.new(@application)
       server.run!
 
       # opens the socket client connection
@@ -54,12 +57,11 @@ describe Gopher::Server do
     file.write("hi")
     file.close
 
-
     @application.should_receive(:dispatch).with(any_args).and_return(File.new(file))
     @application.should_receive(:reload_stale)
 
     ::EM.run {
-      server = Gopher::Server.new(@application, @host, @port)
+      server = Gopher::Server.new(@application)
       server.run!
 
       # opens the socket client connection
@@ -78,7 +80,7 @@ describe Gopher::Server do
     @application.should_receive(:reload_stale)
 
     ::EM.run {
-      server = Gopher::Server.new(@application, @host, @port)
+      server = Gopher::Server.new(@application)
       server.run!
 
       # opens the socket client connection

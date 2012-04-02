@@ -1,21 +1,17 @@
 module Gopher
   class Server
-    attr_accessor :application, :config
-    def initialize(app, host = '0.0.0.0', port = 70, handler = Gopher::Connection)
+    attr_accessor :application
+    def initialize(app, handler = Gopher::Connection)
       @application = app
-      @config = {}
-      @config[:host] = host
-      @config[:port] = port
-
       @handler = handler
     end
 
     def host
-      @config[:host]
+      @application.config[:host] || '0.0.0.0'
     end
 
     def port
-      @config[:port]
+      @application.config[:port] || 70
     end
 
     def run!

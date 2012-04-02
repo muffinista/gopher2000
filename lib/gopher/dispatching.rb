@@ -30,8 +30,6 @@ module Gopher
         response.body = block.bind(self).call
         response.code = :success
 
-        debug_log response.body
-
       rescue Gopher::NotFoundError => e
         debug_log("#{@request.selector} -- not found")
         response.body = handle_not_found
