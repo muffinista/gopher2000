@@ -11,13 +11,16 @@ module Gopher
     @@application = nil
     def application
       return @@application unless @@application.nil?
+      puts "fire up app"
+
       @@application = Gopher::Application #.new
       @@application.reset!
     end
 
     def set(key, value = nil)
-      debug_log "SET #{key} #{value}"
       application.config[key] = value
+
+      puts application.config.inspect
     end
 
     def route(path, &block)
@@ -45,13 +48,18 @@ module Gopher
       application.scripts << f
     end
 
+    #
+    # run a script with the specified options applied to the config. This is
+    # called by bin/gopher2000
+    #
     def run(script, opts = {})
+      puts opts.inspect
       opts.each { |k, v|
         set k, v
       }
 
       if application.config[:debug] == true
-        debug_log "watching #{script} for changes"
+        puts "watching #{script} for changes"
         watch script
       end
 

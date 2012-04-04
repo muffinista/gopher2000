@@ -2,21 +2,26 @@ require 'logging'
 
 module Gopher
   module Logging
-    attr_accessor :config
-
-    def use_debug_log?
-      @config && @config.has_key?(:debug) ? @config[:debug] == true : false
-    end
-
-    def access_log_dest
-      @config && @config.has_key?(:log_dest) ? @config[:log_dest] : STDOUT
-    end
-
     def debug_log(x)
+      if config.nil?
+        STDERR.puts x
+        return
+      end
+
       return if ! use_debug_log?
       @debug_logger ||= ::Logging.logger(STDOUT)
       @debug_logger.debug x
     end
+
+    def use_debug_log?
+      config.nil? || config[:debug] == true
+    end
+
+    def access_log_dest
+      self.config && self.config.has_key?(:log_dest) ? self.config[:log_dest] : STDOUT
+    end
+
+
 
     def access_log(request, response)
       @access_logger ||= ::Logging.logger(access_log_dest)

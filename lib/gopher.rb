@@ -70,7 +70,6 @@ module Gopher
 
   require 'gopher/request'
   require 'gopher/response'
- # require 'gopher/dsl'
 
   require 'gopher/connection'
   require 'gopher/application'
@@ -81,6 +80,8 @@ module Gopher
   require 'gopher/server'
 end
 
-
+#
+# include Gopher DSL in the main object space
+#
 require 'gopher/dsl'
 include Gopher::DSL

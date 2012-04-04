@@ -58,11 +58,18 @@ module Gopher
         end
       end
 
+      #
+      # reset the app before reloading any scripts
+      #
       def reset!
         self.routes = []
         self.menus = {}
         self.scripts ||= []
-        self.config ||= {}
+        self.config ||= {
+          :debug => false,
+          :host => "0.0.0.0",
+          :port => 70
+        }
 
         register_defaults
 
@@ -70,32 +77,59 @@ module Gopher
       end
     end
 
+    #
+    # are we in debugging mode? doesn't really do much now
+    #
+    def debug_mode?
+      config[:debug] == true
+    end
+
+    #
+    # should we use non-blocking operations? for now, defaults to false if in debug mode,
+    # true if we're not in debug mode (presumably, in some sort of production state. HAH!
+    # Gopher servers in production)
+    #
+    def non_blocking?
+      config[:non_blocking] ||= ! debug_mode?
+    end
+
+    #
+    # called by EventMachine when there's an incoming request
+    #
     def receive_data(selector)
       # parse out the request
       @request = Request.new(selector, remote_ip)
-
-
 
       operation = proc {
         resp = dispatch(@request)
         access_log(@request, resp)
         resp
       }
-
       callback = proc {|result|
         send_response result
         close_connection_after_writing
       }
 
-      EventMachine.defer( operation, callback )
+      #
+      # if we don't want to block on slow calls, use EM#defer
+      # @see http://eventmachine.rubyforge.org/EventMachine.html#M000486
+      #
+      if non_blocking?
+        EventMachine.defer( operation, callback )
+      else
+        callback.call(operation.call)
+      end
     end
 
+    #
+    # get the IP address of the client
+    #
     def remote_ip
       Socket.unpack_sockaddr_in(get_peername).last
     end
 
     #
-    # @todo work on end_of_transmission call
+    # send the response back to the client
     #
     def send_response(response)
       case response

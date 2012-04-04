@@ -25,15 +25,16 @@ module Gopher
     attr_accessor :handler
 
     def host
-      @handler.config[:host] || '0.0.0.0'
+      @handler.config[:host] ||= '0.0.0.0'
     end
 
     def port
-      @handler.config[:port] || 70
+      @handler.config[:port] ||= 70
     end
 
     def run!(h = Gopher::Application)
       @handler = h
+
       EventMachine::run do
         Signal.trap("INT") {
           puts "It's a trap!"

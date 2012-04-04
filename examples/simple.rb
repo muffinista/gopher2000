@@ -5,7 +5,6 @@
 #
 
 require 'gopher'
-require 'gopher/dsl'
 
 set :host, '0.0.0.0'
 set :port, 7070
