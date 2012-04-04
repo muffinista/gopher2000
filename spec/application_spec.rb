@@ -1,12 +1,14 @@
 require File.join(File.dirname(__FILE__), '/spec_helper')
+require 'tempfile'
 
 describe Gopher::Application do
   before(:each) do
-    @app = Gopher::Application.new
+    @app = Gopher::Application
+    @app = Gopher::Application.reset!
+    @app.scripts = []
   end
 
   it 'should have default host/port' do
-    @app = Gopher::Application.new
     @app.host.should == "0.0.0.0"
     @app.port.should == 70
   end
@@ -48,6 +50,5 @@ describe Gopher::Application do
 
       @app.last_reload.should == now
     end
-
   end
 end

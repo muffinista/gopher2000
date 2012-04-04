@@ -1,20 +1,26 @@
 require File.join(File.dirname(__FILE__), '/spec_helper')
 
 class MockServer
-  attr_accessor :routes, :config
   include Gopher::Routing
   include Gopher::Dispatching
   include Gopher::Rendering
   include Gopher::Logging
 
+  extend Gopher::Routing
+  extend Gopher::Dispatching
+  extend Gopher::Rendering
+  extend Gopher::Logging
+
+  attr_accessor :menus, :routes, :config, :scripts, :last_reload
+
   def initialize
-    @menus = {}
-    @config = {}
+    @@routes = []
+    @@menus = {}
+    @@scripts ||= []
 
     register_defaults
   end
 end
-
 
 describe Gopher::Dispatching do
   before(:each) do

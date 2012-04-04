@@ -2,11 +2,11 @@ require File.join(File.dirname(__FILE__), '/../spec_helper')
 
 describe Gopher::Rendering::Menu do
   before(:each) do
-    app = mock(Gopher::Application,
-      :host => "host",
-      :port => 1234)
+    Gopher::Application.config = {}
+    Gopher::Application.config[:host] = "host"
+    Gopher::Application.config[:port] = 1234
 
-    @ctx = Gopher::Rendering::Menu.new(app)
+    @ctx = Gopher::Rendering::Menu.new #(app)
   end
 
   it 'should add text as a gopher line' do

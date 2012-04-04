@@ -26,8 +26,8 @@ module Gopher
       def line(type, text, selector, host=nil, port=nil)
         text = sanitize_text(text)
 
-        host = application.host if host.nil?
-        port = application.port if port.nil?
+        host = Gopher::Application.host if host.nil?
+        port = Gopher::Application.port if port.nil?
 
         # no need to add a line-ending here, Base will handle that
         self << ["#{type}#{text}", selector, host, port].join("\t") + LINE_ENDING

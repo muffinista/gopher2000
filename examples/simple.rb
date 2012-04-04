@@ -78,6 +78,14 @@ route '/about' do
   "Gopher 2000 -- World Domination via Text Protocols"
 end
 
+route '/slow' do
+  sleep 2
+  render :slow
+end
+menu :slow do
+  text "i'm not too fast"
+end
+
 #
 # requests can have variables specified on the URL
 #
@@ -98,6 +106,7 @@ menu :current_time do
   br 2
   menu 'back', '/'
 end
+
 
 menu :hello do |name|
   text "Hello, #{name}!"

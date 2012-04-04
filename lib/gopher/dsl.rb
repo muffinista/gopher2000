@@ -8,10 +8,11 @@ module Gopher
 
     include Logging
 
+    @@application = nil
     def application
-      return @application unless @application.nil?
-      @application = Gopher::Application.new
-      @application.reset!
+      return @@application unless @@application.nil?
+      @@application = Gopher::Application #.new
+      @@application.reset!
     end
 
     def set(key, value = nil)
@@ -56,7 +57,6 @@ module Gopher
 
       load script
     end
-
   end
 end
 

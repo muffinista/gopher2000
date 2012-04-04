@@ -1,75 +1,124 @@
+require 'socket'
+
 module Gopher
-  class Application
+  class Application < EventMachine::Connection
 
-    include Routing
+    include Gopher::Routing
+    extend Gopher::Routing
+
     include Dispatching
+    extend Dispatching
+
     include Helpers
+    extend Helpers
+
     include Rendering
+    extend Rendering
+
     include Logging
+    extend Logging
 
-    attr_accessor :templates, :menus, :routes, :config, :scripts, :last_reload
+    @routes = []
+    @menus = {}
+    @scripts ||= []
 
-    def initialize(c={})
-      @config = {
-        :host => '0.0.0.0',
-        :port => 70
-      }.merge(c)
+    cattr_accessor :menus, :routes, :config, :scripts, :last_reload
+
+    class << self
+      def host
+        config[:host] ||= '0.0.0.0'
+      end
+
+      def port
+        config[:port] ||= 70
+      end
 
       #
-      # don't run this code if we're running specs
+      # check if our script has been updated since the last reload
       #
-      unless ENV['gopher_test']
-        at_exit do
-          s = Gopher::Server.new(self)
-          s.run!
+      def should_reload?
+        ! last_reload.nil? && self.scripts.any? do |f|
+          File.mtime(f) > last_reload
         end
       end
 
-      reset!
-    end
+      #
+      # reload scripts if needed
+      #
+      def reload_stale
+        reload_check = should_reload?
+        self.last_reload = Time.now
 
-    def host
-      config[:host]
-    end
+        return if ! reload_check
+        reset!
 
-    def port
-      config[:port]
-    end
+        self.scripts.each do |f|
+          debug_log "reload #{f}"
+          load f
+        end
+      end
 
-    #
-    # check if our script has been updated since the last reload
-    #
-    def should_reload?
-      ! @last_reload.nil? && self.scripts.any? do |f|
-        File.mtime(f) > @last_reload
+      def reset!
+        self.routes = []
+        self.menus = {}
+        self.scripts ||= []
+        self.config ||= {}
+
+        register_defaults
+
+        self
       end
     end
 
-    #
-    # reload scripts if needed
-    #
-    def reload_stale
-      reload_check = should_reload?
-      @last_reload = Time.now
+    def receive_data(selector)
+      # parse out the request
+      @request = Request.new(selector, remote_ip)
 
-      return if ! reload_check
-      reset!
 
-      self.scripts.each do |f|
-        debug_log "reload #{f}"
-        load f
+
+      operation = proc {
+        resp = dispatch(@request)
+        access_log(@request, resp)
+        resp
+      }
+
+      callback = proc {|result|
+        send_response result
+        close_connection_after_writing
+      }
+
+      EventMachine.defer( operation, callback )
+    end
+
+    def remote_ip
+      Socket.unpack_sockaddr_in(get_peername).last
+    end
+
+    #
+    # @todo work on end_of_transmission call
+    #
+    def send_response(response)
+      case response
+      when Gopher::Response then send_response(response.body)
+      when String then send_data(response + end_of_transmission)
+      when StringIO then send_data(response.read + end_of_transmission)
+      when File
+        while chunk = response.read(8192) do
+          send_data(chunk)
+        end
+        response.close
       end
     end
 
-    def reset!
-      @routes = []
-      @templates = {}
-      @menus = {}
-      @scripts ||= []
 
-      register_defaults
-
-      self
+    protected
+    #
+    # Add the period on a line by itself that closes the connection
+    #
+    # @todo don't add an extra line ending here if we don't need it
+    def end_of_transmission
+      [Gopher::Rendering::LINE_ENDING, ".", Gopher::Rendering::LINE_ENDING].join
     end
+
   end
 end

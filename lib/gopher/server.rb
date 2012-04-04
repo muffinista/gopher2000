@@ -1,33 +1,54 @@
+# class WTF < EventMachine::Connection
+#   def receive_data data
+#     operation = proc {
+#       sleep(1)
+#       "OH, HELLO!"
+#     }
+#     callback = proc {|result|
+#       result = "1Patch to enable Gopher in IE6	/gopher/clients/ie6	gopher.floodgap.com	70"
+
+#       # do something with result here, such as send it back to a network client.
+#       send_data result + [Gopher::Rendering::LINE_ENDING, ".", Gopher::Rendering::LINE_ENDING].join
+#       close_connection_after_writing
+#     }
+
+#     EventMachine.defer( operation, callback ).inspect
+#   end
+
+#   def unbind
+#     puts "A connection has terminated"
+#   end
+# end
+
 module Gopher
   class Server
-    attr_accessor :application
-    def initialize(app, handler = Gopher::Connection)
-      @application = app
-      @handler = handler
-    end
+    attr_accessor :handler
 
     def host
-      @application.config[:host] || '0.0.0.0'
+      @handler.config[:host] || '0.0.0.0'
     end
 
     def port
-      @application.config[:port] || 70
+      @handler.config[:port] || 70
     end
 
-    def run!
-      trap("INT") {
-        puts "It's a trap!"
-        exit!
-      }
+    def run!(h = Gopher::Application)
+      @handler = h
+      EventMachine::run do
+        Signal.trap("INT") {
+          puts "It's a trap!"
+          EventMachine.stop
+        }
+        Signal.trap("TERM") {
+          puts "It's a trap!"
+          EventMachine.stop
+        }
 
-      ::EM.run do
         puts "start server at #{host} #{port}"
-        ::EM.start_server(host, port, @handler) do |conn|
-          @application.set :host, host
-          @application.set :port, port
-          @application.reload_stale
-          conn.application = @application
-        end
+        EventMachine::start_server(host, port, h)
+        #do |conn|
+        #  #@application.reload_stale
+        #end
       end
     end
 
@@ -45,3 +66,10 @@ module Gopher
     end
   end
 end
+
+  unless ENV['gopher_test']
+    at_exit do
+      s = Gopher::Server.new(self)
+      s.run!
+    end
+  end

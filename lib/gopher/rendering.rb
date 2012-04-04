@@ -4,8 +4,7 @@ module Gopher
   #
   module Rendering
     def menu(name, &block)
-      @menus ||= {}
-      @menus[name.to_sym] = block
+      menus[name.to_sym] = block
     end
 
     def not_found(&block)
@@ -18,7 +17,7 @@ module Gopher
     # end
 
     def find_template(t)
-      @menus[t]
+      menus[t]
     end
 
     # Find the right template (with context) and instance_exec it inside the context
@@ -38,15 +37,15 @@ module Gopher
     end
 
     def not_found_template
-      @menus.include?(:not_found) ? :not_found : :'internal/not_found'
+      menus.include?(:not_found) ? :not_found : :'internal/not_found'
     end
 
     def error_template
-      @menus.include?(:error) ? :error : :'internal/error'
+      menus.include?(:error) ? :error : :'internal/error'
     end
 
     def invalid_request_template
-      @menus.include?(:invalid_request) ? :invalid_request : :'internal/invalid_request'
+      menus.include?(:invalid_request) ? :invalid_request : :'internal/invalid_request'
     end
 
     def register_defaults

@@ -1,12 +1,16 @@
 require File.join(File.dirname(__FILE__), '/spec_helper')
 
-class FakeServer
+class FakeApp < Gopher::Application
+
+end
+
+class FakeServer < Gopher::Server
 
 end
 
 describe Gopher::DSL do
   before(:each) do
-    @app = Gopher::Application.new
+    @app = FakeApp
 
     @server = FakeServer.new
     @server.send :require, 'gopher/dsl'
