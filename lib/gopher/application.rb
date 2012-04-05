@@ -107,6 +107,7 @@ module Gopher
       }
       callback = proc {|result|
         send_response result
+
         close_connection_after_writing
       }
 
