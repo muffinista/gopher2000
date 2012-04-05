@@ -77,6 +77,26 @@ bundle exec bin/gopher2000 -d examples/simple.rb
 Logging
 -------
 
+Logging is pretty basic at the moment. Right now debug messages are
+dumped to stderr. There's also an apache-esque access log, which can
+be written to a file specified like this:
+
+```rb
+set :access_log, "/tmp/access.log"
+```
+
+The log will rollover daily, so your million hits per day won't
+accumulate into an unmanageable file.
+
+The format is pretty basic:
+
+	2012-04-05 19:14:01	127.0.0.1	/lookup		missing	46
+
+	date	   ip_address			request_url		result_code	response_size
+
+
+
+
 TODO
 ----
 * Get logging working
