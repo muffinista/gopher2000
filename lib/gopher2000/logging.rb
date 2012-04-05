@@ -12,19 +12,16 @@ module Gopher
     end
 
     def access_log_dest
-      self.config && self.config.has_key?(:log_dest) ? self.config[:log_dest] : STDOUT
+      self.config && self.config.has_key?(:access_log) ? self.config[:access_log] : STDOUT
     end
 
     def init_access_log
       log = ::Logging.logger['access_log']
       ::Logging.appenders.stdout(:level => :debug,
         :layout => GOPHER_LOG_PATTERN)
-        #a        :layout => ::Logging.layouts.pattern(:pattern => ACCESS_LOG_PATTERN))
-
-#      log.add_appenders('stdout')
 
       log.add_appenders('stdout',
-        ::Logging.appenders.rolling_file('development.log',
+        ::Logging.appenders.rolling_file(access_log_dest,
           :level => :debug,
           :age => 'daily',
           :layout => GOPHER_LOG_PATTERN)
