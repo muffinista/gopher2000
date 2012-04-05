@@ -20,6 +20,8 @@ module Gopher
           :path => Dir.getwd
         }.merge(opts)
 
+        STDERR.puts "FILTER: #{opts[:filter]}"
+
         @path = opts[:path]
         @filter = opts[:filter]
         @mount_point = opts[:mount_point]
@@ -85,14 +87,20 @@ module Gopher
       def directory(dir)
         m = Menu.new(@application)
 
+        m.text "Browsing: #{dir}"
+
         #
-        # iterate through the contents of this directory
+        # iterate through the contents of this directory.
+        # NOTE: we don't filter this, so we will ALWAYS list subdirectories of a mounted folder
         #
-        Dir.glob("#{dir}/#{filter}").each do |x|
+        Dir.glob("#{dir}/*.*").each do |x|
           # if this is a directory, then generate a directory link for it
           if File.directory?(x)
             m.directory File.basename(x), to_selector(x)
-          else
+
+          elsif File.file?(x) && File.fnmatch(filter, x)
+            # fnmatch makes sure that the file matches the glob filter specified in the mount directive
+
             # otherwise, it's a normal file link
             m.link File.basename(x), to_selector(x)
           end

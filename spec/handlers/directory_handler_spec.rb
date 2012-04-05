@@ -52,7 +52,7 @@ describe Gopher::Handlers::DirectoryHandler do
     end
 
     it "should work" do
-      @h.call(:splat => "bar/baz").to_s.should == "0a\t/xyz/123/bar/baz/a\thost\t1234\r\n1dir2\t/xyz/123/bar/baz/dir2\thost\t1234\r\n"
+      @h.call(:splat => "bar/baz").to_s.should == "iBrowsing: /tmp/bar/baz\tnull\t(FALSE)\t0\r\n1dir2\t/xyz/123/bar/baz/dir2\thost\t1234\r\n"
     end
   end
 

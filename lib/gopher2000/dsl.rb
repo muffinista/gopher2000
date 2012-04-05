@@ -29,6 +29,17 @@ module Gopher
 
     def mount(path, opts = {})
       route, folder = path.first
+
+      #
+      # if path has more than the one option (:route => :folder),
+      # then incorporate the rest of the hash into our opts
+      #
+      if path.size > 1
+        other_opts = path.dup
+        other_opts.dup.delete(route)
+        opts = opts.merge(other_opts)
+      end
+
       application.mount(route, opts.merge({:path => folder}))
     end
 
