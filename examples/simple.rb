@@ -4,7 +4,7 @@
 # Simple gopher example
 #
 
-require 'gopher'
+require 'gopher2000'
 
 set :host, '0.0.0.0'
 set :port, 7070

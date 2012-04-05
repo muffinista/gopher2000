@@ -17,3 +17,6 @@ group :development do
   gem "bundler", "~> 1.0.0"
   gem "watchr"
 end
+
+
+gem "weather-underground"

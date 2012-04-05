@@ -13,7 +13,7 @@ describe Gopher::DSL do
     @app = FakeApp
 
     @server = FakeServer.new
-    @server.send :require, 'gopher/dsl'
+    @server.send :require, 'gopher2000/dsl'
     @server.stub!(:application).and_return(@app)
     @app.reset!
   end

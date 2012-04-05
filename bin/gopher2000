@@ -6,7 +6,7 @@
 #
 $stdout.sync = true
 
-require 'gopher'
+require 'gopher2000'
 require 'optparse'
 
 #

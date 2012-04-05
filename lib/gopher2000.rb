@@ -56,32 +56,32 @@ end
 
 
 module Gopher
-  require "gopher/version"
-  require "gopher/logging"
+  require "gopher2000/version"
+  require "gopher2000/logging"
 
-  require "gopher/errors"
-  require 'gopher/routing'
-  require 'gopher/helpers'
-  require 'gopher/dispatching'
+  require "gopher2000/errors"
+  require 'gopher2000/routing'
+  require 'gopher2000/helpers'
+  require 'gopher2000/dispatching'
 
-  require 'gopher/rendering'
-  require 'gopher/rendering/base'
-  require 'gopher/rendering/menu'
+  require 'gopher2000/rendering'
+  require 'gopher2000/rendering/base'
+  require 'gopher2000/rendering/menu'
 
-  require 'gopher/request'
-  require 'gopher/response'
+  require 'gopher2000/request'
+  require 'gopher2000/response'
 
-  require 'gopher/connection'
-  require 'gopher/application'
+  require 'gopher2000/connection'
+  require 'gopher2000/application'
 
-  require 'gopher/handlers/base_handler'
-  require 'gopher/handlers/directory_handler'
+  require 'gopher2000/handlers/base_handler'
+  require 'gopher2000/handlers/directory_handler'
 
-  require 'gopher/server'
+  require 'gopher2000/server'
 end
 
 #
 # include Gopher DSL in the main object space
 #
-require 'gopher/dsl'
+require 'gopher2000/dsl'
 include Gopher::DSL

@@ -1,18 +1,19 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "gopher/version"
+require "gopher2000/version"
 
 Gem::Specification.new do |s|
-  s.name        = "gopher"
+  s.name        = "gopher2000"
   s.version     = Gopher::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Colin Mitchell"]
   s.email       = ["colin@muffinlabs.com"]
-  s.homepage    = "http://muffinlabs.com"
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.homepage    = "https://github.com/muffinista/gopher2000"
+  s.summary     = %q{Gopher2000 - A Gopher server for the next millenium}
+  s.description = %q{Gopher2000 is a ruby-based Gopher server. It is built for speedy, enjoyable development of all sorts of gopher sites.}
 
-  s.rubyforge_project = "gopher"
+  s.rubyforge_project = "gopher2000"
+  s.licenses = ["WTFPL"]
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
@@ -21,9 +22,12 @@ Gem::Specification.new do |s|
 
   # specify any dependencies here; for example:
   s.add_development_dependency "rspec"
+  s.add_development_dependency "shoulda"
   s.add_development_dependency "rdoc"
+  s.add_development_dependency "simplecov"
+  s.add_development_dependency "watchr"
+  s.add_development_dependency "eventmachine"
+
   s.add_runtime_dependency "eventmachine"
   s.add_runtime_dependency "logger"
-
-  # s.add_runtime_dependency "rest-client"
 end

@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '..', 'gopher')
+require File.join(File.dirname(__FILE__), '..', 'gopher2000')
 
 module Gopher
   #
