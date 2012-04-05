@@ -7,11 +7,6 @@ module Gopher
 
       # Sanitizes text for use in gopher menus
       def sanitize_text(raw)
-        # text = raw.dup
-        # text.rstrip! # Remove excess whitespace
-        # text.gsub!(/\t/, ' ' * 8) # Tabs to spaces
-        # text.gsub!(/\n/, '') # Get rid of newlines (\r as well?)
-        # text
         raw.
           rstrip. # Remove excess whitespace
           gsub(/\t/, ' ' * 8). # Tabs to spaces
@@ -29,7 +24,6 @@ module Gopher
         host = Gopher::Application.host if host.nil?
         port = Gopher::Application.port if port.nil?
 
-        # no need to add a line-ending here, Base will handle that
         self << ["#{type}#{text}", selector, host, port].join("\t") + LINE_ENDING
       end
 
