@@ -30,7 +30,7 @@ describe Gopher::Rendering::Base do
 
   describe "block" do
     it "wraps text" do
-      @ctx.should_receive(:text).with "a\na"
+      @ctx.should_receive(:text).twice.with "a"
       @ctx.block("a a",1)
     end
   end

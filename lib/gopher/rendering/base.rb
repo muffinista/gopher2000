@@ -38,16 +38,21 @@ module Gopher
       #
       # File actionpack/lib/action_view/helpers/text_helper.rb, line 217
       def word_wrap(text, width=80*args)
-
         text.split("\n").collect do |line|
           line.length > width ? line.gsub(/(.{1,#{width}})(\s+|$)/, "\\1\n").strip : line
-        end# * "\n"
+        end
       end
 
       # Wraps +text+ to +width+ characters
       def block(text, width=80)
-        word_wrap(text, width).each do |line|
-          text line
+
+        # this is a hack - recombine lines, then re-split on newlines
+        # doing this because word_wrap is returning an array of lines, but
+        # those lines have newlines in them where we should wrap
+        lines = word_wrap(text, width).join("\n").split("\n")
+
+        lines.each do |line|
+          text line.lstrip.rstrip
         end
       end
 
