@@ -6,8 +6,8 @@
 #
 $stdout.sync = true
 
-require 'gopher2000'
 require 'optparse'
+require 'gopher2000'
 
 #
 # pull in any arguments and set them as env variables
@@ -17,7 +17,8 @@ opts.banner = <<-EOS
 
 Run a gopher server!
 
-Usage: #{File.basename($0)} [options]
+Usage: #{File.basename($0)} [options] [scriptname]
+
 EOS
 
 opts.separator ""
@@ -35,16 +36,18 @@ opts.on('-p port',   'set the port (default is 70)')                { |val| para
 opts.on('-o addr',   'set the host (default is 0.0.0.0)')             { |val| params[host] = val }
 opts.on('-e env',    'set the environment (default is development)')  { |val| params[:env] = val.to_sym }
 
-
 opts.on_tail("-h", "--help", "Show this message") do
   puts opts
-  exit
+  exit!
 end
 
 extra = opts.parse!(ARGV)
 
 script = extra.shift
 
-puts "RUNNING #{script}"
+if script.nil?
+  puts "Sorry, you need to specify a script to run"
+  exit!
+end
 
 run script, params
