@@ -20,10 +20,7 @@ module Gopher
 
     def init_access_log
       log = ::Logging.logger['access_log']
-#      ::Logging.appenders.stdout(:level => :debug,
-#        :layout => GOPHER_LOG_PATTERN)
-
-      log.add_appenders(#'stdout',
+      log.add_appenders(
         ::Logging.appenders.rolling_file(access_log_dest,
           :level => :debug,
           :age => 'daily',
