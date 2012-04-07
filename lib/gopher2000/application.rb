@@ -93,10 +93,7 @@ module Gopher
       config[:non_blocking] ||= ! debug_mode?
     end
 
-    #
-    # called by EventMachine when there's an incoming request
-    #
-    def receive_data(selector)
+    def call!(selector)
       # parse out the request
       @request = Request.new(selector, remote_ip)
 
@@ -107,7 +104,6 @@ module Gopher
       }
       callback = proc {|result|
         send_response result
-
         close_connection_after_writing
       }
 
@@ -120,6 +116,17 @@ module Gopher
       else
         callback.call(operation.call)
       end
+    end
+
+    #
+    # called by EventMachine when there's an incoming request
+    # roughly matching sinatra's style of duping the app to respond
+    # to requests, @see http://www.sinatrarb.com/intro#Request/Instance%20Scope
+    #
+    # this essentially means we have 'one instance per request'
+    #
+    def receive_data(selector)
+      dup.call!(selector)
     end
 
     #
