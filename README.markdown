@@ -69,10 +69,32 @@ You can see more working examples in the examples/ folder
 Running a script
 ----------------
 
+You can use the supplied wrapper script
+
 ```
-bundle exec bin/gopher2000 -d examples/simple.rb
+gopher2000 -d examples/simple.rb
 ```
 
+Or, if you include gopher in your file, you can just run the script itself:
+
+```rb
+require 'gopher2000'
+```
+There are several command-line options:
+
+* -d -- run in debug mode
+* -p [port] -- which port to listen on
+* -o [addr] -- what IP/host to listen on
+* -e [env] -- what 'environment' to use -- this isn't really used by
+  Gopher2000, but you could use it when writing your app to determine
+  how you behave in production vs development, etc.
+
+
+```
+# ruby script.rb
+
+==> *start server at 0.0.0.0 7070*
+```
 
 Logging
 -------
@@ -88,17 +110,14 @@ set :access_log, "/tmp/access.log"
 The log will rollover daily, so your million hits per day won't
 accumulate into an unmanageable file.
 
-The format is pretty basic:
+The format is a pretty basic tab-delimited file:
 
-	2012-04-05 19:14:01	127.0.0.1	/lookup		missing	46
-
-	date	   ip_address			request_url		result_code	response_size
-
-
+	timestamp 		   	ip_address	request_url		result_code	response_size
+	2012-04-05 19:14:01	127.0.0.1	/lookup			success		46
 
 
 TODO
 ----
-* Get logging working
-* Initscripts
-* stats
+* More examples
+* clean up/improve EventMachine usage
+* stats generation
