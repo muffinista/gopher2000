@@ -23,6 +23,9 @@ module Gopher
           EventMachine.stop
         }
 
+        EventMachine.kqueue = true if EventMachine.kqueue?
+        EventMachine.epoll = true if EventMachine.epoll?
+
         puts "start server at #{host} #{port}"
         EventMachine::start_server(host, port, h) do |conn|
           @handler.reload_stale
@@ -45,6 +48,9 @@ module Gopher
   end
 end
 
+#
+# don't call at_exit if we're running specs
+#
 unless ENV['gopher_test']
   at_exit do
     s = Gopher::Server.new(self)
