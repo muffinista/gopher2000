@@ -16,7 +16,7 @@ group :development do
 
   gem "bundler", "~> 1.0.0"
   gem "watchr"
+
+  gem "god"
+  gem "weather-underground"
 end
-
-
-gem "weather-underground"
