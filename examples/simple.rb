@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
 
 #
 # Simple gopher example
@@ -23,7 +24,6 @@ route '/' do
   render :index
 end
 
-
 #
 # main index for the server
 #
@@ -43,25 +43,31 @@ menu :index do
   br
 
   # ask for some input
-  input 'your name plz', '/name'
+  input 'Hey, what is your name?', '/hello'
+  br
+
+  # ask for some input
+  input 'echo test', '/echo_test'
   br
 
   # mount some files
   menu 'filez', '/files'
 end
 
-mount '/files' => '/home/colin/Projects', :filter => '*.jpg'
+#
+# mounting a directory
+#
+mount '/files' => '/home/username/files', :filter => '*.jpg'
 
 
 #
-# actions have access to the request object, and can grab the following data:
+# actions have access to the request object, which has the following attributes:
 #
 # input: The input string, if provided (for searches, etc)
 # selector: The path of the request being made
 # ip_address: The remote IP address
 #
-route '/name' do
-#  render :hello, request.input.strip
+route '/echo_test' do
   render :echo, request
 end
 
@@ -80,14 +86,6 @@ route '/about' do
   "Gopher 2000 -- World Domination via Text Protocols"
 end
 
-route '/slow' do
-  sleep 2
-  render :slow
-end
-menu :slow do
-  text "i'm not too fast"
-end
-
 #
 # requests can have variables specified on the URL
 #
@@ -99,17 +97,9 @@ menu :request_with_params do |params|
   text params.inspect
 end
 
-
-menu :current_time do
-  text "present day //// present time"
-  text ruler(30)
-  br 1
-  text current_time
-  br 2
-  menu 'back', '/'
+route '/hello' do
+  render :hello, request.input
 end
-
-
 menu :hello do |name|
   text "Hello, #{name}!"
 end
