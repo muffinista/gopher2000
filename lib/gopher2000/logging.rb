@@ -15,10 +15,12 @@ module Gopher
     end
 
     def access_log_dest
-      self.config && self.config.has_key?(:access_log) ? self.config[:access_log] : STDOUT
+      self.config && self.config.has_key?(:access_log) ? self.config[:access_log] : nil
     end
 
     def init_access_log
+      return if access_log_dest.nil?
+
       log = ::Logging.logger['access_log']
       log.add_appenders(
         ::Logging.appenders.rolling_file(access_log_dest,
@@ -31,6 +33,8 @@ module Gopher
     end
 
     def access_log(request, response)
+      return if access_log_dest.nil?
+
       @@access_logger ||= init_access_log
       code = response.respond_to?(:code) ? response.code : "success"
       size = response.respond_to?(:size) ? response.size : response.length
