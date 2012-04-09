@@ -1,25 +1,3 @@
-# class WTF < EventMachine::Connection
-#   def receive_data data
-#     operation = proc {
-#       sleep(1)
-#       "OH, HELLO!"
-#     }
-#     callback = proc {|result|
-#       result = "1Patch to enable Gopher in IE6	/gopher/clients/ie6	gopher.floodgap.com	70"
-
-#       # do something with result here, such as send it back to a network client.
-#       send_data result + [Gopher::Rendering::LINE_ENDING, ".", Gopher::Rendering::LINE_ENDING].join
-#       close_connection_after_writing
-#     }
-
-#     EventMachine.defer( operation, callback ).inspect
-#   end
-
-#   def unbind
-#     puts "A connection has terminated"
-#   end
-# end
-
 module Gopher
   class Server
     attr_accessor :handler
@@ -46,10 +24,9 @@ module Gopher
         }
 
         puts "start server at #{host} #{port}"
-        EventMachine::start_server(host, port, h)
-        #do |conn|
-        #  #@application.reload_stale
-        #end
+        EventMachine::start_server(host, port, h) do |conn|
+          @handler.reload_stale
+        end
       end
     end
 
@@ -68,9 +45,9 @@ module Gopher
   end
 end
 
-  unless ENV['gopher_test']
-    at_exit do
-      s = Gopher::Server.new(self)
-      s.run!
-    end
+unless ENV['gopher_test']
+  at_exit do
+    s = Gopher::Server.new(self)
+    s.run!
   end
+end
