@@ -112,6 +112,18 @@ mount '/files' => '/home/username/files', :filter => '*.jpg'
 
 This will display a list of all the JPGs in the files directory.
 
+Outputting Gopher Menus
+-----------------------
+
+@todo document how to generate gopher menus
+
+
+Formatting Helpers
+------------------
+
+@todo finish/document helpers
+
+
 Testing
 -------
 
@@ -125,7 +137,6 @@ port 7070:
 
 
 ```
-
 #
 # getting a menu listing
 #
@@ -143,7 +154,6 @@ i	null	(FALSE)	0
 7echo test	/echo_test	0.0.0.0	7070
 i	null	(FALSE)	0
 1filez	/files	0.0.0.0	7070
-```
 
 #
 # getting a simple text response
@@ -155,9 +165,14 @@ Gopher 2000 -- World Domination via Text Protocols
 
 
 Or, you can use the equally awesome [ncat](http://nmap.org/ncat/),
-which is basically the successor to netcat:
+which is basically the successor to netcat. In general, I find that
+ncat works better. Here's an example of it in operation:
 
 ```
+#
+# Testing text output
+#
+
 ~/Projects/gopher2000: echo "/about" | ncat -C localhost 7070
 Gopher 2000 -- World Domination via Text Protocols
 .
