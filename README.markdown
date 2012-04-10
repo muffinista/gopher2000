@@ -44,9 +44,6 @@ route '/' do
   render :index
 end
 
-#
-# main index for the server
-#
 menu :index do
   # output a text entry in the menu
   text 'simple gopher example'
@@ -96,6 +93,88 @@ There are several command-line options:
 ==> *start server at 0.0.0.0 7070*
 ```
 
+Developing Gopher Sites
+-----------------------
+
+Gopher2000 makes developing sites easy! Any time you change your
+script, Gopher2000 will reload it. This way, you can make tweaks and
+your site will be refreshed immediately. NOTE -- this is an
+experimental feature, and might need some work.
+
+Serving Files and Directories
+-----------------------------
+
+If you just want to serve up some files, there's a command for that:
+
+```rb
+mount '/files' => '/home/username/files', :filter => '*.jpg'
+```
+
+This will display a list of all the JPGs in the files directory.
+
+Testing
+-------
+
+Here's some simple ways to test your server. First, you can always
+just install a
+[gopher client](http://lmgtfy.com/?q=gopher+clients). Or, if you like
+to live on the edge, there's a few commands worth learning. First, you
+can use [netcat](http://netcat.sourceforge.net/) to achieve
+awesomeness. Here's some examples, assuming you're running the example script on
+port 7070:
+
+
+```
+
+#
+# getting a menu listing
+#
+
+~/Projects/gopher2000: echo "/" | nc localhost 7070
+isimple gopher example	null	(FALSE)	0
+i	null	(FALSE)	0
+i	null	(FALSE)	0
+0current time	/time	0.0.0.0	7070
+i	null	(FALSE)	0
+0about	/about	0.0.0.0	7070
+i	null	(FALSE)	0
+7Hey, what is your name?	/hello	0.0.0.0	7070
+i	null	(FALSE)	0
+7echo test	/echo_test	0.0.0.0	7070
+i	null	(FALSE)	0
+1filez	/files	0.0.0.0	7070
+```
+
+#
+# getting a simple text response
+#
+~/Projects/gopher2000: echo "/about" | nc localhost 7070
+Gopher 2000 -- World Domination via Text Protocols
+.
+```
+
+
+Or, you can use the equally awesome [ncat](http://nmap.org/ncat/),
+which is basically the successor to netcat:
+
+```
+~/Projects/gopher2000: echo "/about" | ncat -C localhost 7070
+Gopher 2000 -- World Domination via Text Protocols
+.
+
+#
+# testing a route with some input
+#
+
+~/Projects/gopher2000: echo "/hello\tcolin" | ncat -C localhost 7070
+iHello, colin!	null	(FALSE)	0
+
+.
+
+```
+
+
+
 Logging
 -------
 
@@ -115,9 +194,29 @@ The format is a pretty basic tab-delimited file:
 	timestamp 		   	ip_address	request_url		result_code	response_size
 	2012-04-05 19:14:01	127.0.0.1	/lookup			success		46
 
+Non-Blocking Requests
+---------------------
+
+When not running in debug mode, Gopher2000 will handle requests
+without blocking -- this way, if you have an app that handles slow
+requests, your users aren't held up waiting for other requests to
+finish. However, this is somewhat experimental, so you can turn it off
+by setting :non_blocking to be false in your script:
+
+```rb
+set :non_blocking, false
+```
+
+Also, non-blocking is always off in debug mode.
+
+You probably need to be wary of this feature if you're actually
+running a Gopher server that needs to be non-blocking. Read up on
+EventMachine's defer feature if you need to learn more.
+
 
 TODO
 ----
 * More examples
+* Documentation
 * clean up/improve EventMachine usage
 * stats generation
