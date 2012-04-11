@@ -48,6 +48,7 @@ module Gopher
         1.upto(n) do
           text 'i', ""
         end
+        self.to_s
       end
 
       #

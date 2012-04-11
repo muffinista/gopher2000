@@ -22,9 +22,31 @@ describe Gopher::Rendering::Base do
     @ctx.br(2).should == "\r\n\r\n"
   end
 
+  describe "underline" do
+    it "underline outputs a pretty line" do
+      @ctx.underline(1, 'x').should == "x\r\n"
+    end
+    it "has defaults" do
+      @ctx.underline.should == "=" * 80 + "\r\n"
+    end
+  end
+
+  describe "big_header" do
+    it "outputs a box with text" do
+      @ctx.width(5)
+      @ctx.big_header('pie').should == "\r\n=====\r\n=pie=\r\n=====\r\n\r\n"
+    end
+  end
+
+  describe "header" do
+    it "outputs underlined text" do
+      @ctx.width(5)
+      @ctx.header('pie').should == " pie \r\n=====\r\n"
+    end
+  end
+
   it "uses to_s to output result" do
     @ctx.text("line 1")
-
     @ctx.to_s.should == @ctx.result
   end
 
@@ -34,8 +56,4 @@ describe Gopher::Rendering::Base do
       @ctx.block("a a",1)
     end
   end
-
-#  it "should make urls" do
-#    @ctx.url("foo").should == "foo"
-#  end
 end
