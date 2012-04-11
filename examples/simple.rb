@@ -17,6 +17,28 @@ route '/gopher' do
   "Greetings from Gopher 2000!" # You can output any text you want here
 end
 
+route '/prettytext' do
+  render :prettytext
+end
+
+#
+# special text output rendering
+#
+text :prettytext do
+  @text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ullamcorper dictum euismod. Sed accumsan sem id quam rutrum eu hendrerit quam adipiscing. Fusce consequat accumsan eros, ac elementum eros molestie et. Vestibulum aliquet varius nulla nec rhoncus. Vivamus felis ipsum, commodo sit amet eleifend eu, lacinia et est. Nullam dolor sapien, luctus eu rhoncus non, ullamcorper vitae nibh. Proin viverra luctus dapibus. Integer aliquam, ante id consectetur vulputate, nibh sapien aliquet nisl, in porttitor massa elit a lectus. Maecenas nec diam nec nulla fringilla feugiat. Nulla facilisi. Proin odio libero, viverra at blandit eget, mattis id dui. Aliquam sed leo leo. Pellentesque eros ante, viverra in accumsan sit amet, pellentesque nec massa."
+
+  # nicely wrapped text
+  block @text
+
+  # spacing
+  br(2)
+
+  # smaller line-width
+  block @text, 30
+end
+
+
+
 #
 # main route
 #
