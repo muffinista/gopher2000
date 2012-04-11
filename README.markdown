@@ -115,7 +115,27 @@ This will display a list of all the JPGs in the files directory.
 Outputting Gopher Menus
 -----------------------
 
-@todo document how to generate gopher menus
+There are a collection of commands to output Gopher menus (see
+rendering/menu.rb for the code). The commands are:
+
+**line(type, text, selector)** - output a line of type 'type' -- see
+  the RFC for the different types of links you can have.
+
+**text** - output a line of text with no action on it.
+
+**br(x)** - output x blank lines.
+
+**error** - output an error message.
+
+**directory** - (aliased as menu) output a link to a 'directory' -- this could be an
+  actual directory if you're building some sort of filesystem tree, or
+  a sub-menu for other actions in your app.
+
+**link(text, selector)** - output a menu link to to the /selector path.
+
+**search(text, selector)** -- output a link to a search action at
+  /selector.
+
 
 
 Formatting Helpers
@@ -166,7 +186,9 @@ Gopher 2000 -- World Domination via Text Protocols
 
 Or, you can use the equally awesome [ncat](http://nmap.org/ncat/),
 which is basically the successor to netcat. In general, I find that
-ncat works better. Here's an example of it in operation:
+ncat works better, particularly if you're using non-blocking
+operations. Here's an example of it in operation:
+
 
 ```
 #
