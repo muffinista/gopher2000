@@ -75,12 +75,19 @@ You can use the supplied wrapper script
 
 ```
 gopher2000 -d examples/simple.rb
+
+==> *start server at 0.0.0.0 7070*
 ```
 
 Or, if you include gopher in your file, you can just run the script itself:
 
 ```rb
+# scriptname.rb
 require 'gopher2000'
+
+# ruby scriptname.rb
+
+==> *start server at 0.0.0.0 7070*
 ```
 There are several command-line options:
 
@@ -91,12 +98,9 @@ There are several command-line options:
   Gopher2000, but you could use it when writing your app to determine
   how you behave in production vs development, etc.
 
+Command line options will override defaults specified in your script
+-- so you can try out things on a different port/address if needed.
 
-```
-# ruby script.rb
-
-==> *start server at 0.0.0.0 7070*
-```
 
 Developing Gopher Sites
 -----------------------
@@ -141,6 +145,44 @@ rendering/menu.rb for the code). The commands are:
 **search(text, selector)** -- output a link to a search action at
   /selector.
 
+Outputting Pretty Text
+----------------------
+
+If you would like to output text, but have the ability to format it
+nicely, you can use a 'text' block like this:
+
+```rb
+route '/prettytext' do
+  render :prettytext
+end
+
+#
+# special text output rendering
+#
+text :prettytext do
+  @text = "A really long chunk of text. Lorem ipsum dolor sit amet ... nec massa."
+
+  # nicely wrapped text
+  block @text
+
+  # spacing
+  br(2)
+
+  # smaller line-width
+  block @text, 30
+end
+
+```
+
+A call to:
+
+```
+echo "/prettytext" | ncat -C localhost 7070
+```
+
+Will return your text, but with nice wrapping, etc.
+
+@todo headers, etc.
 
 
 Formatting Helpers
