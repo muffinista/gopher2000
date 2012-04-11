@@ -29,7 +29,6 @@ module Gopher
         #
         response.body = block.bind(self).call
         response.code = :success
-
       rescue Gopher::NotFoundError => e
         debug_log("#{@request.selector} -- not found")
         response.body = handle_not_found
@@ -68,6 +67,13 @@ module Gopher
     end
 
     class << self
+
+#      require 'gopher2000/rendering'
+#      require 'gopher2000/rendering/base'
+
+#      include Gopher::Rendering
+#      extend Gopher::Rendering
+
       def generate_method(method_name, &block)
         define_method(method_name, &block)
         method = instance_method method_name

@@ -36,7 +36,7 @@ module Gopher
       #
       if path.size > 1
         other_opts = path.dup
-        other_opts.dup.delete(route)
+        other_opts.delete(route)
         opts = opts.merge(other_opts)
       end
 
@@ -45,6 +45,9 @@ module Gopher
 
     def menu(name, &block)
       application.menu(name, &block)
+    end
+    def text(name, &block)
+      application.text(name, &block)
     end
 
     def template(name, &block)

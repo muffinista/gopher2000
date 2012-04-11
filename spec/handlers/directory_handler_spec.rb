@@ -4,7 +4,8 @@ describe Gopher::Handlers::DirectoryHandler do
   before(:each) do
     app = mock(Gopher::Application,
       :host => "host",
-      :port => 1234)
+      :port => 1234,
+      :config => {})
 
     @h = Gopher::Handlers::DirectoryHandler.new(:path => "/tmp", :mount_point => "/xyz/123")
     @h.application = app
@@ -48,11 +49,17 @@ describe Gopher::Handlers::DirectoryHandler do
       File.should_receive(:directory?).with("/tmp/bar/baz").and_return(true)
       File.should_receive(:directory?).with("/tmp/bar/baz/a").and_return(false)
       File.should_receive(:directory?).with("/tmp/bar/baz/dir2").and_return(true)
-      Dir.should_receive(:glob).with("/tmp/bar/baz/*.*").and_return(["/tmp/bar/baz/a", "/tmp/bar/baz/dir2"])
+
+      File.should_receive(:file?).with("/tmp/bar/baz/a").and_return(true)
+      File.should_receive(:fnmatch).with("*.*", "/tmp/bar/baz/a").and_return(true)
+
+      Dir.should_receive(:glob).with("/tmp/bar/baz/*.*").and_return([
+          "/tmp/bar/baz/a",
+          "/tmp/bar/baz/dir2"])
     end
 
     it "should work" do
-      @h.call(:splat => "bar/baz").to_s.should == "iBrowsing: /tmp/bar/baz\tnull\t(FALSE)\t0\r\n1dir2\t/xyz/123/bar/baz/dir2\thost\t1234\r\n"
+      @h.call(:splat => "bar/baz").to_s.should == "iBrowsing: /tmp/bar/baz\tnull\t(FALSE)\t0\r\n0a\t/xyz/123/bar/baz/a\thost\t1234\r\n1dir2\t/xyz/123/bar/baz/dir2\thost\t1234\r\n"
     end
   end
 
@@ -60,6 +67,7 @@ describe Gopher::Handlers::DirectoryHandler do
     before(:each) do
       @file = mock(File)
       File.should_receive(:directory?).with("/tmp/baz.txt").and_return(false)
+
       File.should_receive(:file?).with("/tmp/baz.txt").and_return(true)
       File.should_receive(:new).with("/tmp/baz.txt").and_return(@file)
     end

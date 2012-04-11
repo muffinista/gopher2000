@@ -16,6 +16,12 @@ describe Gopher::Response do
     @response.size.should == 5
   end
 
+  it "defaults to 0 size for weird objects" do
+    @response.body = mock(Object)
+    @response.size.should == 0
+  end
+
+
   it "gets size for file results" do
     temp_file = Tempfile.new('result')
     temp_file.write("1234567890")

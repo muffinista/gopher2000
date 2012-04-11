@@ -20,8 +20,6 @@ module Gopher
           :path => Dir.getwd
         }.merge(opts)
 
-        STDERR.puts "FILTER: #{opts[:filter]}"
-
         @path = opts[:path]
         @filter = opts[:filter]
         @mount_point = opts[:mount_point]
@@ -96,13 +94,13 @@ module Gopher
         Dir.glob("#{dir}/*.*").each do |x|
           # if this is a directory, then generate a directory link for it
           if File.directory?(x)
-            m.directory File.basename(x), to_selector(x)
+            m.directory File.basename(x), to_selector(x), @application.host, @application.port
 
           elsif File.file?(x) && File.fnmatch(filter, x)
             # fnmatch makes sure that the file matches the glob filter specified in the mount directive
 
             # otherwise, it's a normal file link
-            m.link File.basename(x), to_selector(x)
+            m.link File.basename(x), to_selector(x), @application.host, @application.port
           end
         end
         m.to_s

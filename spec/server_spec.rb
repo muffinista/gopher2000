@@ -11,6 +11,7 @@ end
 describe Gopher::Server do
   before(:each) do
     @application = FakeApp
+    @application.scripts = []
     @application.reset!
 
     @host = "0.0.0.0"

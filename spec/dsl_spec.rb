@@ -33,8 +33,6 @@ describe Gopher::DSL do
         "hi"
       end
     end
-
-    pending "test block?"
   end
 
   describe "mount" do
@@ -42,12 +40,26 @@ describe Gopher::DSL do
       @app.should_receive(:mount).with('/foo', {:path => "/bar"})
       @server.mount "/foo" => "/bar"
     end
+
+    it "should pass a route, path, filter, and some opts to the app" do
+      @app.should_receive(:mount).with('/foo', {:path => "/bar", :filter => "*.jpg"})
+      @server.mount "/foo" => "/bar", :filter => "*.jpg"
+    end
   end
 
   describe "menu" do
     it "should pass a menu key and block to the app" do
       @app.should_receive(:menu).with('/foo')
       @server.menu '/foo' do
+        "hi"
+      end
+    end
+  end
+
+  describe "text" do
+    it "should pass a text_template key and block to the app" do
+      @app.should_receive(:text).with('/foo')
+      @server.text '/foo' do
         "hi"
       end
     end

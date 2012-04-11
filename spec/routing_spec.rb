@@ -10,8 +10,15 @@ describe Gopher::Routing do
     @router = MockServer.new
   end
 
-  pending "route"
-  pending "default_route"
+  describe "default_route" do
+    it "should set route as default" do
+      @router.default_route do
+        "hi"
+      end
+      junk, block = @router.lookup("sfssfdfsfsd")
+      block.class.should eql(UnboundMethod)
+    end
+  end
 
   describe "globify" do
     it "should add glob if none yet" do

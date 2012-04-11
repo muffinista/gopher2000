@@ -20,9 +20,10 @@ module Gopher
 
     @routes = []
     @menus = {}
+    @text_templates = {}
     @scripts ||= []
 
-    cattr_accessor :menus, :routes, :config, :scripts, :last_reload
+    cattr_accessor :menus, :text_templates, :routes, :config, :scripts, :last_reload
 
     class << self
       def host
@@ -64,6 +65,7 @@ module Gopher
       def reset!
         self.routes = []
         self.menus = {}
+        self.text_templates = {}
         self.scripts ||= []
         self.config ||= {
           :debug => false,

@@ -1,11 +1,12 @@
 require File.join(File.dirname(__FILE__), '/spec_helper')
 
 class MockServer
-  attr_accessor :menus, :params, :request
+  attr_accessor :menus, :text_templates, :params, :request
   include Gopher::Rendering
 
   def initialize
     @menus = {}
+    @text_templates = {}
   end
 end
 
@@ -18,7 +19,11 @@ describe Gopher::Rendering do
   describe "find_template" do
     it "should check in menus" do
       @s.menus['foo'] = "bar"
-      @s.find_template('foo').should == "bar"
+      @s.find_template('foo').should == ["bar", Gopher::Rendering::Menu]
+    end
+    it "should check in text_templates" do
+      @s.text_templates['foo'] = "bar"
+      @s.find_template('foo').should == ["bar", Gopher::Rendering::Text]
     end
   end
 
@@ -45,7 +50,14 @@ describe Gopher::Rendering do
       @s.render(:foo).should == "abc"
     end
 
-    pending "args, etc"
+    it "rendering text access to request obj" do
+      @s.request = "abc"
+      @s.text :foo do
+        @request
+      end
+
+      @s.render(:foo).should == "abc"
+    end
   end
 
   describe "not_found_template" do
