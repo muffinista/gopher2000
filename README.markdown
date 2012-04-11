@@ -25,6 +25,11 @@ Features
 * built in logging and stats.
 * Runs on Ruby 1.9.2 with all the modern conveniences.
 
+Requirements
+------------
+* Ruby 1.9.2 or greater
+* Nerves of steel
+
 Examples
 --------
 
