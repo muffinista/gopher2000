@@ -19,8 +19,6 @@ module Gopher
 
     def set(key, value = nil)
       application.config[key] = value
-
-      puts application.config.inspect
     end
 
     def route(path, &block)
@@ -67,7 +65,13 @@ module Gopher
     # called by bin/gopher2000
     #
     def run(script, opts = {})
-      puts opts.inspect
+
+      load script
+
+      #
+      # apply options after loading the script so that anything specified on the command-line
+      # will take precedence over defaults specified in the script
+      #
       opts.each { |k, v|
         set k, v
       }
@@ -77,7 +81,6 @@ module Gopher
         watch script
       end
 
-      load script
     end
   end
 end

@@ -26,8 +26,6 @@ opts.separator "Options:"
 
 params = {
   :debug => false,
-  :port => 70,
-  :host => '0.0.0.0',
   :env => :production
 }
 
