@@ -5,8 +5,10 @@ module Gopher
     # @see http://www.faqs.org/rfcs/rfc1436.html
     LINE_ENDING = "\r\n"
 
-    # All rendering of templates (inline and otherwise) is done inside a RenderContext
-    class Base
+    #
+    # base class for rendering output
+    #
+    class Base < AbstractRenderer
       attr_accessor :result, :spacing, :request, :params, :application
 
       def initialize(app=nil) # nodoc
@@ -15,19 +17,30 @@ module Gopher
         @spacing = 1
       end
 
+      #
+      # add a line to the output
+      #
       def <<(string); @result << string.to_s; end
 
+      #
       # Adds +text+ to the result
+      #
       def text(text)
         self << text
         add_spacing
       end
 
+      #
+      # specify spacing between lines. to make something double-spaced, you could call:
+      # spacing(2)
+      #
       def spacing(n)
         @spacing = n.to_i
       end
 
+      #
       # Adds +n+ empty lines
+      #
       def br(n=1)
         self << (LINE_ENDING * n)
       end
@@ -54,8 +67,13 @@ module Gopher
         lines.each do |line|
           text line.lstrip.rstrip
         end
+
+        self.to_s
       end
 
+      #
+      # return the output as a string
+      #
       def to_s
         @result
       end

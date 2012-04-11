@@ -6,18 +6,26 @@ module Gopher
     def menu(name, &block)
       menus[name.to_sym] = block
     end
+    def text(name, &block)
+      text_templates[name.to_sym] = block
+    end
 
+    #
+    # specify a template to be used for missing requests
+    #
     def not_found(&block)
       menu :not_found, &block
     end
 
-    # def template(name, &block)
-    #   @templates ||= {}
-    #   @templates[name.to_sym] = block
-    # end
-
     def find_template(t)
-      menus[t]
+      x = menus[t]
+      if x
+        return x, Menu
+      end
+      x = text_templates[t]
+      if x
+        return x, Text
+      end
     end
 
     # Find the right template (with context) and instance_exec it inside the context
@@ -25,11 +33,11 @@ module Gopher
       #
       # find the right renderer we need
       #
-      block = find_template(template)
+      block, handler = find_template(template)
 
       raise TemplateNotFound if block.nil?
 
-      ctx = Gopher::Rendering::Menu.new(application)
+      ctx = handler.new(application)
       ctx.params = @params
       ctx.request = @request
 

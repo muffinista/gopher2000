@@ -1,6 +1,11 @@
 module Gopher
   module Rendering
-    # The MenuContext is for rendering gopher menus
+    #
+    # The MenuContext is for rendering gopher menus in the "pseudo
+    # file-system hierarchy" defined by RFC1436
+    #
+    # @see http://www.ietf.org/rfc/rfc1436.txt
+    #
     class Menu < Base
       NO_HOST = '(FALSE)'
       NO_PORT = 0
@@ -13,11 +18,13 @@ module Gopher
           gsub(/\n/, '') # Get rid of newlines (\r as well?)
       end
 
-      # Creates a gopher menu line from +type+, +text+, +selector+, +host+ and +port+
-      # +host+ and +post+ will default to the current host and port of the running Gopher server
-      # (by default 0.0.0.0 and 70)
-      # +text+ will be sanitized according to a few simple rules (see Gopher::Utils)
-      #      def line(type, text, selector, host=Gopher::Server.host, port=Gopher::Server.port)
+      #
+      # output a gopher menu line
+      #
+      # +type+ -- what sort of entry is this? @see http://www.ietf.org/rfc/rfc1436.txt for a list
+      # +text+ -- the text of the line
+      # +selector+ -- if this is a link, the path of the route we are linking to
+      # +host+ and +post+ will default to the current host and port of the server
       def line(type, text, selector, host=nil, port=nil)
         text = sanitize_text(text)
 
@@ -27,39 +34,68 @@ module Gopher
         self << ["#{type}#{text}", selector, host, port].join("\t") + LINE_ENDING
       end
 
+      #
+      # output a line of text, with no selector
+      #
       def text(text, type = 'i')
         line type, text, 'null', NO_HOST, NO_PORT
       end
 
+      #
+      # add some empty lines to the menu
+      #
       def br(n=1)
         1.upto(n) do
           text 'i', ""
         end
       end
 
+      #
+      # output an error message
+      #
       def error(msg)
         text(msg, '3')
       end
 
-      def directory(name, selector)
-        line '1', name, selector
+      #
+      # output a link to a sub-menu/directory
+      #
+      def directory(name, selector, host=nil, port=nil)
+        line '1', name, selector, host, port
       end
+      alias menu directory
 
-      def link(text, selector, *args)
+
+      #
+      # output a menu link
+      #
+      # text -- the text of the link
+      # selector -- the path of the link. the extension of this path will be used to
+      # detemine the type of link -- image, archive, etc. If you want
+      # to specify a specific link-type, you should use the text
+      # method instead
+      #
+      def link(text, selector, host=nil, port=nil)
         type = determine_type(selector)
-        line type, text, selector, *args
+        line type, text, selector, host, port
       end
 
+      #
+      # output a search entry
+      # text - text of the selector
+      # selector -- the path to call
+      #
       def search(text, selector, *args)
         line '7', text, selector, *args
       end
       alias input search
 
-      def menu(text, selector, *args)
-        line '1', text, selector, *args
-      end
 
-      # Determines the gopher type for +selector+ based on the extension
+      #
+      # Determines the gopher type for +selector+ based on the
+      # extension. This is a pretty simple check based on the entities
+      # list in http://www.ietf.org/rfc/rfc1436.txt
+      #
       def determine_type(selector)
         ext = File.extname(selector).downcase
         case ext
