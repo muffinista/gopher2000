@@ -85,7 +85,11 @@ Or, if you include gopher in your file, you can just run the script itself:
 # scriptname.rb
 require 'gopher2000'
 
-# ruby scriptname.rb
+# ...
+# write some code here
+# ...
+
+# Then, run 'ruby scriptname.rb'
 
 ==> *start server at 0.0.0.0 7070*
 ```
@@ -331,5 +335,5 @@ TODO
 References
 ----------
 
-http://www.ietf.org/rfc/rfc1436.txt
-https://github.com/sinatra/sinatra
+* http://www.ietf.org/rfc/rfc1436.txt
+* https://github.com/sinatra/sinatra

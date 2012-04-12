@@ -22,6 +22,8 @@ Gem::Specification.new do |s|
 
   # specify any dependencies here; for example:
   s.add_development_dependency "rspec"
+  s.add_development_dependency "redcarpet"
+  s.add_development_dependency "yard"
   s.add_development_dependency "shoulda"
   s.add_development_dependency "rdoc"
   s.add_development_dependency "simplecov"
