@@ -328,6 +328,8 @@ EventMachine's defer feature if you need to learn more.
 TODO
 ----
 * More examples
+* Work on putting routing/rendering/etc into same context, and making
+  instance variables/methods generally available.
 * Documentation
 * clean up/improve EventMachine usage
 * stats generation
