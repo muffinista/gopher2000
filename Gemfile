@@ -17,6 +17,11 @@ group :development do
   gem "bundler", "~> 1.0.0"
   gem "watchr"
 
+  # There's a god example script stashed away in the repo
   gem "god"
+
+  #
+  # gems used in examples and for development.
+  #
   gem "weather-underground"
 end
