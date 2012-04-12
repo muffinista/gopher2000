@@ -335,5 +335,8 @@ TODO
 References
 ----------
 
-* http://www.ietf.org/rfc/rfc1436.txt
-* https://github.com/sinatra/sinatra
+* http://www.ietf.org/rfc/rfc1436.txt -- the original RFC for the
+  Gopher Protocol
+* https://github.com/sinatra/sinatra -- almost everything good in this
+  library was taken or influenced by something in Sinatra. RUN don't
+  walk to the code and take a look.
