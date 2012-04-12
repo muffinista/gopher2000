@@ -145,8 +145,8 @@ rendering/menu.rb for the code). The commands are:
 **search(text, selector)** -- output a link to a search action at
   /selector.
 
-Outputting Pretty Text
-----------------------
+Outputting Text
+---------------
 
 If you would like to output text, but have the ability to format it
 nicely, you can use a 'text' block like this:
@@ -185,10 +185,33 @@ Will return your text, but with nice wrapping, etc.
 @todo headers, etc.
 
 
-Formatting Helpers
-------------------
+Making It Pretty
+----------------
 
-@todo finish/document helpers
+There are several helpers which you can call within render blocks to
+help make your output a little shinier:
+
+**width(x)** will set the width of your output. The default is 80
+  characters. You can change this to make your output wider or
+  thinner. This setting is used by **block** and also by the methods
+  described below.
+
+**header(text, style='=')** will generate a very simple 'header', which is
+  basically the text you specify with an underline of the character
+  you specify. It will be centered in your output width, and will look
+  something like this:
+
+	     Hello There!
+	 =====================
+
+**big_header** is the same as header, except it is bigger and better!
+
+	 =====================
+	 =   Hello There!    =
+	 =====================
+
+**underline** can be used to just output plain old lines, if you're
+  into that sort of thing.
 
 
 Testing
@@ -199,8 +222,8 @@ just install a
 [gopher client](http://lmgtfy.com/?q=gopher+clients). Or, if you like
 to live on the edge, there's a few commands worth learning. First, you
 can use [netcat](http://netcat.sourceforge.net/) to achieve
-awesomeness. Here's some examples, assuming you're running the example script on
-port 7070:
+awesomeness. Here's some examples, assuming you're running the example
+script on port 7070:
 
 
 ```
@@ -304,3 +327,9 @@ TODO
 * Documentation
 * clean up/improve EventMachine usage
 * stats generation
+
+References
+----------
+
+http://www.ietf.org/rfc/rfc1436.txt
+https://github.com/sinatra/sinatra
