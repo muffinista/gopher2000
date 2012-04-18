@@ -130,6 +130,11 @@ route "/junk" do
   garble
 end
 
+route "/slow" do
+  sleep 1
+  "i am not fast"
+end
+
 helpers do
   def garble; "hhdhd"; end
 end

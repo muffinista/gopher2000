@@ -10,9 +10,9 @@ module Gopher
       attr_accessor :path, :filter, :mount_point
 
       #
-      # opts:
-      # filter -- a subset of files to show to user
-      # path -- the base path of the filesystem to work from
+      # @option opts [String] :filter a subset of files to show to user
+      # @option opts [String] :path the base path of the filesystem to work from
+      # @option opts [String] :mount_point the route for this handler -- this will be used to generate paths in the response
       #
       def initialize(opts = {})
         opts = {
@@ -25,6 +25,11 @@ module Gopher
         @mount_point = opts[:mount_point]
       end
 
+      #
+      # strip slashes, extra dots, etc, from an incoming selector and turn it into a 'normalized' path
+      # @param [String] path
+      # @return clean path string
+      #
       def sanitize(p)
         Pathname.new(p).cleanpath.to_s
       end
@@ -41,15 +46,17 @@ module Gopher
 
       #
       # take the incoming parameters, and turn them into a path
+      # @option opts [String] :splat splat value from Request params
       #
       def request_path(params)
         File.absolute_path(sanitize(params[:splat]), @path)
-        #File.join(@path, sanitize(params[:splat]))
       end
 
       #
       # take the path to a file and turn it into a selector which will match up when
       # a gopher client makes requests
+      # @param [String] path to a file on the filesytem
+      # @return selector which will match the file on subsequent requests
       #
       def to_selector(path)
         path.gsub(/^#{@path}/, @mount_point)
@@ -58,13 +65,11 @@ module Gopher
       #
       # handle a request
       #
-      # params - the params as parsed during the dispatching process - the main thing
-      # here should be :splat, which will basically be the path requested.
-      #
-      # request - the Request object for this session -- not currently used?
+      # @param [Hash] the params as parsed during the dispatching process - the main thing here should be :splat, which will basically be the path requested.
+      # @param [Request] - the Request object for this session -- not currently used?
       #
       def call(params = {}, request = nil)
-        debug_log "DirectoryHandler: call #{params.inspect}, #{request.inspect}"
+#        debug_log "DirectoryHandler: call #{params.inspect}, #{request.inspect}"
 
         lookup = request_path(params)
 
@@ -81,6 +86,8 @@ module Gopher
 
       #
       # generate a directory listing
+      # @param [String] path to directory
+      # @return rendered directory output for a response
       #
       def directory(dir)
         m = Menu.new(@application)

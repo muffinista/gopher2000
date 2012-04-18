@@ -2,15 +2,15 @@ require File.join(File.dirname(__FILE__), '/spec_helper')
 require 'tempfile'
 
 class FakeApp < Gopher::Application
-  cattr_accessor :fake_response
+  attr_accessor :fake_response
   def dispatch(x)
-    @@fake_response
+    @fake_response
   end
 end
 
 describe Gopher::Server do
   before(:each) do
-    @application = FakeApp
+    @application = FakeApp.new
     @application.scripts = []
     @application.reset!
 
@@ -27,14 +27,31 @@ describe Gopher::Server do
     @response.body = "hi"
   end
 
+  it "should work in non-blocking mode" do
+    @application.fake_response = @response
+    @application.stub!(:non_blocking?).and_return(false)
+
+    ::EM.run {
+      server = Gopher::Server.new(@application)
+      server.run!
+
+      # opens the socket client connection
+      socket = ::EM.connect(@host, @port, FakeSocketClient)
+      socket.send_data("123\n")
+
+      socket.onopen = lambda {
+        socket.data.last.chomp.should == "hi\r\n."
+        EM.stop
+      }
+    }
+  end
+
   it "should handle Gopher::Response results" do
-#    @application.should_receive(:dispatch).with(any_args).and_return(@response)
-#    @application.should_receive(:reload_stale)
     @application.fake_response = @response
 
     ::EM.run {
-      server = Gopher::Server.new
-      server.run!(@application)
+      server = Gopher::Server.new(@application)
+      server.run!
 
       # opens the socket client connection
       socket = ::EM.connect(@host, @port, FakeSocketClient)
@@ -48,13 +65,11 @@ describe Gopher::Server do
   end
 
   it "should handle string results" do
-#    @application.should_receive(:dispatch).with(any_args).and_return(@response)
-#    @application.should_receive(:reload_stale)
     @application.fake_response = @response
 
     ::EM.run {
-      server = Gopher::Server.new
-      server.run!(@application)
+      server = Gopher::Server.new(@application)
+      server.run!
 
       # opens the socket client connection
       socket = ::EM.connect(@host, @port, FakeSocketClient)
@@ -74,12 +89,9 @@ describe Gopher::Server do
 
     @application.fake_response = File.new(file)
 
-#    @application.should_receive(:dispatch).with(any_args).and_return(File.new(file))
-#    @application.should_receive(:reload_stale)
-
     ::EM.run {
-      server = Gopher::Server.new
-      server.run!(@application)
+      server = Gopher::Server.new(@application)
+      server.run!
 
       # opens the socket client connection
       socket = ::EM.connect(@host, @port, FakeSocketClient)
@@ -96,8 +108,8 @@ describe Gopher::Server do
     @application.fake_response = StringIO.new("hi")
 
     ::EM.run {
-      server = Gopher::Server.new
-      server.run!(@application)
+      server = Gopher::Server.new(@application)
+      server.run!
 
       # opens the socket client connection
       socket = ::EM.connect(@host, @port, FakeSocketClient)

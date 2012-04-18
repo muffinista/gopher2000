@@ -1,11 +1,11 @@
 require File.join(File.dirname(__FILE__), '/spec_helper')
 
-class MockServer
-  attr_accessor :routes
-  include Gopher::Routing
+class MockServer < Gopher::Application
+#  attr_accessor :routes
+#  include Gopher::Routing
 end
 
-describe Gopher::Routing do
+describe Gopher::Application do
   before(:each) do
     @router = MockServer.new
   end

@@ -5,16 +5,12 @@ module Gopher
   # very basic DSL to handle the common stuff you would want to do
   #
   module DSL
-
-    include Logging
-
-    @@application = nil
+    @application = nil
     def application
-      return @@application unless @@application.nil?
-      puts "fire up app"
+      return @application unless @application.nil?
 
-      @@application = Gopher::Application #.new
-      @@application.reset!
+      @application = Gopher::Application.new
+      @application.reset!
     end
 
     def set(key, value = nil)
@@ -23,6 +19,10 @@ module Gopher
 
     def route(path, &block)
       application.route(path, &block)
+    end
+
+    def default_route(&block)
+      application.default_route(&block)
     end
 
     def mount(path, opts = {})
@@ -86,3 +86,13 @@ module Gopher
 end
 
 include Gopher::DSL
+
+#
+# don't call at_exit if we're running specs
+#
+unless ENV['gopher_test']
+  at_exit do
+    s = Gopher::Server.new(@application)
+    s.run!
+  end
+end

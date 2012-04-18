@@ -1,17 +1,22 @@
 module Gopher
   class Server
-    attr_accessor :handler
+    attr_accessor :app
+
+    def initialize(a)
+      @app = a
+    end
 
     def host
-      @handler.config[:host] ||= '0.0.0.0'
+      puts @app.inspect
+      @app.config[:host] ||= '0.0.0.0'
     end
 
     def port
-      @handler.config[:port] ||= 70
+      @app.config[:port] ||= 70
     end
 
-    def run!(h = Gopher::Application)
-      @handler = h
+    def run!#(h = Gopher::Application)
+#      @app = h
 
       EventMachine::run do
         Signal.trap("INT") {
@@ -26,9 +31,11 @@ module Gopher
         EventMachine.kqueue = true if EventMachine.kqueue?
         EventMachine.epoll = true if EventMachine.epoll?
 
+
         puts "start server at #{host} #{port}"
-        EventMachine::start_server(host, port, h) do |conn|
-          @handler.reload_stale
+        EventMachine::start_server(host, port, Gopher::Dispatcher) do |conn|
+          conn.app = @app
+          #          @handler.reload_stale
         end
       end
     end
@@ -45,15 +52,5 @@ module Gopher
         op.on('-e env',    'set the environment (default is development)')  { |val| set :environment, val.to_sym }
       }.parse!(ARGV.dup)
     end
-  end
-end
-
-#
-# don't call at_exit if we're running specs
-#
-unless ENV['gopher_test']
-  at_exit do
-    s = Gopher::Server.new(self)
-    s.run!
   end
 end

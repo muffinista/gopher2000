@@ -3,8 +3,8 @@ require 'tempfile'
 
 describe Gopher::Application do
   before(:each) do
-    @app = Gopher::Application
-    @app = Gopher::Application.reset!
+    @app = Gopher::Application.new
+    @app.reset!
     @app.scripts = []
   end
 

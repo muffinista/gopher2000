@@ -10,9 +10,9 @@ end
 
 describe Gopher::DSL do
   before(:each) do
-    @app = FakeApp
+    @app = FakeApp.new
 
-    @server = FakeServer.new
+    @server = FakeServer.new(@app)
     @server.send :require, 'gopher2000/dsl'
     @server.stub!(:application).and_return(@app)
     @app.reset!
@@ -30,6 +30,15 @@ describe Gopher::DSL do
     it "should pass a lookup and block to the app" do
       @app.should_receive(:route).with('/foo')
       @server.route '/foo' do
+        "hi"
+      end
+    end
+  end
+
+  describe "default_route" do
+    it "should pass a default block to the app" do
+      @app.should_receive(:default_route)
+      @server.default_route do
         "hi"
       end
     end

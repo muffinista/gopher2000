@@ -11,7 +11,31 @@ describe Gopher::Handlers::DirectoryHandler do
     @h.application = app
   end
 
-  pending "filtering"
+  describe "filtering" do
+    before(:each) do
+      File.should_receive(:directory?).with("/tmp/bar/baz").and_return(true)
+      File.should_receive(:directory?).with("/tmp/bar/baz/a.txt").and_return(false)
+      File.should_receive(:directory?).with("/tmp/bar/baz/b.exe").and_return(false)
+      File.should_receive(:directory?).with("/tmp/bar/baz/dir2").and_return(true)
+
+      File.should_receive(:file?).with("/tmp/bar/baz/a.txt").and_return(true)
+      File.should_receive(:file?).with("/tmp/bar/baz/b.exe").and_return(true)
+
+      File.should_receive(:fnmatch).with("*.txt", "/tmp/bar/baz/a.txt").and_return(true)
+      File.should_receive(:fnmatch).with("*.txt", "/tmp/bar/baz/b.exe").and_return(false)
+
+      Dir.should_receive(:glob).with("/tmp/bar/baz/*.*").and_return([
+          "/tmp/bar/baz/a.txt",
+          "/tmp/bar/baz/b.exe",
+          "/tmp/bar/baz/dir2"])
+
+      @h.filter = "*.txt"
+    end
+
+    it "should use right filter" do
+      @h.call(:splat => "bar/baz")
+    end
+  end
 
   describe "request_path" do
     it "should join existing path with incoming path" do

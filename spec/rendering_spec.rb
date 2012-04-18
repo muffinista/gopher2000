@@ -1,8 +1,7 @@
 require File.join(File.dirname(__FILE__), '/spec_helper')
 
-class MockServer
+class MockServer < Gopher::Application
   attr_accessor :menus, :text_templates, :params, :request
-  include Gopher::Rendering
 
   def initialize
     @menus = {}
@@ -11,7 +10,7 @@ class MockServer
 end
 
 
-describe Gopher::Rendering do
+describe Gopher::Application do
   before(:each) do
     @s = MockServer.new
   end
@@ -62,7 +61,7 @@ describe Gopher::Rendering do
 
   describe "not_found_template" do
     before(:each) do
-      @s.register_defaults
+      @s.reset!
     end
 
     it "should use custom template if provided" do
@@ -75,11 +74,11 @@ describe Gopher::Rendering do
     end
   end
 
-  describe "register_defaults" do
-    it "should add to internal" do
-      @s.find_template(:'internal/not_found').should be_nil
-      @s.register_defaults
-      @s.find_template(:'internal/not_found').should_not be_nil
-    end
-  end
+  # describe "register_defaults" do
+  #   it "should add to internal" do
+  #     @s.find_template(:'internal/not_found').should be_nil
+  #     @s.register_defaults
+  #     @s.find_template(:'internal/not_found').should_not be_nil
+  #   end
+  # end
 end
