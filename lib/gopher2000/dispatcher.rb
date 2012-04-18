@@ -1,10 +1,16 @@
 module Gopher
+
+  #
+  # Handle communication between Server and the actual gopher Application
+  #
   class Dispatcher < EventMachine::Connection
 
+    # the Application we are running
     attr_accessor :app
 
     #
     # get the IP address of the client
+    # @return ip address
     #
     def remote_ip
       Socket.unpack_sockaddr_in(get_peername).last
@@ -18,10 +24,18 @@ module Gopher
     #
     # this essentially means we have 'one instance per request'
     #
+    # @param [String] incoming selector
+    # @return Response object
+    #
     def receive_data(selector)
       dup.call!(selector)
     end
 
+    #
+    # generate a request object from an incoming selector, and dispatch it to the app
+    # @param [String] incoming selector
+    # @return Response object
+    #
     def call!(selector)
       # parse out the request
       @request = Request.new(selector, remote_ip)
@@ -48,6 +62,7 @@ module Gopher
 
     #
     # send the response back to the client
+    # @param [Response] response object
     #
     def send_response(response)
       case response
@@ -65,7 +80,7 @@ module Gopher
     #
     # Add the period on a line by itself that closes the connection
     #
-    # @todo don't add an extra line ending here if we don't need it
+    # @return valid string to mark end of transmission as specified in RFC1436
     def end_of_transmission
       [Gopher::Rendering::LINE_ENDING, ".", Gopher::Rendering::LINE_ENDING].join
     end

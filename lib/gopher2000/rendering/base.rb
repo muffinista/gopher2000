@@ -1,4 +1,8 @@
 module Gopher
+
+  #
+  # namespace for classes that render output for the app
+  #
   module Rendering
 
     # "A CR LF denotes the end of the item." RFC 1436
