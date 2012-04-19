@@ -131,7 +131,6 @@ route "/junk" do
 end
 
 route "/slow" do
-  sleep 1
   "i am not fast"
 end
 

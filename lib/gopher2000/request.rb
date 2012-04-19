@@ -1,4 +1,8 @@
 module Gopher
+
+  #
+  # basic class for an incoming request
+  #
   class Request
     attr_accessor :selector, :input, :ip_address
 
@@ -7,6 +11,8 @@ module Gopher
       @ip_address = ip_addr
     end
 
+    # confirm that this is actually a valid gopher request
+    # @return [Boolean] true if the request is valid, false otherwise
     def valid?
       # The Selector string should be no longer than 255 characters. (RFC 1436)
       @selector.length <= 255

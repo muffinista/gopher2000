@@ -28,7 +28,7 @@ module Gopher
     # @return Response object
     #
     def receive_data(selector)
-      dup.call!(selector)
+      call! Request.new(selector, remote_ip)
     end
 
     #
@@ -36,13 +36,9 @@ module Gopher
     # @param [String] incoming selector
     # @return Response object
     #
-    def call!(selector)
-      # parse out the request
-      @request = Request.new(selector, remote_ip)
-
+    def call!(request)
       operation = proc {
-        resp = app.dispatch(@request)
-        resp
+        app.dispatch(request)
       }
       callback = proc {|result|
         send_response result

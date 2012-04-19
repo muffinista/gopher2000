@@ -1,11 +1,16 @@
 module Gopher
+
+  #
+  # main application class for a gopher server. holds all the
+  # methods/data required to interact with clients.
+  #
   class Application
 
     # The output pattern we will use to generate access logs
     ACCESS_LOG_PATTERN = "%d\t%m\n"
 
-    @access_log = nil
-    @debug_log = nil
+    @@access_log = nil
+    @@debug_log = nil
 
     @routes = []
     @menus = {}
@@ -453,8 +458,8 @@ module Gopher
     # output a debugging message
     #
     def debug_log(x)
-      @debug_logger ||= ::Logging.logger(STDERR)
-      @debug_logger.debug x
+      @@debug_logger ||= ::Logging.logger(STDERR)
+      @@debug_logger.debug x
     end
 
 
@@ -517,12 +522,12 @@ module Gopher
     def access_log(request, response)
       return if access_log_dest.nil?
 
-      @access_logger ||= init_access_log
+      @@access_logger ||= init_access_log
       code = response.respond_to?(:code) ? response.code : "success"
       size = response.respond_to?(:size) ? response.size : response.length
       output = [request.ip_address, request.selector, request.input, code.to_s, size].join("\t")
 
-      @access_logger.debug output
+      @@access_logger.debug output
     end
 
 

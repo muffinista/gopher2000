@@ -10,7 +10,8 @@ module Gopher
     LINE_ENDING = "\r\n"
 
     #
-    # base class for rendering output
+    # base class for rendering output. this class provides methods
+    # that can be used when rendering both text and gopher menus
     #
     class Base < AbstractRenderer
       attr_accessor :result, :spacing, :width, :request, :params, :application
@@ -24,11 +25,16 @@ module Gopher
 
       #
       # add a line to the output
+      # @param [String] string text to add to the output
       #
-      def <<(string); @result << string.to_s; end
+      def <<(string)
+        @result << string.to_s
+      end
 
       #
       # Adds +text+ to the result
+      # @param[String] text text to add to the result. Adds the line,
+      #   then adds any required spacing
       #
       def text(text)
         self << text
@@ -37,14 +43,19 @@ module Gopher
 
       #
       # specify the desired width of text output -- defaults to 80 chars
+      # @param [Integer] n desired width for text output
       #
       def width(n)
         @width = n.to_i
       end
 
       #
-      # specify spacing between lines. to make something double-spaced, you could call:
-      # spacing(2)
+      # specify spacing between lines.
+      #
+      # @param [Integer] n desired line spacing
+      #
+      # @example to make something double-spaced, you could call:
+      #   spacing(2)
       #
       def spacing(n)
         @spacing = n.to_i
@@ -52,7 +63,7 @@ module Gopher
 
       #
       # Add some empty lines to the output
-      # n - how many lines to add
+      # @param [Integer] n how many lines to add
       #
       def br(n=1)
         self << (LINE_ENDING * n)
@@ -62,9 +73,9 @@ module Gopher
       # wrap +text+ into lines no wider than +width+. Hacked from ActionView
       # @see https://github.com/rails/rails/blob/196407c54f0736c275d2ad4e6f8b0ac55360ad95/actionpack/lib/action_view/helpers/text_helper.rb#L217
       #
-      # text -- the text you want to wrap
-      # width - the desired width of the block -- defaults to the
-      # current output width
+      # @param [String] text the text you want to wrap
+      # @param [Integer] width the desired width of the block -- defaults to the
+      #   current output width
       #
       def block(text, width=@width)
 
@@ -83,11 +94,12 @@ module Gopher
       #
       # output a centered string with a nice underline below it,
       # centered on the current output width
-      # str - the string to output
-      # under - the desired underline character
-      # edge - should we output an edge? if so, there will be a
-      # character to the left/right edges of the string, so you can
-      # draw a box around the text
+      #
+      # @param [String] str - the string to output
+      # @param [String] under - the desired underline character
+      # @param [Boolean] edge - should we output an edge? if so, there will be a
+      #  character to the left/right edges of the string, so you can
+      #  draw a box around the text
       #
       def header(str, under = '=', edge = false)
         w = @width
@@ -106,8 +118,8 @@ module Gopher
 
       #
       # output a centered string in a box
-      # str - the string to output
-      # under - the character to use to make the box
+      # @param [String] str the string to output
+      # @param [Strnig] under the character to use to make the box
       #
       def big_header(str, under = '=')
         br
@@ -120,9 +132,10 @@ module Gopher
 
       #
       # output an underline
-      # length - the length of the underline -- defaults to current
-      # output width.
-      # char - the character to output
+      #
+      # @param [Integer] length the length of the underline -- defaults to current
+      #   output width.
+      # @param [String] char the character to output
       #
       def underline(length=@width, char='=')
         text(char * length)
@@ -131,6 +144,7 @@ module Gopher
 
       #
       # return the output as a string
+      # @return rendered output
       #
       def to_s
         @result

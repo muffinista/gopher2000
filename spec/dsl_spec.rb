@@ -74,15 +74,6 @@ describe Gopher::DSL do
     end
   end
 
-  describe "template" do
-    it "should pass a template key and block to the app" do
-      @app.should_receive(:template).with('/foo')
-      @server.template '/foo' do
-        "hi"
-      end
-    end
-  end
-
   describe "helpers" do
     it "should pass a block to the app" do
       @app.should_receive(:helpers)

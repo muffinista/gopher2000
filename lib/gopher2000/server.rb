@@ -1,23 +1,37 @@
 module Gopher
+
+  #
+  # main class which will listen on a specified port, and pass requests to an Application class
+  #
   class Server
     attr_accessor :app
 
+    #
+    # constructor
+    # @param [Application] instance of Gopher::Application we want to run
+    #
     def initialize(a)
       @app = a
     end
 
+    #
+    # @return [String] name of the host specified in our config
+    #
     def host
-      puts @app.inspect
       @app.config[:host] ||= '0.0.0.0'
     end
 
+    #
+    # @return [Integer] port specified in our config
+    #
     def port
       @app.config[:port] ||= 70
     end
 
-    def run!#(h = Gopher::Application)
-#      @app = h
-
+    #
+    # main app loop
+    #
+    def run!
       EventMachine::run do
         Signal.trap("INT") {
           puts "It's a trap!"
@@ -33,9 +47,12 @@ module Gopher
 
 
         puts "start server at #{host} #{port}"
+        if @app.non_blocking?
+          puts "Not blocking on requests"
+        end
         EventMachine::start_server(host, port, Gopher::Dispatcher) do |conn|
-          conn.app = @app
-          #          @handler.reload_stale
+#          @app.reload_stale
+          conn.app = @app.dup
         end
       end
     end
