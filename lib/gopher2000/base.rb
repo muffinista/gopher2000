@@ -497,12 +497,16 @@ module Gopher
 
 
     #
-    # where should we store access logs?
+    # where should we store access logs? if nil, don't store them at all
+    # @return logfile path
     #
     def access_log_dest
       config.has_key?(:access_log) ? config[:access_log] : nil
     end
 
+    #
+    # initialize a Logger for tracking hits to the server
+    #
     def init_access_log
       return if access_log_dest.nil?
 
@@ -519,11 +523,14 @@ module Gopher
       log
     end
 
+    #
+    # write out an entry to our access log
+    #
     def access_log(request, response)
       return if access_log_dest.nil?
 
       @@access_logger ||= init_access_log
-      code = response.respond_to?(:code) ? response.code : "success"
+      code = response.respond_to?(:code) ? response.code.to_s : "success"
       size = response.respond_to?(:size) ? response.size : response.length
       output = [request.ip_address, request.selector, request.input, code.to_s, size].join("\t")
 

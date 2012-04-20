@@ -19,10 +19,6 @@ module Gopher
 
     #
     # called by EventMachine when there's an incoming request
-    # roughly matching sinatra's style of duping the app to respond
-    # to requests, @see http://www.sinatrarb.com/intro#Request/Instance%20Scope
-    #
-    # this essentially means we have 'one instance per request'
     #
     # @param [String] incoming selector
     # @return Response object

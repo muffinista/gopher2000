@@ -29,7 +29,7 @@ module Gopher
     end
 
     #
-    # main app loop
+    # main app loop. called via at_exit block defined in DSL
     #
     def run!
       EventMachine::run do
@@ -46,12 +46,24 @@ module Gopher
         EventMachine.epoll = true if EventMachine.epoll?
 
 
-        puts "start server at #{host} #{port}"
+        STDERR.puts "start server at #{host} #{port}"
         if @app.non_blocking?
-          puts "Not blocking on requests"
+          STDERR.puts "Not blocking on requests"
         end
+
+
         EventMachine::start_server(host, port, Gopher::Dispatcher) do |conn|
-#          @app.reload_stale
+          #
+          # check if we should reload any scripts before moving along
+          #
+          @app.reload_stale
+
+          #
+          # roughly matching sinatra's style of duping the app to respond
+          # to requests, @see http://www.sinatrarb.com/intro#Request/Instance%20Scope
+          #
+          # this essentially means we have 'one instance per request'
+          #
           conn.app = @app.dup
         end
       end

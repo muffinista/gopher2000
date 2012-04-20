@@ -112,11 +112,19 @@ end
 # requests can have variables specified on the URL
 #
 route '/request/:x/:y' do
-  render :request_with_params, params
+  render :request_with_params
 end
 
-menu :request_with_params do |params|
+#menu :request_with_params do |params|
+#  text params.inspect
+#end
+
+#
+# both the incoming params, and the request object are available when rendering
+#
+menu :request_with_params do
   text params.inspect
+  text request.inspect
 end
 
 route '/hello' do
