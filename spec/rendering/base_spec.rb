@@ -27,7 +27,7 @@ describe Gopher::Rendering::Base do
       @ctx.underline(1, 'x').should == "x\r\n"
     end
     it "has defaults" do
-      @ctx.underline.should == "=" * 80 + "\r\n"
+      @ctx.underline.should == "=" * 70 + "\r\n"
     end
   end
 

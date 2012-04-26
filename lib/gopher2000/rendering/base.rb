@@ -20,7 +20,10 @@ module Gopher
         @application = app
         @result = ""
         @spacing = 1
-        @width = 80
+
+        # default to 70 per RFC1436 3.9
+        # "the user display string should be kept under 70 characters in length"
+        @width = 70
       end
 
       #
@@ -42,7 +45,7 @@ module Gopher
       end
 
       #
-      # specify the desired width of text output -- defaults to 80 chars
+      # specify the desired width of text output -- defaults to 70 chars
       # @param [Integer] n desired width for text output
       #
       def width(n)
@@ -156,7 +159,7 @@ module Gopher
       # returning an array of lines for now in case we want to do nifty processing with them
       #
       # File actionpack/lib/action_view/helpers/text_helper.rb, line 217
-      def word_wrap(text, width=80*args)
+      def word_wrap(text, width=70*args)
         text.split("\n").collect do |line|
           line.length > width ? line.gsub(/(.{1,#{width}})(\s+|$)/, "\\1\n").strip : line
         end
