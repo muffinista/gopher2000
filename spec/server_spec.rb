@@ -1,124 +1,127 @@
 require File.join(File.dirname(__FILE__), '/spec_helper')
 require 'tempfile'
 
-class FakeApp < Gopher::Application
-  attr_accessor :fake_response
-  def dispatch(x)
-    @fake_response
-  end
-end
+if ENV["WITH_SERVER_SPECS"].to_i == 1
 
-describe Gopher::Server do
-  before(:each) do
-    @application = FakeApp.new
-    @application.scripts = []
-    @application.reset!
-
-    @host = "0.0.0.0"
-    @port = 12345
-
-    @application.config[:host] = @host
-    @application.config[:port] = @port
-
-    @request = Gopher::Request.new("foo", "bar")
-
-    @response = Gopher::Response.new(@request)
-    @response.code = :success
-    @response.body = "hi"
+  class FakeApp < Gopher::Application
+    attr_accessor :fake_response
+    def dispatch(x)
+      @fake_response
+    end
   end
 
-  it "should work in non-blocking mode" do
-    @application.fake_response = @response
-    @application.stub!(:non_blocking?).and_return(false)
+  describe Gopher::Server do
+    before(:each) do
+      @application = FakeApp.new
+      @application.scripts = []
+      @application.reset!
 
-    ::EM.run {
-      server = Gopher::Server.new(@application)
-      server.run!
+      @host = "0.0.0.0"
+      @port = 12345
 
-      # opens the socket client connection
-      socket = ::EM.connect(@host, @port, FakeSocketClient)
-      socket.send_data("123\n")
+      @application.config[:host] = @host
+      @application.config[:port] = @port
 
-      socket.onopen = lambda {
-        socket.data.last.chomp.should == "hi\r\n."
-        EM.stop
+      @request = Gopher::Request.new("foo", "bar")
+
+      @response = Gopher::Response.new(@request)
+      @response.code = :success
+      @response.body = "hi"
+    end
+
+    it "should work in non-blocking mode" do
+      @application.fake_response = @response
+      @application.stub!(:non_blocking?).and_return(false)
+
+      ::EM.run {
+        server = Gopher::Server.new(@application)
+        server.run!
+
+        # opens the socket client connection
+        socket = ::EM.connect(@host, @port, FakeSocketClient)
+        socket.send_data("123\n")
+
+        socket.onopen = lambda {
+          socket.data.last.chomp.should == "hi\r\n."
+          EM.stop
+        }
       }
-    }
-  end
+    end
 
-  it "should handle Gopher::Response results" do
-    @application.fake_response = @response
+    it "should handle Gopher::Response results" do
+      @application.fake_response = @response
 
-    ::EM.run {
-      server = Gopher::Server.new(@application)
-      server.run!
+      ::EM.run {
+        server = Gopher::Server.new(@application)
+        server.run!
 
-      # opens the socket client connection
-      socket = ::EM.connect(@host, @port, FakeSocketClient)
-      socket.send_data("123\n")
+        # opens the socket client connection
+        socket = ::EM.connect(@host, @port, FakeSocketClient)
+        socket.send_data("123\n")
 
-      socket.onopen = lambda {
-        socket.data.last.chomp.should == "hi\r\n."
-        EM.stop
+        socket.onopen = lambda {
+          socket.data.last.chomp.should == "hi\r\n."
+          EM.stop
+        }
       }
-    }
-  end
+    end
 
-  it "should handle string results" do
-    @application.fake_response = @response
+    it "should handle string results" do
+      @application.fake_response = @response
 
-    ::EM.run {
-      server = Gopher::Server.new(@application)
-      server.run!
+      ::EM.run {
+        server = Gopher::Server.new(@application)
+        server.run!
 
-      # opens the socket client connection
-      socket = ::EM.connect(@host, @port, FakeSocketClient)
-      socket.send_data("123\n")
+        # opens the socket client connection
+        socket = ::EM.connect(@host, @port, FakeSocketClient)
+        socket.send_data("123\n")
 
-      socket.onopen = lambda {
-        socket.data.last.chomp.should == "hi\r\n."
-        EM.stop
+        socket.onopen = lambda {
+          socket.data.last.chomp.should == "hi\r\n."
+          EM.stop
+        }
       }
-    }
-  end
+    end
 
-  it "should handle File results" do
-    file = Tempfile.new('foo')
-    file.write("hi")
-    file.close
+    it "should handle File results" do
+      file = Tempfile.new('foo')
+      file.write("hi")
+      file.close
 
-    @application.fake_response = File.new(file)
+      @application.fake_response = File.new(file)
 
-    ::EM.run {
-      server = Gopher::Server.new(@application)
-      server.run!
+      ::EM.run {
+        server = Gopher::Server.new(@application)
+        server.run!
 
-      # opens the socket client connection
-      socket = ::EM.connect(@host, @port, FakeSocketClient)
-      socket.send_data("123\n")
+        # opens the socket client connection
+        socket = ::EM.connect(@host, @port, FakeSocketClient)
+        socket.send_data("123\n")
 
-      socket.onopen = lambda {
-        socket.data.last.chomp.should == "hi"
-        EM.stop
+        socket.onopen = lambda {
+          socket.data.last.chomp.should == "hi"
+          EM.stop
+        }
       }
-    }
-  end
+    end
 
-  it "should handle StringIO results" do
-    @application.fake_response = StringIO.new("hi")
+    it "should handle StringIO results" do
+      @application.fake_response = StringIO.new("hi")
 
-    ::EM.run {
-      server = Gopher::Server.new(@application)
-      server.run!
+      ::EM.run {
+        server = Gopher::Server.new(@application)
+        server.run!
 
-      # opens the socket client connection
-      socket = ::EM.connect(@host, @port, FakeSocketClient)
-      socket.send_data("123\n")
+        # opens the socket client connection
+        socket = ::EM.connect(@host, @port, FakeSocketClient)
+        socket.send_data("123\n")
 
-      socket.onopen = lambda {
-        socket.data.last.chomp.should == "hi\r\n."
-        EM.stop
+        socket.onopen = lambda {
+          socket.data.last.chomp.should == "hi\r\n."
+          EM.stop
+        }
       }
-    }
+    end
   end
 end
