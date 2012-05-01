@@ -1,4 +1,3 @@
-require 'logging'
 require 'eventmachine'
 require 'stringio'
 

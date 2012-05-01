@@ -45,8 +45,7 @@ end
 #  location = request.input.strip
 
 route '/lookup' do
-#  location = request.input.strip
-  location = "01351"
+  location = request.input.strip
   w = WeatherUnderground::Base.new
   f = w.TextForecast(location)
 
