@@ -1,3 +1,5 @@
+require 'socket'
+
 module Gopher
 
   #
