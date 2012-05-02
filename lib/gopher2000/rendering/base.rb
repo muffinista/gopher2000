@@ -119,6 +119,12 @@ module Gopher
         underline(@width, under)
       end
 
+	  def small_header(str, under = '=')
+		str = " " + str + " "
+		text(str)
+		underline(str.length, under)
+	  end
+
       #
       # output a centered string in a box
       # @param [String] str the string to output
