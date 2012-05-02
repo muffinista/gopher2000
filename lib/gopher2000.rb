@@ -1,6 +1,6 @@
 require 'eventmachine'
 require 'stringio'
-
+require 'logging'
 
 #
 # Define everything needed to run a gopher server

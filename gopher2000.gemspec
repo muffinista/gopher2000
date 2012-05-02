@@ -31,5 +31,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "eventmachine"
 
   s.add_runtime_dependency "eventmachine"
-  s.add_runtime_dependency "logger"
+  s.add_runtime_dependency "logging"
 end
