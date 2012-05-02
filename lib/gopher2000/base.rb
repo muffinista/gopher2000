@@ -133,7 +133,7 @@ module Gopher
     #   end
     #
     def route(path, &block)
-      selector = sanitize_selector(path)
+      selector = Gopher::Application.sanitize_selector(path)
       sig = compile!(selector, &block)
 
       debug_log("Add route for #{selector}")
@@ -162,7 +162,7 @@ module Gopher
     #
     def lookup(selector)
       unless routes.nil?
-        routes.each do |pattern, keys, block|
+		routes.each do |pattern, keys, block|
 
           if match = pattern.match(selector)
             match = match.to_a
@@ -428,19 +428,23 @@ module Gopher
       [/^#{pattern}$/, keys]
     end
 
-    #
-    # Sanitizes a gopher selector
-    #
-    def sanitize_selector(raw)
-      raw.to_s.dup.
-        strip. # Strip whitespace
-        sub(/\/$/, ''). # Strip last rslash
-        sub(/^\/*/, '/'). # Strip extra lslashes
-        gsub(/\.+/, '.') # Don't want consecutive dots!
-    end
 
     class << self
-      #
+
+	  #
+	  # Sanitizes a gopher selector
+	  #
+	  def sanitize_selector(raw)
+		"/#{raw}".dup.
+		  strip. # Strip whitespace
+		  sub(/\/$/, ''). # Strip last rslash
+		  sub(/^\/*/, '/'). # Strip extra lslashes
+		  gsub(/\.+/, '.') # Don't want consecutive dots!
+
+		#raw = "/#{raw}" if ! raw.match(/^\//)
+	  end
+
+	  #
       # generate a method which we will use to run routes. this is
       # based on #generate_method as used by sinatra.
       # @see https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb
