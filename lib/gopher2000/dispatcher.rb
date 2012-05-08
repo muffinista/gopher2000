@@ -22,7 +22,7 @@ module Gopher
     #
     # called by EventMachine when there's an incoming request
     #
-    # @param [String] incoming selector
+    # @param [String] selector incoming selector
     # @return Response object
     #
     def receive_data(selector)
@@ -31,7 +31,7 @@ module Gopher
 
     #
     # generate a request object from an incoming selector, and dispatch it to the app
-    # @param [String] incoming selector
+    # @param [Request] request Request object to handle
     # @return Response object
     #
     def call!(request)

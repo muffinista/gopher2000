@@ -27,7 +27,7 @@ module Gopher
 
       #
       # strip slashes, extra dots, etc, from an incoming selector and turn it into a 'normalized' path
-      # @param [String] path
+      # @param [String] p path to check
       # @return clean path string
       #
       def sanitize(p)
@@ -65,12 +65,10 @@ module Gopher
       #
       # handle a request
       #
-      # @param [Hash] the params as parsed during the dispatching process - the main thing here should be :splat, which will basically be the path requested.
-      # @param [Request] - the Request object for this session -- not currently used?
+      # @param [Hash] params the params as parsed during the dispatching process - the main thing here should be :splat, which will basically be the path requested.
+      # @param [Request] request the Request object for this session -- not currently used?
       #
       def call(params = {}, request = nil)
-#        debug_log "DirectoryHandler: call #{params.inspect}, #{request.inspect}"
-
         lookup = request_path(params)
 
         raise Gopher::InvalidRequest if ! contained?(lookup)
@@ -86,7 +84,7 @@ module Gopher
 
       #
       # generate a directory listing
-      # @param [String] path to directory
+      # @param [String] dir path to directory
       # @return rendered directory output for a response
       #
       def directory(dir)

@@ -31,6 +31,13 @@ describe Gopher::Rendering::Base do
     end
   end
 
+  describe "figlet" do
+    it "outputs a figlet" do
+      @ctx.figlet('pie').should == "        _      \r\n       (_)     \r\n  _ __  _  ___ \r\n | '_ \\| |/ _ \\\r\n | |_) | |  __/\r\n | .__/|_|\\___|\r\n | |           \r\n |_|           \r\n"
+    end
+  end
+
+
   describe "big_header" do
     it "outputs a box with text" do
       @ctx.width(5)

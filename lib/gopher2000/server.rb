@@ -8,7 +8,7 @@ module Gopher
 
     #
     # constructor
-    # @param [Application] instance of Gopher::Application we want to run
+    # @param [Application] a instance of Gopher::Application we want to run
     #
     def initialize(a)
       @app = a

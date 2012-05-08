@@ -81,7 +81,7 @@ module Gopher
     end
 
     # watch the specified script for changes
-    # @param [String] script to watch
+    # @param [String] f script to watch
     def watch(f)
       application.scripts << f
     end

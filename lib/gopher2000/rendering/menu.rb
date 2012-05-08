@@ -15,7 +15,7 @@ module Gopher
       NO_PORT = 0
 
       # Sanitizes text for use in gopher menus
-      # @param [String] text text to cleanup
+      # @param [String] raw text to cleanup
       # @return string that can be used in a gopher menu
       def sanitize_text(raw)
         raw.
@@ -111,7 +111,7 @@ module Gopher
       # Determines the gopher type for +selector+ based on the
       # extension. This is a pretty simple check based on the entities
       # list in http://www.ietf.org/rfc/rfc1436.txt
-      # @param [String] selector, presumably a link to a file name with an extension
+      # @param [String] selector presumably a link to a file name with an extension
       # @return gopher selector type
       #
       def determine_type(selector)

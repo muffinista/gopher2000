@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "watchr"
   s.add_development_dependency "eventmachine"
 
+  s.add_runtime_dependency "artii", ">= 2.0.1"
   s.add_runtime_dependency "eventmachine"
   s.add_runtime_dependency "logging"
 end

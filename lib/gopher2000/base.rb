@@ -91,9 +91,9 @@ module Gopher
     #
     # mount a directory for browsing via gopher
     #
-    # @param [Hash] A hash specifying the path your route will answer to, and the filesystem path to use '/route' => '/home/path/etc'
-    #
-    # @param [Hash] a hash of options for the mount. Primarily this is a filter, which will restrict the list files outputted. example: :filter => '*.jpg'
+    # @param [Hash] path A hash specifying the path your route will answer to, and the filesystem path to use '/route' => '/home/path/etc'
+    # @param [Hash] opts a hash of options for the mount. Primarily this is a filter, which will restrict the list files outputted. example: :filter => '*.jpg'
+	# @param [Class] klass The class that should be used to handle this mount. You could write and use a custom handler if desired
     #
     # @example mount the directory '/home/user/foo' at the gopher path '/files', and only show JPG files:
     #   mount '/files' => '/home/user/foo', :filter => '*.jpg'
@@ -118,8 +118,7 @@ module Gopher
 
     #
     # define a route.
-    # @param [String] the path your route will answer to. This is
-    # basically a URI path
+    # @param [String] path the path your route will answer to. This is basically a URI path
     # @yield a block that handles your route
     #
     # @example respond with a simple string
@@ -145,6 +144,7 @@ module Gopher
 
     #
     # specify a default route to handle requests if no other route exists
+    # @yield a block to handle the default route
     #
     # @example render a template
     #   default_route do
@@ -158,7 +158,7 @@ module Gopher
     #
     # lookup an incoming path
     #
-    # @param [String] the selector path of the incoming request
+    # @param [String] selector the selector path of the incoming request
     #
     def lookup(selector)
       unless routes.nil?
@@ -190,7 +190,7 @@ module Gopher
 
     #
     # find and run the first route which matches the incoming request
-    # @param [Request] Gopher::Request object
+    # @param [Request] req Gopher::Request object
     #
     def dispatch(req)
       debug_log(req)
@@ -233,11 +233,11 @@ module Gopher
     # define a template which will be used to render a gopher-style
     # menu.
     #
-    # @param [String/Symbol] -- the name of the template. This is what
-    # identifies the template when making a call to render
+    # @param [String/Symbol] name the name of the template. This is what
+    #   identifies the template when making a call to render
     # @yield a block which will output the menu. This block is
-    # executed within an instance of Gopher::Rendering::Menu and will
-    # have access to all of its methods.
+    #   executed within an instance of Gopher::Rendering::Menu and will
+    #   have access to all of its methods.
     #
     # @example a simple menu:
     #  menu :index do
@@ -273,7 +273,7 @@ module Gopher
     # access to the methods defined in Gopher::Rendering::Text for
     # wrapping strings, adding simple headers, etc.
     #
-    # @param [String/Symbol] -- the name of the template. This is what identifies the template when making a call to render
+    # @param [String/Symbol] name the name of the template. This is what identifies the template when making a call to render
     #
     # @yield a block which will output the menu. This block is executed within an instance of Gopher::Rendering::Text and will have access to all of its methods.
     # @example simple example
@@ -295,7 +295,7 @@ module Gopher
 
     #
     # find a template
-    # @param [String/Symbol] name of the template
+    # @param [String/Symbol] t name of the template
     # @return template block and the class context it should use
     #
     def find_template(t)
@@ -311,8 +311,8 @@ module Gopher
 
     #
     # Find the desired template and call it within the proper context
-    # @param [String/Symbol] name of the template to render
-    # @param [Array] optional arguments to be passed to template
+    # @param [String/Symbol] template name of the template to render
+    # @param [Array] arguments optional arguments to be passed to template
     # @return result of rendering
     #
     def render(template, *arguments)
@@ -411,7 +411,7 @@ module Gopher
     # turn a path string with optional keys (/foo/:bar/:boo) into a
     # regexp which will be used when searching for a route
     #
-    # @param [String] the path to compile
+    # @param [String] path the path to compile
     #
     def compile(path)
       keys = []
@@ -448,7 +448,7 @@ module Gopher
       # generate a method which we will use to run routes. this is
       # based on #generate_method as used by sinatra.
       # @see https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb
-      # @param [String] name to use for the method
+      # @param [String] method_name name to use for the method
       # @yield block to use for the method
       def generate_method(method_name, &block)
         define_method(method_name, &block)
