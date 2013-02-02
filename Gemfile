@@ -1,6 +1,4 @@
-source "http://rubygems.org"
-
-# Specify your gem's dependencies in gopher.gemspec
+source :rubygems
 gemspec
 
 gem "rake"
@@ -13,7 +11,6 @@ group :development do
   gem "shoulda", ">= 0"
   gem "rspec"
 
-  gem "bundler", "~> 1.0.0"
   gem "watchr"
 
   # There's a god example script stashed away in the repo
