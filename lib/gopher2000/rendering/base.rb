@@ -5,12 +5,14 @@ module Gopher
   #
   module Rendering
 
-	require 'artii'
+    require 'artii'
 
     # "A CR LF denotes the end of the item." RFC 1436
     # @see http://www.faqs.org/rfcs/rfc1436.html
     LINE_ENDING = "\r\n"
 
+    DEFAULT_ENCODING = 'UTF-8'
+    
     #
     # base class for rendering output. this class provides methods
     # that can be used when rendering both text and gopher menus
@@ -42,7 +44,7 @@ module Gopher
       #   then adds any required spacing
       #
       def text(text)
-        self << text
+        self << text.force_encoding(DEFAULT_ENCODING)
         add_spacing
       end
 
