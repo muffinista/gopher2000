@@ -60,6 +60,12 @@ describe Gopher::Rendering::Menu do
     end
   end
 
+  describe "http" do
+    it "should work" do
+      @ctx.http("weblink", "http://google.com").should == "hweblink\tURL:http://google.com\thost\t1234\r\n"
+    end
+  end
+
   describe "search" do
     it "should output link type/text" do
       @ctx.search("FIND", "search").should == "7FIND\tsearch\thost\t1234\r\n"

@@ -97,6 +97,23 @@ module Gopher
         line type, text, selector, host, port
       end
 
+      # Create an HTTP link entry. This is how this works (via wikipedia)
+      #
+      # For example, to create a link to http://gopher.quux.org/, the
+      # item type is "h", the display string is the title of the link,
+      # the item selector is "URL:http://gopher.quux.org/", and the
+      # domain and port are that of the originating Gopher server (so
+      # that clients that do not support URL links will query the
+      # server and receive an HTML redirection page).
+      #
+      # @param [String] text the text of the link
+      # @param [String] URL of the link
+      # @param [String] host for link, defaults to current host
+      # @param [String] port for link, defaults to current port
+      def http(text, url, host=nil, port=nil)
+        line "h", text, "URL:#{url}", host, port
+      end
+      
       #
       # output a search entry
       # @param [String] text the text of the link
