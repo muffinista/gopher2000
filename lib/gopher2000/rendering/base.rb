@@ -98,31 +98,31 @@ module Gopher
         self.to_s
       end
 
-	  #
-	  # output a figlet, which is a big ASCII art header like this:
-	  #    _    _      _ _       _
-	  #   | |  | |    | | |     | |
-	  #   | |__| | ___| | | ___ | |
-	  #   |  __  |/ _ \ | |/ _ \| |
-	  #   | |  | |  __/ | | (_) |_|
-	  #   |_|  |_|\___|_|_|\___/(_)
-	  #
-	  # This method doesn't do any width checks, so you should be
-	  # careful with it.
-	  # You can get a list of fonts from the artii source code or
-	  # http://www.figlet.org/examples.html
-	  # https://github.com/miketierney/artii/tree/master/lib/figlet/fonts
-
-	  # @param [String] str the text you want to use for your figlet
-	  # @param [String] font name of the font. Defaults to 'big'.
-	  #
-	  def figlet(str, font = 'big')
-		a = Artii::Base.new(:font => font)
-		a.asciify(str).split("\n").each do |l|
-		  text l
-		end
-		self.to_s
-	  end
+      #
+      # output a figlet, which is a big ASCII art header like this:
+      #    _    _      _ _       _
+      #   | |  | |    | | |     | |
+      #   | |__| | ___| | | ___ | |
+      #   |  __  |/ _ \ | |/ _ \| |
+      #   | |  | |  __/ | | (_) |_|
+      #   |_|  |_|\___|_|_|\___/(_)
+      #
+      # This method doesn't do any width checks, so you should be
+      # careful with it.
+      # You can get a list of fonts from the artii source code or
+      # http://www.figlet.org/examples.html
+      # https://github.com/miketierney/artii/tree/master/lib/figlet/fonts
+      
+      # @param [String] str the text you want to use for your figlet
+      # @param [String] font name of the font. Defaults to 'big'.
+      #
+      def figlet(str, font = 'big')
+        a = Artii::Base.new(:font => font)
+        a.asciify(str).split("\n").each do |l|
+          text l
+        end
+        self.to_s
+      end
 
       #
       # output a centered string with a nice underline below it,
