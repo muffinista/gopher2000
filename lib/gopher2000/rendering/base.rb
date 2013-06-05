@@ -149,16 +149,16 @@ module Gopher
         underline(@width, under)
       end
 
-	  #
-	  # output a 'small' header, just the text with an underline
+      #
+      # output a 'small' header, just the text with an underline
       # @param [String] str - the string to output
       # @param [String] under - the desired underline character
-	  #
-	  def small_header(str, under = '=')
-		str = " " + str + " "
-		text(str)
-		underline(str.length, under)
-	  end
+      #
+      def small_header(str, under = '=')
+        str = " " + str + " "
+        text(str)
+        underline(str.length, under)
+      end
 
       #
       # output a centered string in a box
