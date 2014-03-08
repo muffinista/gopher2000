@@ -168,7 +168,7 @@ module Gopher
         
         if !mimetype
           return '9' # Binary file
-        elif mimetype.child_of?('image/gif')
+        elsif mimetype.child_of?('image/gif')
           return 'g' # GIF image
         elsif mimetype.child_of?('text/x-uuencode')
           return '6' # UUEncode encoded file
