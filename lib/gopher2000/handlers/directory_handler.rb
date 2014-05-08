@@ -59,7 +59,7 @@ module Gopher
       # @return selector which will match the file on subsequent requests
       #
       def to_selector(path)
-        path.gsub(/^#{@path}\//, @mount_point)
+        path.gsub(/^#{@path}/, @mount_point)
       end
 
       #
@@ -90,7 +90,7 @@ module Gopher
       def directory(dir)
         m = Menu.new(@application)
 
-        m.text "Browsing: #{to_selector(dir)}"
+        m.text "Browsing: #{dir}"
 
         #
         # iterate through the contents of this directory.
@@ -105,7 +105,7 @@ module Gopher
             # fnmatch makes sure that the file matches the glob filter specified in the mount directive
 
             # otherwise, it's a normal file link
-            m.link File.basename(x), to_selector(x), @application.host, @application.port, x
+            m.link File.basename(x), to_selector(x), @application.host, @application.port
           end
         end
         m.to_s

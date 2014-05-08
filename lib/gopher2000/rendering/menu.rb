@@ -165,9 +165,16 @@ module Gopher
             nil
           end
         end
+
+        if !mimetype
+          ext = File.extname(filepath).split(".").last
+          mimetype = MimeMagic.by_extension(ext)
+        end
         
         if !mimetype
           return '9' # Binary file
+        elsif mimetype.child_of?('application/gzip') || mimetype.child_of?('application/x-bzip') || mimetype.child_of?('application/zip')
+          return '5' # archive
         elsif mimetype.child_of?('image/gif')
           return 'g' # GIF image
         elsif mimetype.child_of?('text/x-uuencode')
