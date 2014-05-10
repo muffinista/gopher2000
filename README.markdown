@@ -16,6 +16,8 @@ Gopher2000 - A Gopher server for the next millenium
 Gopher2000 is a ruby-based Gopher server. It is built for speedy, enjoyable development of
 all sorts of gopher sites.
 
+[![Build Status](https://travis-ci.org/muffinista/gopher2000.svg?branch=master)](https://travis-ci.org/muffinista/gopher2000)
+
 Features
 --------
 * Simple, Sintra-inspired routing DSL.
