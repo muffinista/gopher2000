@@ -94,15 +94,33 @@ module Gopher
       # @param [String] host for link, defaults to current host
       # @param [String] port for link, defaults to current port
       # @param [String] real filepath of the link
-      def link(text, selector, host=nil, port=nil, filepath=nil)
-        if filepath
-          type = determine_type(filepath)
-        else
-          type = determine_type(selector)
+      # @param [String] selector type. if not specified, we will guess
+      def link(text, selector, host=nil, port=nil, filepath=nil, type=nil)
+        if !type
+          if filepath
+            type = determine_type(filepath)
+          else
+            type = determine_type(selector)
+          end
         end
         line type, text, selector, host, port
       end
 
+      #
+      # output a link to text output
+      #
+      # @param [String] text the text of the link
+      # @param [String] selector the path of the link. the extension of this path will be used to
+      #   detemine the type of link -- image, archive, etc. If you want
+      #   to specify a specific link-type, you should use the text
+      #   method instead
+      # @param [String] host for link, defaults to current host
+      # @param [String] port for link, defaults to current port
+      # @param [String] real filepath of the link
+      def text_link(text, selector, host=nil, port=nil, filepath=nil)
+        link(text, selector, host, port, filepath, '0')
+      end
+      
       # Create an HTTP link entry. This is how this works (via wikipedia)
       #
       # For example, to create a link to http://gopher.quux.org/, the
