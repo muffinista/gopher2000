@@ -96,7 +96,7 @@ module Gopher
         # iterate through the contents of this directory.
         # NOTE: we don't filter this, so we will ALWAYS list subdirectories of a mounted folder
         #
-        Dir.glob("#{dir}/*.*").each do |x|
+        Dir.glob("#{dir}/*").each do |x|
           # if this is a directory, then generate a directory link for it
           if File.directory?(x)
             m.directory File.basename(x), to_selector(x), @application.host, @application.port

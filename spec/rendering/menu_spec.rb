@@ -105,7 +105,7 @@ describe Gopher::Rendering::Menu do
       "foo.png" => 'I',
       "foo.mp3" => 's',
       "foo.wav" => 's',
-      "foo.random-file" => "0"
+      "foo.random-file" => "9"
     }.each do |file, expected|
       it "should have right selector for #{file}" do
         expect(@ctx.determine_type(file)).to eq(expected)

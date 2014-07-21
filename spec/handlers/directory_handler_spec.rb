@@ -24,7 +24,7 @@ describe Gopher::Handlers::DirectoryHandler do
       expect(File).to receive(:fnmatch).with("*.txt", "/tmp/bar/baz/a.txt").and_return(true)
       expect(File).to receive(:fnmatch).with("*.txt", "/tmp/bar/baz/b.exe").and_return(false)
 
-      expect(Dir).to receive(:glob).with("/tmp/bar/baz/*.*").and_return([
+      expect(Dir).to receive(:glob).with("/tmp/bar/baz/*").and_return([
           "/tmp/bar/baz/a.txt",
           "/tmp/bar/baz/b.exe",
           "/tmp/bar/baz/dir2"])
@@ -77,13 +77,13 @@ describe Gopher::Handlers::DirectoryHandler do
       expect(File).to receive(:file?).with("/tmp/bar/baz/a").and_return(true)
       expect(File).to receive(:fnmatch).with("*.*", "/tmp/bar/baz/a").and_return(true)
 
-      expect(Dir).to receive(:glob).with("/tmp/bar/baz/*.*").and_return([
+      expect(Dir).to receive(:glob).with("/tmp/bar/baz/*").and_return([
           "/tmp/bar/baz/a",
           "/tmp/bar/baz/dir2"])
     end
 
     it "should work" do
-      expect(@h.call(:splat => "bar/baz").to_s).to eq("iBrowsing: /tmp/bar/baz\tnull\t(FALSE)\t0\r\n0a\t/xyz/123/bar/baz/a\thost\t1234\r\n1dir2\t/xyz/123/bar/baz/dir2\thost\t1234\r\n")
+      expect(@h.call(:splat => "bar/baz").to_s).to eq("iBrowsing: /tmp/bar/baz\tnull\t(FALSE)\t0\r\n9a\t/xyz/123/bar/baz/a\thost\t1234\r\n1dir2\t/xyz/123/bar/baz/dir2\thost\t1234\r\n")
     end
   end
 

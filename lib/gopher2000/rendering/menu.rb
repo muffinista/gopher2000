@@ -1,5 +1,7 @@
 module Gopher
   module Rendering
+    require 'mimemagic'
+
     #
     # The MenuContext is for rendering gopher menus in the "pseudo
     # file-system hierarchy" defined by RFC1436
@@ -7,7 +9,6 @@ module Gopher
     # @see http://www.ietf.org/rfc/rfc1436.txt
     #
     class Menu < Base
-
       # default host value when rendering a line with no selector
       NO_HOST = '(FALSE)'
 
@@ -92,11 +93,34 @@ module Gopher
       #   method instead
       # @param [String] host for link, defaults to current host
       # @param [String] port for link, defaults to current port
-      def link(text, selector, host=nil, port=nil)
-        type = determine_type(selector)
+      # @param [String] real filepath of the link
+      # @param [String] selector type. if not specified, we will guess
+      def link(text, selector, host=nil, port=nil, filepath=nil, type=nil)
+        if !type
+          if filepath
+            type = determine_type(filepath)
+          else
+            type = determine_type(selector)
+          end
+        end
         line type, text, selector, host, port
       end
 
+      #
+      # output a link to text output
+      #
+      # @param [String] text the text of the link
+      # @param [String] selector the path of the link. the extension of this path will be used to
+      #   detemine the type of link -- image, archive, etc. If you want
+      #   to specify a specific link-type, you should use the text
+      #   method instead
+      # @param [String] host for link, defaults to current host
+      # @param [String] port for link, defaults to current port
+      # @param [String] real filepath of the link
+      def text_link(text, selector, host=nil, port=nil, filepath=nil)
+        link(text, selector, host, port, filepath, '0')
+      end
+      
       # Create an HTTP link entry. This is how this works (via wikipedia)
       #
       # For example, to create a link to http://gopher.quux.org/, the
@@ -126,19 +150,67 @@ module Gopher
 
       #
       # Determines the gopher type for +selector+ based on the
-      # extension. This is a pretty simple check based on the entities
-      # list in http://www.ietf.org/rfc/rfc1436.txt
-      # @param [String] selector presumably a link to a file name with an extension
+      # information stored in the shared mime database.
+      # @param [String] filepath The full path to the file (should also exist, if possible)
       # @return gopher selector type
       #
-      def determine_type(selector)
-        ext = File.extname(selector).downcase
-        case ext
-        when '.zip', '.gz', '.bz2' then '5'
-        when '.gif' then 'g'
-        when '.jpg', '.png' then 'I'
-        when '.mp3', '.wav' then 's'
-        else '0'
+      def determine_type(filepath)
+        # Determine MIME type by path
+        mimetype = MimeMagic.by_path(filepath)
+
+        # Determine MIME type by contents
+        if !mimetype
+          begin
+            # Open file
+            file = File.open(filepath)
+
+            # Try to detect MIME type using by recognition of typical characters
+            mimetype = MimeMagic.by_magic(file)
+
+            if !mimetype
+              file.rewind
+
+              # Read up to 1k of file data and look for a "\0\0" sequence (typical for binary files)
+              if file.read(1000).include?("\0\0")
+                mimetype = MimeMagic.new("application/octet-stream")
+              else
+                mimetype = MimeMagic.new("text/plain")
+              end
+              
+              file.close
+            end
+          rescue SystemCallError,IOError
+            nil
+          end
+        end
+
+        if !mimetype
+          ext = File.extname(filepath).split(".").last
+          mimetype = MimeMagic.by_extension(ext)
+        end
+        
+        if !mimetype
+          return '9' # Binary file
+        elsif mimetype.child_of?('application/gzip') || mimetype.child_of?('application/x-bzip') || mimetype.child_of?('application/zip')
+          return '5' # archive
+        elsif mimetype.child_of?('image/gif')
+          return 'g' # GIF image
+        elsif mimetype.child_of?('text/x-uuencode')
+          return '6' # UUEncode encoded file
+        elsif mimetype.child_of?('application/mac-binhex40')
+          return '4' # BinHex encoded file
+        elsif mimetype.child_of?('text/html') || mimetype.child_of?('application/xhtml+xml')
+          return 'h' # HTML file
+        elsif mimetype.mediatype == 'text'    || mimetype.child_of?('text/plain')
+          return '0' # General text file
+        elsif mimetype.mediatype == 'image'
+          return 'I' # General image file
+        elsif mimetype.mediatype == 'audio'
+          return 's' # General audio file
+        elsif mimetype.mediatype == 'video'
+          return 'v' # General video file
+        else
+          return '9' # Binary file
         end
       end
     end
