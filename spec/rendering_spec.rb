@@ -18,11 +18,11 @@ describe Gopher::Application do
   describe "find_template" do
     it "should check in menus" do
       @s.menus['foo'] = "bar"
-      @s.find_template('foo').should == ["bar", Gopher::Rendering::Menu]
+      expect(@s.find_template('foo')).to eq(["bar", Gopher::Rendering::Menu])
     end
     it "should check in text_templates" do
       @s.text_templates['foo'] = "bar"
-      @s.find_template('foo').should == ["bar", Gopher::Rendering::Text]
+      expect(@s.find_template('foo')).to eq(["bar", Gopher::Rendering::Text])
     end
   end
 
@@ -37,7 +37,7 @@ describe Gopher::Application do
         @params
       end
 
-      @s.render(:foo).should == "xyz"
+      expect(@s.render(:foo)).to eq("xyz")
     end
 
     it "has access to request obj" do
@@ -46,7 +46,7 @@ describe Gopher::Application do
         @request
       end
 
-      @s.render(:foo).should == "abc"
+      expect(@s.render(:foo)).to eq("abc")
     end
 
     it "rendering text access to request obj" do
@@ -55,7 +55,7 @@ describe Gopher::Application do
         @request
       end
 
-      @s.render(:foo).should == "abc"
+      expect(@s.render(:foo)).to eq("abc")
     end
   end
 
@@ -66,11 +66,11 @@ describe Gopher::Application do
 
     it "should use custom template if provided" do
       @s.not_found do ; end
-      @s.not_found_template.should == :not_found
+      expect(@s.not_found_template).to eq(:not_found)
     end
 
     it "should use default otherwise" do
-      @s.not_found_template.should == :'internal/not_found'
+      expect(@s.not_found_template).to eq(:'internal/not_found')
     end
   end
 

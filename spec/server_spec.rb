@@ -31,7 +31,7 @@ if ENV["WITH_SERVER_SPECS"].to_i == 1
 
     it "should work in non-blocking mode" do
       @application.fake_response = @response
-      @application.stub!(:non_blocking?).and_return(false)
+      allow(@application).to receive(:non_blocking?).and_return(false)
 
       ::EM.run {
         server = Gopher::Server.new(@application)
@@ -42,7 +42,7 @@ if ENV["WITH_SERVER_SPECS"].to_i == 1
         socket.send_data("123\n")
 
         socket.onopen = lambda {
-          socket.data.last.chomp.should == "hi\r\n."
+          expect(socket.data.last.chomp).to eq("hi\r\n.")
           EM.stop
         }
       }
@@ -60,7 +60,7 @@ if ENV["WITH_SERVER_SPECS"].to_i == 1
         socket.send_data("123\n")
 
         socket.onopen = lambda {
-          socket.data.last.chomp.should == "hi\r\n."
+          expect(socket.data.last.chomp).to eq("hi\r\n.")
           EM.stop
         }
       }
@@ -78,7 +78,7 @@ if ENV["WITH_SERVER_SPECS"].to_i == 1
         socket.send_data("123\n")
 
         socket.onopen = lambda {
-          socket.data.last.chomp.should == "hi\r\n."
+          expect(socket.data.last.chomp).to eq("hi\r\n.")
           EM.stop
         }
       }
@@ -100,7 +100,7 @@ if ENV["WITH_SERVER_SPECS"].to_i == 1
         socket.send_data("123\n")
 
         socket.onopen = lambda {
-          socket.data.last.chomp.should == "hi"
+          expect(socket.data.last.chomp).to eq("hi")
           EM.stop
         }
       }
@@ -118,7 +118,7 @@ if ENV["WITH_SERVER_SPECS"].to_i == 1
         socket.send_data("123\n")
 
         socket.onopen = lambda {
-          socket.data.last.chomp.should == "hi\r\n."
+          expect(socket.data.last.chomp).to eq("hi\r\n.")
           EM.stop
         }
       }

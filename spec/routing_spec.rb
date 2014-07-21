@@ -16,30 +16,30 @@ describe Gopher::Application do
         "hi"
       end
       junk, block = @router.lookup("sfssfdfsfsd")
-      block.class.should eql(UnboundMethod)
+      expect(block.class).to eql(UnboundMethod)
     end
   end
 
   describe "globify" do
     it "should add glob if none yet" do
-      @router.globify("/foo").should == "/foo/?*"
+      expect(@router.globify("/foo")).to eq("/foo/?*")
     end
 
     it "should be ok with trailing slashes" do
-      @router.globify("/foo/").should == "/foo/?*"
+      expect(@router.globify("/foo/")).to eq("/foo/?*")
     end
 
     it "shouldn't add glob if there is one already" do
-      @router.globify("/foo/*").should == "/foo/*"
+      expect(@router.globify("/foo/*")).to eq("/foo/*")
     end
   end
 
   describe "mount" do
     before(:each) do
-      @h = mock(Gopher::Handlers::DirectoryHandler)
-      @h.should_receive(:application=).with(@router)
+      @h = double(Gopher::Handlers::DirectoryHandler)
+      expect(@h).to receive(:application=).with(@router)
 
-      Gopher::Handlers::DirectoryHandler.should_receive(:new).with({:bar => :baz, :mount_point => "/foo"}).and_return(@h)
+      expect(Gopher::Handlers::DirectoryHandler).to receive(:new).with({:bar => :baz, :mount_point => "/foo"}).and_return(@h)
     end
 
     it "should work" do
@@ -50,42 +50,42 @@ describe Gopher::Application do
   describe "compile" do
     it "should generate a basic string for routes without keys" do
       lookup, keys, block = @router.compile! "/foo" do; end
-      lookup.to_s.should == /^\/foo$/.to_s
-      keys.should == []
+      expect(lookup.to_s).to eq(/^\/foo$/.to_s)
+      expect(keys).to eq([])
     end
 
     context "with keys" do
       it "should generate a lookup and keys for routes with keys" do
         lookup, keys, block = @router.compile! "/foo/:bar" do; end
-        lookup.to_s.should == "(?-mix:^\\/foo\\/([^\\/?#]+)$)"
+        expect(lookup.to_s).to eq("(?-mix:^\\/foo\\/([^\\/?#]+)$)")
 
-        keys.should == ["bar"]
+        expect(keys).to eq(["bar"])
       end
 
       it "should match correctly" do
         lookup, keys, block = @router.compile! "/foo/:bar" do; end
-        lookup.to_s.should == "(?-mix:^\\/foo\\/([^\\/?#]+)$)"
+        expect(lookup.to_s).to eq("(?-mix:^\\/foo\\/([^\\/?#]+)$)")
 
-        lookup.match("/foo/baz").should_not be_nil
-        lookup.match("/foo2/baz").should be_nil
-        lookup.match("/baz/foo/baz").should be_nil
-        lookup.match("/foo/baz/bar").should be_nil
+        expect(lookup.match("/foo/baz")).not_to be_nil
+        expect(lookup.match("/foo2/baz")).to be_nil
+        expect(lookup.match("/baz/foo/baz")).to be_nil
+        expect(lookup.match("/foo/baz/bar")).to be_nil
       end
     end
 
     context "with splat" do
       it "should work with splats" do
         lookup, keys, block = @router.compile! "/foo/*" do; end
-        lookup.to_s.should == "(?-mix:^\\/foo\\/(.*?)$)"
-        keys.should == ["splat"]
+        expect(lookup.to_s).to eq("(?-mix:^\\/foo\\/(.*?)$)")
+        expect(keys).to eq(["splat"])
       end
 
       it "should match correctly" do
         lookup, keys, block = @router.compile! "/foo/*" do; end
 
-        lookup.match("/foo/baz/bar/bam").should_not be_nil
-        lookup.match("/foo2/baz").should be_nil
-        lookup.match("/baz/foo/baz").should be_nil
+        expect(lookup.match("/foo/baz/bar/bam")).not_to be_nil
+        expect(lookup.match("/foo2/baz")).to be_nil
+        expect(lookup.match("/baz/foo/baz")).to be_nil
       end
     end
   end

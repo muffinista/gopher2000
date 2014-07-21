@@ -8,17 +8,17 @@ describe Gopher::Response do
 
   it "gets size for string results" do
     @response.body = "hi"
-    @response.size.should == 2
+    expect(@response.size).to eq(2)
   end
 
   it "gets size for stringio results" do
     @response.body = StringIO.new("12345")
-    @response.size.should == 5
+    expect(@response.size).to eq(5)
   end
 
   it "defaults to 0 size for weird objects" do
-    @response.body = mock(Object)
-    @response.size.should == 0
+    @response.body = double(Object)
+    expect(@response.size).to eq(0)
   end
 
 
@@ -28,6 +28,6 @@ describe Gopher::Response do
     temp_file.flush
 
     @response.body = File.new(temp_file.path)
-    @response.size.should == 10
+    expect(@response.size).to eq(10)
   end
 end

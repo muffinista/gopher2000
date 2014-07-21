@@ -11,6 +11,6 @@ describe Gopher::Application do
       def foo; "FOO"; end
     end
 
-    @obj.foo.should == "FOO"
+    expect(@obj.foo).to eq("FOO")
   end
 end
