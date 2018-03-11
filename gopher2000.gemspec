@@ -20,10 +20,6 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  if RUBY_VERSION < "1.9" || RUBY_VERSION == "1.9.2"
-    s.add_dependency "activesupport", "~> 3.0.11"
-  end
-  
   # specify any dependencies here; for example:
   s.add_development_dependency "rspec"
   s.add_development_dependency "redcarpet"
@@ -34,7 +30,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "watchr"
 
   s.add_runtime_dependency "artii", ">= 2.0.1"
-  s.add_runtime_dependency "eventmachine", "1.0.3"
+  s.add_runtime_dependency "eventmachine", "1.2.5"
   s.add_runtime_dependency "logging"
   s.add_runtime_dependency "mimemagic"
 end
