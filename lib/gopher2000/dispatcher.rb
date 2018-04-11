@@ -25,10 +25,6 @@ module Gopher
     # @param [String] selector incoming selector
     # @return Response object
     #
-#    def receive_data(selector)
-#      call! Request.new(selector, remote_ip)
-#    end
-
     def receive_data data
       (@buf ||= '') << data
       

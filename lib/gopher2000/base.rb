@@ -385,7 +385,7 @@ module Gopher
     # Gopher servers in production)
     #
     def non_blocking?
-      config[:non_blocking] ||= ! debug_mode?
+      config.key?(:non_blocking) ? config[:non_blocking] : ! debug_mode?
     end
 
 

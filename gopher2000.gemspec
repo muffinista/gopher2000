@@ -26,11 +26,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency "yard"
   s.add_development_dependency "shoulda"
   s.add_development_dependency "rdoc"
-  s.add_development_dependency "simplecov"
+  s.add_development_dependency "simplecov", "~> 0.16.1"
   s.add_development_dependency "watchr"
 
   s.add_runtime_dependency "artii", ">= 2.0.1"
-  s.add_runtime_dependency "eventmachine", "1.2.5"
+  s.add_runtime_dependency "eventmachine", "~> 1.2.5"
   s.add_runtime_dependency "logging"
   s.add_runtime_dependency "mimemagic"
 end
