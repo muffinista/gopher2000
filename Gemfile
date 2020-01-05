@@ -9,9 +9,4 @@ group :development do
 
   # There's a god example script stashed away in the repo
   gem "god"
-
-  #
-  # gems used in examples and for development.
-  #
-  #gem "weather-underground"
 end

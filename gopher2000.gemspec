@@ -12,7 +12,6 @@ Gem::Specification.new do |s|
   s.summary     = %q{Gopher2000 - A Gopher server for the next millenium}
   s.description = %q{Gopher2000 is a ruby-based Gopher server. It is built for speedy, enjoyable development of all sorts of gopher sites.}
 
-  s.rubyforge_project = "gopher2000"
   s.licenses = ["WTFPL"]
 
   s.files         = `git ls-files`.split("\n")
