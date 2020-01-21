@@ -55,6 +55,13 @@ module Gopher
     end
 
     #
+    # return the application environment
+    #
+    def env
+      config[:env] ||= 'development'
+    end
+
+    #
     # are we in debugging mode?
     #
     def debug_mode?

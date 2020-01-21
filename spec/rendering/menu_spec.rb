@@ -54,9 +54,25 @@ describe Gopher::Rendering::Menu do
   end
 
   describe "link" do
-    it "should get type with determine_type" do
-      expect(@ctx).to receive(:determine_type).with("foo.txt").and_return("A")
-      expect(@ctx.link("FILE", "foo.txt")).to eq("AFILE\tfoo.txt\thost\t1234\r\n")
+    context "with filepath" do
+      it "should get type with determine_type" do
+        expect(@ctx).to receive(:determine_type).with("foo.txt").and_return("A")
+        expect(@ctx.link("FILE", "thing", "external-server.com", 70, "foo.txt")).to eq("AFILE\tthing\texternal-server.com\t70\r\n")
+      end
+    end
+
+    context "without filepath" do
+      it "should get type with determine_type" do
+        expect(@ctx).to receive(:determine_type).with("foo.txt").and_return("A")
+        expect(@ctx.link("FILE", "foo.txt")).to eq("AFILE\tfoo.txt\thost\t1234\r\n")
+      end
+    end
+    
+  end
+
+  describe "text_link" do
+    it "should work" do
+      expect(@ctx.text_link("text link", "/files/foo.txt")).to eq("0text link\t/files/foo.txt\thost\t1234\r\n")
     end
   end
 

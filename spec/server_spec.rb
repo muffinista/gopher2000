@@ -18,17 +18,33 @@ if ENV["WITH_SERVER_SPECS"].to_i == 1
 
       @host = "0.0.0.0"
       @port = 12345
+      @environment = 'test'
 
       @application.config[:host] = @host
       @application.config[:port] = @port
+      @application.config[:env] = @environment
 
       @request = Gopher::Request.new("foo", "bar")
 
-      @response = Gopher::Response.new(@request)
+      @response = Gopher::Response.new
       @response.code = :success
       @response.body = "hi"
     end
 
+    it "returns host" do
+      @application.config[:host] = 'gopher-site.test'
+      expect(@application.host).to eql('gopher-site.test')
+    end
+
+    it "returns port" do
+      expect(@application.port).to eql(@port)
+    end
+
+    it "returns environment" do
+      expect(@application.env).to eql(@environment)
+    end
+   
+    
     it "should work in non-blocking mode" do
       @application.fake_response = @response
       allow(@application).to receive(:non_blocking?).and_return(false)
