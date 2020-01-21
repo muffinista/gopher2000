@@ -8,9 +8,9 @@ module Gopher
 
     def initialize(raw, ip_addr=nil)
       @selector, @input = raw.chomp.split("\t")
-
-	  @selector = Gopher::Application.sanitize_selector(@selector)
-	  @ip_address = ip_addr
+      
+	    @selector = Gopher::Application.sanitize_selector(@selector)
+	    @ip_address = ip_addr
     end
 
     # confirm that this is actually a valid gopher request

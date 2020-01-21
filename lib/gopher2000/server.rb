@@ -13,7 +13,7 @@ module Gopher
     def initialize(a)
       @app = a
     end
-
+ 
     #
     # @return [String] name of the host specified in our config
     #
@@ -28,6 +28,13 @@ module Gopher
       @app.config[:port] ||= 70
     end
 
+    #
+    # @return [String] environment specified in config
+    #
+    def env
+      @app.config[:env] || 'development'
+    end
+    
     #
     # main app loop. called via at_exit block defined in DSL
     #
@@ -77,8 +84,8 @@ module Gopher
       require 'optparse'
       OptionParser.new { |op|
         op.on('-p port',   'set the port (default is 70)')                { |val| set :port, Integer(val) }
-        op.on('-o addr',   'set the host (default is 0.0.0.0)')             { |val| set :bind, val }
-        op.on('-e env',    'set the environment (default is development)')  { |val| set :environment, val.to_sym }
+        op.on('-o addr',   'set the host (default is 0.0.0.0)')             { |val| set :host, val }
+        op.on('-e env',    'set the environment (default is development)')  { |val| set :env, val.to_sym }
       }.parse!(ARGV.dup)
     end
   end

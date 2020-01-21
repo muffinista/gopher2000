@@ -31,7 +31,7 @@ params = {
 
 opts.on('-d', '--debug', "run in debug mode")    { params[:debug] = true }
 opts.on('-p port',   'set the port (default is 70)')                { |val| params[:port] = Integer(val) }
-opts.on('-o addr',   'set the host (default is 0.0.0.0)')             { |val| params[host] = val }
+opts.on('-o addr',   'set the host (default is 0.0.0.0)')             { |val| params[:host] = val }
 opts.on('-e env',    'set the environment (default is development)')  { |val| params[:env] = val.to_sym }
 
 opts.on_tail("-h", "--help", "Show this message") do
