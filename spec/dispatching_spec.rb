@@ -51,6 +51,7 @@ describe Gopher::Application do
 
       @response = @server.dispatch(@request)
       expect(@response.code).to eq(:missing)
+      expect(@response.body).to contain_any_error
     end
 
     it "should respond with error if invalid request" do
@@ -59,6 +60,7 @@ describe Gopher::Application do
 
       @response = @server.dispatch(@request)
       expect(@response.code).to eq(:error)
+      expect(@response.body).to contain_any_error
     end
 
     it "should respond with error if there's an exception" do
@@ -67,6 +69,7 @@ describe Gopher::Application do
 
       @response = @server.dispatch(@request)
       expect(@response.code).to eq(:error)
+      expect(@response.body).to contain_any_error
     end
   end
 
@@ -139,6 +142,14 @@ describe Gopher::Application do
       @request = Gopher::Request.new("/about/a/b")
       @response = @server.dispatch(@request)
       expect(@response.body).to eq("a/b")
+    end
+  end
+end
+
+RSpec::Matchers.define :contain_any_error do
+  match do |actual|
+    actual.split(/\r?\n/).any? do |line| 
+      line.match(/^3.*?\tnull\t\(FALSE\)\t0$/)
     end
   end
 end
