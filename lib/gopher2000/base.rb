@@ -481,15 +481,15 @@ module Gopher
     #
     def register_defaults
       menu :'internal/not_found' do
-        text "Sorry, #{@request.selector} was not found"
+        error "Sorry, #{@request.selector} was not found"
       end
 
       menu :'internal/error' do |details|
-        text "Sorry, there was an error #{details}"
+        error "Sorry, there was an error #{details}"
       end
 
       menu :'internal/invalid_request' do
-        text "invalid request"
+        error "invalid request"
       end
     end
 
