@@ -59,7 +59,7 @@ menu :index do
   br(2)
 
   # link somewhere
-  link 'current time', '/time'
+  text_link 'current time', '/time'
   br
 end
 
