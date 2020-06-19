@@ -32,4 +32,10 @@ describe Gopher::Request do
     request = Gopher::Request.new("x" * 255, "bar")
     expect(request.valid?).to eq(false)
   end
+
+  it 'detects urls' do
+    request = Gopher::Request.new("URL:http://github.com/muffinista/gopher2000")
+    expect(request).to be_url
+    expect(request.url).to eql('http://github.com/muffinista/gopher2000')
+  end
 end
