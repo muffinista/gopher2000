@@ -169,12 +169,11 @@ module Gopher
     #
     def lookup(selector)
       unless routes.nil?
-		routes.each do |pattern, keys, block|
-
+		    routes.each do |pattern, keys, block|
           if match = pattern.match(selector)
             match = match.to_a
             url = match.shift
-
+            
             params = to_params_hash(keys, match)
 
             #
@@ -208,6 +207,9 @@ module Gopher
       if ! @request.valid?
         response.body = handle_invalid_request
         response.code = :error
+      elsif @request.url?
+        response.body = handle_url(@request)
+        response.code = :success
       else
         begin
           debug_log("do lookup for #{@request.selector}")
@@ -354,6 +356,15 @@ module Gopher
       menus.include?(:error) ? :error : :'internal/error'
     end
 
+
+    #
+    # get the id of the template that will be used when rendering an html page
+    # @return name of error template
+    #
+    def url_template
+      menus.include?(:html) ? :html : :'internal/url'
+    end
+    
     #
     # get the id of the template that will be used when rendering an
     # invalid request
@@ -438,20 +449,18 @@ module Gopher
 
     class << self
 
-	  #
-	  # Sanitizes a gopher selector
-	  #
-	  def sanitize_selector(raw)
-		"/#{raw}".dup.
-		  strip. # Strip whitespace
-		  sub(/\/$/, ''). # Strip last rslash
-		  sub(/^\/*/, '/'). # Strip extra lslashes
-		  gsub(/\.+/, '.') # Don't want consecutive dots!
-
-		#raw = "/#{raw}" if ! raw.match(/^\//)
-	  end
-
-	  #
+	    #
+	    # Sanitizes a gopher selector
+	    #
+	    def sanitize_selector(raw)
+		    "/#{raw}".dup.
+		      strip. # Strip whitespace
+		      sub(/\/$/, ''). # Strip last rslash
+		      sub(/^\/*/, '/'). # Strip extra lslashes
+		      gsub(/\.+/, '.') # Don't want consecutive dots!
+	    end
+      
+	    #
       # generate a method which we will use to run routes. this is
       # based on #generate_method as used by sinatra.
       # @see https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb
@@ -464,7 +473,7 @@ module Gopher
         method
       end
     end
-
+    
     #
     # output a debugging message
     #
@@ -491,10 +500,35 @@ module Gopher
       menu :'internal/invalid_request' do
         error "invalid request"
       end
+
+      menu :'internal/url' do
+        <<~EOHTML
+<html>
+  <head>
+    <meta http-equiv="refresh" content="5;URL=#{@request.url}">
+  </head>
+  <body>
+    <p>
+      You are following a link from gopher to a website. If your browser supports it, you will be
+      automatically taken to the web site shortly.  If you do not get
+      sent there, please click <a href="#{@request.url}">here</a>.
+   </p>
+   <p>
+     The URL linked is: <a href="#{@request.url}">#{@request.url}</a>.
+   </p>
+   <p>Have a nice day!</p>
+  </body>
+</html>
+EOHTML
+      end
     end
 
     def handle_not_found
       render not_found_template
+    end
+
+    def handle_url(request)
+      render url_template, request
     end
 
     def handle_error(e)

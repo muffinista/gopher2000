@@ -130,7 +130,17 @@ describe Gopher::Application do
     end
   end
 
+  describe 'dispatch for URL requests' do
+    let(:target) { 'URL:http://github.com/muffinista/gopher2000' }
+    let(:request) { Gopher::Request.new(target) }
+    let(:response) { @server.dispatch(request) }
 
+    it "should return web page" do
+      expect(response.body).to include('<meta http-equiv="refresh" content="5;URL=http://github.com/muffinista/gopher2000">')
+    end
+  end
+
+  
   describe "globs" do
     before(:each) do
       @server.route '/about/*' do
