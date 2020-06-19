@@ -57,11 +57,11 @@ menu :index do
   br(2)
 
   # link somewhere
-  link 'current time', '/time'
+  text_link 'current time', '/time'
   br
 
   # another link
-  link 'about', '/about'
+  text_link 'about', '/about'
   br
 
   # ask for some input
