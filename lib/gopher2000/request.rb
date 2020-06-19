@@ -15,7 +15,7 @@ module Gopher
     end
 
     def url?
-      @raw.match?(/^URL\:/)
+      @raw =~ /^URL\:/
     end
 
     def url
