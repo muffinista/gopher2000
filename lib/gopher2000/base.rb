@@ -502,7 +502,7 @@ module Gopher
       end
 
       menu :'internal/url' do
-        <<~EOHTML
+        output = <<-EOHTML
 <html>
   <head>
     <meta http-equiv="refresh" content="5;URL=#{@request.url}">
@@ -520,6 +520,7 @@ module Gopher
   </body>
 </html>
 EOHTML
+        output
       end
     end
 
