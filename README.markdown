@@ -114,6 +114,7 @@ Docker
 There's a pretty simple docker script which you can use to run an
 app. To run one of the included examples, you could do something like:
 
+
 ```
 docker build -t gopher2000 .
 docker run -p 7070:7070 --rm -it gopher2000 examples/simple.rb
@@ -126,7 +127,12 @@ locally by running something like:
 lynx gopher://0.0.0.0:7070
 ```
 
+The Dockerfile is also published to Docker Hub, so you could run
+something like this:
 
+```
+docker run -p 7070:7070 --rm -v $PWD:/opt muffinista/gopher2000 /opt/gopher-script.rb
+```
 
 
 
