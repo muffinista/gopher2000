@@ -29,7 +29,7 @@ Features
 
 Requirements
 ------------
-* Ruby 1.9.2 or greater
+* Ruby 2 or greater
 * Nerves of steel
 
 Examples
@@ -106,6 +106,28 @@ There are several command-line options:
 
 Command line options will override defaults specified in your script
 -- so you can try out things on a different port/address if needed.
+
+
+Docker
+------
+
+There's a pretty simple docker script which you can use to run an
+app. To run one of the included examples, you could do something like:
+
+```
+docker build -t gopher2000 .
+docker run -p 7070:7070 --rm -it gopher2000 examples/simple.rb
+```
+
+This will run the `simple` example on port 7070. You can view it
+locally by running something like:
+
+```
+lynx gopher://0.0.0.0:7070
+```
+
+
+
 
 
 Developing Gopher Sites

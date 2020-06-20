@@ -5,6 +5,8 @@
 # Simple gopher example
 #
 
+require "rubygems"
+require "bundler/setup"
 require 'gopher2000'
 
 set :host, '0.0.0.0'
