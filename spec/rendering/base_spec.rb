@@ -10,7 +10,7 @@ describe Gopher::Rendering::Base do
     @ctx.text("line 2")
     expect(@ctx.result).to eq("line 1\r\nline 2\r\n")
   end
-
+  
   it "should add breaks correctly" do
     @ctx.spacing 2
     @ctx.text("line 1")
@@ -18,6 +18,13 @@ describe Gopher::Rendering::Base do
     expect(@ctx.result).to eq("line 1\r\n\r\nline 2\r\n\r\n")
   end
 
+  it "should add extra period to lines beginning with period" do
+    @ctx.text("line 1")
+    @ctx.text(".")
+    @ctx.text("line 2")
+    expect(@ctx.result).to eq("line 1\r\n..\r\nline 2\r\n")
+  end
+  
   it "br outputs a bunch of newlines" do
     expect(@ctx.br(2)).to eq("\r\n\r\n")
   end
@@ -60,7 +67,12 @@ describe Gopher::Rendering::Base do
   describe "block" do
     it "wraps text" do
       expect(@ctx).to receive(:text).twice.with "a"
-      @ctx.block("a a",1)
+      @ctx.block("a a", 1)
+    end
+
+    it "handles stray period" do
+      @ctx.block("a a .", 1)
+      expect(@ctx.result).to eq("a\r\na\r\n..\r\n")
     end
   end
 end

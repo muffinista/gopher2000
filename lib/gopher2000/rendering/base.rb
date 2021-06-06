@@ -35,7 +35,7 @@ module Gopher
       # @param [String] string text to add to the output
       #
       def <<(string)
-        @result << string.to_s
+        @result << clean_line(string.to_s)
       end
 
       #
@@ -89,7 +89,9 @@ module Gopher
         # this is a hack - recombine lines, then re-split on newlines
         # doing this because word_wrap is returning an array of lines, but
         # those lines have newlines in them where we should wrap
-        lines = word_wrap(text, width).join("\n").split("\n")
+        #
+        lines = word_wrap(text, width)
+                  .join("\n").split("\n")
 
         lines.each do |line|
           text line.lstrip.rstrip
@@ -206,6 +208,19 @@ module Gopher
         end
       end
 
+      #
+      # handle lines of a single period not at the end of the
+      # transmission
+      #
+      # RFC 1436 states: Note: Lines beginning with
+      # periods must be prepended with an extra period to
+      # ensure that the transmission is not terminated
+      # early. The client should strip extra periods at
+      # the beginning of the line.
+      def clean_line(line)
+        line.match?(/^\./) ? ['.', line].join('') : line
+      end
+      
       private
       def add_spacing
         br(@spacing)
