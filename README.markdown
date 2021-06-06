@@ -25,7 +25,6 @@ Features
 * built on Event Machine.
 * Easy to mount directories and serve up files.
 * built in logging and stats.
-* Runs on Ruby 1.9.2 with all the modern conveniences.
 
 Requirements
 ------------
