@@ -27,15 +27,21 @@ module Gopher
     #
     def receive_data data
       (@buf ||= '') << data
-      
+      first_line = true
+
+      ip_address = remote_ip
       while line = @buf.slice!(/(.*)\r?\n/)
-        receive_line(line)
+        is_proxy = first_line && line.match?(/^PROXY TCP[4,6] /)
+        receive_line(line, ip_address) unless is_proxy
+        ip_address = line.split(/ /)[2] if is_proxy
+
+        first_line = false
       end
     end
 
     # Invoked with lines received over the network
-    def receive_line(line)
-      call! Request.new(line, remote_ip)
+    def receive_line(line, ip_address)
+      call! Request.new(line, ip_address)
     end
     
     #
