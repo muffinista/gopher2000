@@ -23,13 +23,15 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec"
   s.add_development_dependency "redcarpet"
   s.add_development_dependency "yard"
-  s.add_development_dependency "shoulda"
+  s.add_development_dependency "shoulda-context", "~> 3.0.0.rc1"
+  s.add_development_dependency "shoulda-matchers", "~> 6.5.0"  
   s.add_development_dependency "rdoc"
-  s.add_development_dependency "simplecov", "~> 0.16.1"
+  s.add_development_dependency "simplecov", "~> 0.22.0"
   s.add_development_dependency "watchr"
 
   s.add_runtime_dependency "artii", ">= 2.0.1"
   s.add_runtime_dependency "eventmachine", "~> 1.2.5"
   s.add_runtime_dependency "logging"
   s.add_runtime_dependency "mimemagic"
+  s.add_runtime_dependency "syslog"
 end
