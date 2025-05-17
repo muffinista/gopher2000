@@ -5,24 +5,33 @@ module Gopher
   #
   # Handle communication between Server and the actual gopher Application
   #
-  class Dispatcher < EventMachine::Connection
+  class Dispatcher
 
     # the Application we are running
     attr_accessor :app
 
+    def initialize(app, socket)
+      @app = app
+      @socket = socket
+    end
+    
     #
     # get the IP address of the client
     # @return ip address
     #
-    def remote_ip
-      Socket.unpack_sockaddr_in(get_peername).last
+    def remote_ip     
+      @socket.peeraddr.last
     end
 
 
+    def read!
+      receive_data @socket.read_nonblock(4096)
+    end
+    
     #
-    # called by EventMachine when there's an incoming request
+    # called with the raw data of an incoming request
     #
-    # @param [String] selector incoming selector
+    # @param [String] data raw data, should be a selector
     # @return Response object
     #
     def receive_data data
@@ -50,23 +59,8 @@ module Gopher
     # @return Response object
     #
     def call!(request)
-      operation = proc {
-        app.dispatch(request)
-      }
-      callback = proc {|result|
-        send_response result
-        close_connection_after_writing
-      }
-
-      #
-      # if we don't want to block on slow calls, use EM#defer
-      # @see http://eventmachine.rubyforge.org/EventMachine.html#M000486
-      #
-      if app.non_blocking?
-        EventMachine.defer( operation, callback )
-      else
-        callback.call(operation.call)
-      end
+      result = app.dispatch(request)
+      send_response result
     end
 
     #
@@ -86,6 +80,12 @@ module Gopher
       end
     end
 
+    # @todo handle blocking?
+    def send_data(payload)
+      @socket.write_nonblock(payload)
+#      @socket.write(payload)      
+    end
+    
     #
     # Add the period on a line by itself that closes the connection
     #

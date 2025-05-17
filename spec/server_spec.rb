@@ -1,143 +1,135 @@
 require File.join(File.dirname(__FILE__), '/spec_helper')
 require 'tempfile'
 
-if ENV["WITH_SERVER_SPECS"].to_i == 1
-
-  class FakeApp < Gopher::Application
-    attr_accessor :fake_response
-    def dispatch(x)
-      @fake_response
-    end
+class SimpleClient
+  def initialize(host, port)
+    @socket = TCPSocket.open(host, port)
+  end
+  
+  def send(data)
+    @socket.puts(data)
+  end
+  
+  def read
+    @socket.gets(nil)
   end
 
-  describe Gopher::Server do
-    before(:each) do
-      @application = FakeApp.new
-      @application.scripts = []
-      @application.reset!
+  def close
+    @socket.close
+  end
+end
 
-      @host = "0.0.0.0"
-      @port = 12345
-      @environment = 'test'
 
-      @application.config[:host] = @host
-      @application.config[:port] = @port
-      @application.config[:env] = @environment
+class FakeApp < Gopher::Application
+  attr_accessor :fake_response
+  def dispatch(x)
+    @fake_response
+  end
+end
 
-      @request = Gopher::Request.new("foo", "bar")
+def start_server
+  @server = Gopher::Server.new(@application)
+  @thread = @server.run!
+  
+  while @server.status != :run do; end
+end
 
-      @response = Gopher::Response.new
-      @response.code = :success
-      @response.body = "hi"
-    end
+describe Gopher::Server do
+  before(:each) do
+    @application = FakeApp.new
+    @application.scripts = []
+    @application.reset!
 
-    it "returns host" do
-      @application.config[:host] = 'gopher-site.test'
-      expect(@application.host).to eql('gopher-site.test')
-    end
+    @host = "0.0.0.0"
+    @port = 12345
+    @environment = 'test'
 
-    it "returns port" do
-      expect(@application.port).to eql(@port)
-    end
+    @application.config[:host] = @host
+    @application.config[:port] = @port
+    @application.config[:env] = @environment
 
-    it "returns environment" do
-      expect(@application.env).to eql(@environment)
-    end
-   
-    
-    it "should work in non-blocking mode" do
-      @application.fake_response = @response
-      allow(@application).to receive(:non_blocking?).and_return(false)
+    @request = Gopher::Request.new("foo", "bar")
 
-      ::EM.run {
-        server = Gopher::Server.new(@application)
-        server.run!
+    @response = Gopher::Response.new
+    @response.code = :success
+    @response.body = "hi"
+  end
 
-        # opens the socket client connection
-        socket = ::EM.connect(@host, @port, FakeSocketClient)
-        socket.send_data("123\n")
+  after do
+    @server&.stop
+    @thread&.join
+  end
+  
+  it "returns host" do
+    @application.config[:host] = 'gopher-site.test'
+    expect(@application.host).to eql('gopher-site.test')
+  end
 
-        socket.onopen = lambda {
-          expect(socket.data.last.chomp).to eq("hi\r\n.")
-          EM.stop
-        }
-      }
-    end
+  it "returns port" do
+    expect(@application.port).to eql(@port)
+  end
 
-    it "should handle Gopher::Response results" do
-      @application.fake_response = @response
+  it "returns environment" do
+    expect(@application.env).to eql(@environment)
+  end
+  
+  it "should work in non-blocking mode" do
+    @application.fake_response = @response
+    allow(@application).to receive(:non_blocking?).and_return(false)
 
-      ::EM.run {
-        server = Gopher::Server.new(@application)
-        server.run!
+    start_server
 
-        # opens the socket client connection
-        socket = ::EM.connect(@host, @port, FakeSocketClient)
-        socket.send_data("123\n")
+    client = SimpleClient.new(@host, @port)
+    client.send("123\n")
 
-        socket.onopen = lambda {
-          expect(socket.data.last.chomp).to eq("hi\r\n.")
-          EM.stop
-        }
-      }
-    end
+    expect(client.read).to eq("hi\r\n.\r\n")
+  end
 
-    it "should handle string results" do
-      @application.fake_response = @response
+  it "should handle Gopher::Response results" do
+    @application.fake_response = @response
 
-      ::EM.run {
-        server = Gopher::Server.new(@application)
-        server.run!
+    start_server
 
-        # opens the socket client connection
-        socket = ::EM.connect(@host, @port, FakeSocketClient)
-        socket.send_data("123\n")
+    client = SimpleClient.new(@host, @port)
+    client.send("123\n")
 
-        socket.onopen = lambda {
-          expect(socket.data.last.chomp).to eq("hi\r\n.")
-          EM.stop
-        }
-      }
-    end
+    expect(client.read).to eq("hi\r\n.\r\n")
+  end
 
-    it "should handle File results" do
-      file = Tempfile.new('foo')
-      file.write("hi")
-      file.close
+  it "should handle string results" do
+    @application.fake_response = @response
 
-      @application.fake_response = File.new(file)
+    start_server
 
-      ::EM.run {
-        server = Gopher::Server.new(@application)
-        server.run!
+    client = SimpleClient.new(@host, @port)
+    client.send("123\n")
 
-        # opens the socket client connection
-        socket = ::EM.connect(@host, @port, FakeSocketClient)
-        socket.send_data("123\n")
+    expect(client.read).to eq("hi\r\n.\r\n")
+  end
 
-        socket.onopen = lambda {
-          expect(socket.data.last.chomp).to eq("hi")
-          EM.stop
-        }
-      }
-    end
+  it "should handle File results" do
+    file = Tempfile.new('foo')
+    file.write("hi")
+    file.close
 
-    it "should handle StringIO results" do
-      @application.fake_response = StringIO.new("hi")
+    @application.fake_response = File.new(file)
 
-      ::EM.run {
-        server = Gopher::Server.new(@application)
-        server.run!
+    start_server
 
-        # opens the socket client connection
-        socket = ::EM.connect(@host, @port, FakeSocketClient)
-        socket.send_data("123\n")
+    client = SimpleClient.new(@host, @port)
+    client.send("123\n")
 
-        socket.onopen = lambda {
-          expect(socket.data.last.chomp).to eq("hi\r\n.")
-          EM.stop
-        }
-      }
-    end
+    expect(client.read).to eq("hi")
+  end
+
+  it "should handle StringIO results" do
+    @application.fake_response = StringIO.new("hi")
+
+    start_server
+
+    client = SimpleClient.new(@host, @port)
+    client.send("123\n")
+
+    expect(client.read).to eq("hi\r\n.\r\n")
   end
 end

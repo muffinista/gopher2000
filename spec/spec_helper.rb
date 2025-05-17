@@ -13,12 +13,11 @@ Bundler.require
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
 
-require 'eventmachine'
 
 #
 # http://www.rosskaff.com/2010/12/behavior-driven-event-driven-eventmachine-rspec/
 #
-class FakeSocketClient < EventMachine::Connection
+class FakeSocketClient
 
   attr_writer :onopen, :onclose, :onmessage
   attr_reader :data

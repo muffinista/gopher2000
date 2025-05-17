@@ -30,8 +30,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "watchr"
 
   s.add_runtime_dependency "artii", ">= 2.0.1"
-  s.add_runtime_dependency "eventmachine", "~> 1.2.5"
   s.add_runtime_dependency "logging"
   s.add_runtime_dependency "mimemagic"
   s.add_runtime_dependency "syslog"
+  s.add_runtime_dependency "nio4r"
 end

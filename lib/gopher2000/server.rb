@@ -1,10 +1,16 @@
+# frozen_string_literal: true
+
+require "nio"
+require "socket"
+
 module Gopher
 
   #
   # main class which will listen on a specified port, and pass requests to an Application class
   #
   class Server
-    attr_accessor :app
+    attr_accessor :app, :exit
+    attr_reader :status
 
     #
     # constructor
@@ -12,6 +18,7 @@ module Gopher
     #
     def initialize(a)
       @app = a
+      @status = :new
     end
  
     #
@@ -34,47 +41,77 @@ module Gopher
     def env
       @app.config[:env] || 'development'
     end
+
+
+    def accept
+      socket = @server.accept
+      _, port, host = socket.peeraddr
+      
+      monitor = @selector.register(socket, :r)
+      monitor.value = proc { read(socket) }
+    end
+
+    def read(socket)
+      Dispatcher.new(app, socket).read!
+    rescue EOFError
+      _, port, host = socket.peeraddr
+    ensure
+      @selector.deregister(socket)
+      socket.close
+    end
     
     #
     # main app loop. called via at_exit block defined in DSL
     #
-    def run!
-      EventMachine::run do
-        Signal.trap("INT") {
-          puts "It's a trap!"
-          EventMachine.stop
-        }
-        Signal.trap("TERM") {
-          puts "It's a trap!"
-          EventMachine.stop
-        }
-
-        EventMachine.kqueue = true if EventMachine.kqueue?
-        EventMachine.epoll = true if EventMachine.epoll?
-
-
-        STDERR.puts "start server at #{host} #{port}"
-        if @app.non_blocking?
-          STDERR.puts "Not blocking on requests"
-        end
-
-
-        EventMachine::start_server(host, port, Gopher::Dispatcher) do |conn|
-          #
-          # check if we should reload any scripts before moving along
-          #
-          @app.reload_stale
-
-          #
-          # roughly matching sinatra's style of duping the app to respond
-          # to requests, @see http://www.sinatrarb.com/intro#Request/Instance%20Scope
-          #
-          # this essentially means we have 'one instance per request'
-          #
-          conn.app = @app.dup
-        end
+    def run!(background=true)
+      if background
+        @thread = Thread.new { run_server }
+      else
+        run_server
       end
     end
+
+    def stop
+      @status = :stop
+    end
+    
+    def run_server      
+      @selector = NIO::Selector.new
+      puts "Listening on #{host}:#{port}"
+      @server = TCPServer.new(host, port)
+      
+      monitor = @selector.register(@server, :r)
+      monitor.value = proc { accept }
+
+      @status = :run
+
+      Signal.trap("INT") {
+        puts "It's a trap!"
+        @status = :stop
+      }
+      Signal.trap("TERM") {
+        puts "It's a trap!"
+        @status = :stop
+      }
+
+      # todo this could probably be a thread with a loop
+      while @status == :run do
+        #
+        # check if we should reload any scripts before moving along
+        #
+        @app.reload_stale
+
+        @selector.select(1) { |monitor| monitor.value.call }
+      end
+
+      @server.close
+
+      #  STDERR.puts "start server at #{host} #{port}"
+      #  if @app.non_blocking?
+      #    STDERR.puts "Not blocking on requests"
+      #  end
+    end
+    
 
 
     #
