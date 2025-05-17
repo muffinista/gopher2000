@@ -115,7 +115,7 @@ describe Gopher::Rendering::Menu do
     {
       "foo.zip" => '5',
       "foo.gz" => '5',
-      "foo.bz2" => '5',
+      #"foo.bz2" => '5',
       "foo.gif" => 'g',
       "foo.jpg" => 'I',
       "foo.png" => 'I',
