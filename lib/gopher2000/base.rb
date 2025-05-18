@@ -1,5 +1,46 @@
 module Gopher
+  module Types
+    # https://en.wikipedia.org/wiki/Gopher_(protocol)#Item_types
+    TEXT = '0'
+    MENU = '1'
+    CCSO = '2'
+    ERROR = '3'
+    BINHEX = '4'
+    DOS = '5'
+    ARCHIVE = DOS
+    UUENCODED = '6'
+    SEARCH = '7'
+    TELNET = '8'
+    BINARY = '9'
+    MIRROR = '+'
+    GIF = 'g'
+    IMAGE = 'I'
+    TELNET_3270 = 'T'
 
+    DOC = 'd'
+    HTML = 'h'
+    INFO = 'i'
+    PNG = 'p'
+    RTF = 'r'
+    SOUND = AUDIO = 's'
+    PDF = 'P'
+    XML = 'X'
+    VIDEO = 'v'
+  end
+
+  class << self
+    attr_accessor :_application
+    def set_application(app)
+      if !app.is_a?(Gopher::Application)
+        load app
+      else
+        @@application = app
+        @@application.reset!
+      end
+    end
+  end
+
+  
   #
   # main application class for a gopher server. holds all the
   # methods/data required to interact with clients.
@@ -73,7 +114,7 @@ module Gopher
     # check if our script has been updated since the last reload
     #
     def should_reload?
-      ! last_reload.nil? && self.scripts.any? do |f|
+      !last_reload.nil? && self.scripts.any? do |f|
         File.mtime(f) > last_reload
       end
     end
@@ -85,7 +126,7 @@ module Gopher
       reload_check = should_reload?
       self.last_reload = Time.now
 
-      return if ! reload_check
+      return if !reload_check
       reset!
 
       self.scripts.each do |f|

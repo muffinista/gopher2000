@@ -6,18 +6,30 @@ module Gopher
   # @see the examples/ directory for working scripts
   #
   module DSL
-    @application = nil
-
     #
     # initialize an instance of an Application if we haven't already, otherwise, return
     #   the current app
     # @return [Gopher::Application] current app
     #
     def application
-      return @application unless @application.nil?
+      return Gopher._application unless Gopher._application.nil?
 
-      @application = Gopher::Application.new
-      @application.reset!
+      Gopher._application = Gopher::Application.new
+      Gopher._application.reset!
+    end
+
+    def application=(app)
+      if !app.is_a?(Gopher::Application)
+        load app
+      else
+        # @todo properly test this
+        #        @@application = app
+        #        @@application.reset!
+        puts app.inspect
+        Gopher._application = app
+      end
+
+
     end
 
     # set a config value

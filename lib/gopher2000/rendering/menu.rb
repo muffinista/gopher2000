@@ -47,7 +47,7 @@ module Gopher
       # @param [String] text the text of the line
       # @param [String] type what sort of entry is this? @see http://www.ietf.org/rfc/rfc1436.txt for a list
       #
-      def text(text, type = 'i')
+      def text(text, type = Gopher::Types::INFO)
         line type, text, 'null', NO_HOST, NO_PORT
       end
 
@@ -57,7 +57,7 @@ module Gopher
       #
       def br(n=1)
         1.upto(n) do
-          text 'i', ""
+          text Gopher::Types::INFO, ""
         end
         self.to_s
       end
@@ -67,7 +67,7 @@ module Gopher
       # @param [String] msg text of the message
       #
       def error(msg)
-        text(msg, '3')
+        text(msg, Gopher::Types::ERROR)
       end
 
       #
@@ -78,7 +78,7 @@ module Gopher
       # @param [String] port for link, defaults to current port
       #
       def directory(name, selector, host=nil, port=nil)
-        line '1', name, selector, host, port
+        line Gopher::Types::MENU, name, selector, host, port
       end
       alias menu directory
 
@@ -118,7 +118,7 @@ module Gopher
       # @param [String] port for link, defaults to current port
       # @param [String] real filepath of the link
       def text_link(text, selector, host=nil, port=nil, filepath=nil)
-        link(text, selector, host, port, filepath, '0')
+        link(text, selector, host, port, filepath, Gopher::Types::TEXT)
       end
       
       # Create an HTTP link entry. This is how this works (via wikipedia)
@@ -135,7 +135,7 @@ module Gopher
       # @param [String] host for link, defaults to current host
       # @param [String] port for link, defaults to current port
       def http(text, url, host=nil, port=nil)
-        line "h", text, "URL:#{url}", host, port
+        line Gopher::Types::HTML, text, "URL:#{url}", host, port
       end
       
       #
@@ -143,7 +143,7 @@ module Gopher
       # @param [String] text the text of the link
       # @param [String] selector the path of the selector
       def search(text, selector, *args)
-        line '7', text, selector, *args
+        line Gopher::Types::SEARCH, text, selector, *args
       end
       alias input search
 
@@ -190,27 +190,27 @@ module Gopher
         end
         
         if !mimetype
-          return '9' # Binary file
+          return Gopher::Types::BINARY # Binary file
         elsif mimetype.child_of?('application/gzip') || mimetype.child_of?('application/x-bzip') || mimetype.child_of?('application/zip')
-          return '5' # archive
+          return Gopher::Types::ARCHIVE # archive
         elsif mimetype.child_of?('image/gif')
-          return 'g' # GIF image
+          return Gopher::Types::GIF # GIF image
         elsif mimetype.child_of?('text/x-uuencode')
-          return '6' # UUEncode encoded file
+          return Gopher::Types::UUENCODED # UUEncode encoded file
         elsif mimetype.child_of?('application/mac-binhex40')
-          return '4' # BinHex encoded file
+          return Gopher::Types::BINHEX # BinHex encoded file
         elsif mimetype.child_of?('text/html') || mimetype.child_of?('application/xhtml+xml')
-          return 'h' # HTML file
+          return Gopher::Types::HTML # HTML file
         elsif mimetype.mediatype == 'text'    || mimetype.child_of?('text/plain')
-          return '0' # General text file
+          return Gopher::Types::TEXT # General text file
         elsif mimetype.mediatype == 'image'
-          return 'I' # General image file
+          return Gopher::Types::IMAGE # General image file
         elsif mimetype.mediatype == 'audio'
-          return 's' # General audio file
+          return Gopher::Types::AUDIO # General audio file
         elsif mimetype.mediatype == 'video'
-          return 'v' # General video file
+          return Gopher::Types::VIDEO # General video file
         else
-          return '9' # Binary file
+          return Gopher::Types::BINARY # Binary file
         end
       end
     end

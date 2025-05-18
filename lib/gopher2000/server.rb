@@ -16,23 +16,25 @@ module Gopher
     # constructor
     # @param [Application] a instance of Gopher::Application we want to run
     #
-    def initialize(a)
+    def initialize(a, host: nil, port: nil)
       @app = a
       @status = :new
+      @host = host
+      @port = port
     end
  
     #
     # @return [String] name of the host specified in our config
     #
     def host
-      @app.config[:host] ||= '0.0.0.0'
+      @host ||= @app.config[:host] ||= '0.0.0.0'
     end
 
     #
     # @return [Integer] port specified in our config
     #
     def port
-      @app.config[:port] ||= 70
+      @port ||= @app.config[:port] ||= 70
     end
 
     #
@@ -77,7 +79,7 @@ module Gopher
     
     def run_server      
       @selector = NIO::Selector.new
-      puts "Listening on #{host}:#{port}"
+      warn "Listening on #{host}:#{port}"
       @server = TCPServer.new(host, port)
       
       monitor = @selector.register(@server, :r)
@@ -86,11 +88,12 @@ module Gopher
       @status = :run
 
       Signal.trap("INT") {
-        puts "It's a trap!"
+        warm "It's a trap!"
+        exit! if @status == :stop
         @status = :stop
       }
       Signal.trap("TERM") {
-        puts "It's a trap!"
+        warn "It's a trap!"
         @status = :stop
       }
 

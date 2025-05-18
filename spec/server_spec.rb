@@ -1,24 +1,6 @@
 require File.join(File.dirname(__FILE__), '/spec_helper')
 require 'tempfile'
 
-class SimpleClient
-  def initialize(host, port)
-    @socket = TCPSocket.open(host, port)
-  end
-  
-  def send(data)
-    @socket.puts(data)
-  end
-  
-  def read
-    @socket.gets(nil)
-  end
-
-  def close
-    @socket.close
-  end
-end
-
 
 class FakeApp < Gopher::Application
   attr_accessor :fake_response

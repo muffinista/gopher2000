@@ -1,6 +1,8 @@
 require 'stringio'
 require 'logging'
 
+require 'pry' rescue nil
+
 #
 # Define everything needed to run a gopher server
 #
