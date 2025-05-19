@@ -129,7 +129,7 @@ include Gopher::DSL
 #
 unless ENV['gopher_test']
   at_exit do
-    s = Gopher::Server.new(@application)
-    s.run!
+    s = Gopher::Server.new(Gopher._application)
+    s.run!(background: false)
   end
 end
