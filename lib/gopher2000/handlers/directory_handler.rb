@@ -74,7 +74,6 @@ module Gopher
       def call(params = {}, _request = nil)
         lookup = request_path(params)
 
-        puts "LOOKUP: #{lookup}"
         raise Gopher::InvalidRequest unless contained?(lookup)
 
         if File.directory?(lookup)

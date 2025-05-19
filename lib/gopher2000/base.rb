@@ -509,12 +509,19 @@ module Gopher
       end
     end
 
+    def logger
+      return @logger if defined?(@logger)
+
+      @logger = ::Logging.logger($stderr)
+      @logger.level = ENV.fetch('GOPHER_LOG_LEVEL', 'WARN')
+      @logger
+    end
+
     #
     # output a debugging message
     #
     def debug_log(x)
-      @debug_logger ||= ::Logging.logger($stderr)
-      @debug_logger.debug x
+      logger.debug x
     end
 
     protected
