@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), '/spec_helper')
 
 class MockServer < Gopher::Application
@@ -9,67 +11,68 @@ class MockServer < Gopher::Application
   end
 end
 
-
 describe Gopher::Application do
-  before(:each) do
+  before do
     @s = MockServer.new
   end
 
-  describe "find_template" do
-    it "should check in menus" do
-      @s.menus['foo'] = "bar"
-      expect(@s.find_template('foo')).to eq(["bar", Gopher::Rendering::Menu])
+  describe 'find_template' do
+    it 'checks in menus' do
+      @s.menus['foo'] = 'bar'
+      expect(@s.find_template('foo')).to eq(['bar', Gopher::Rendering::Menu])
     end
-    it "should check in text_templates" do
-      @s.text_templates['foo'] = "bar"
-      expect(@s.find_template('foo')).to eq(["bar", Gopher::Rendering::Text])
+
+    it 'checks in text_templates' do
+      @s.text_templates['foo'] = 'bar'
+      expect(@s.find_template('foo')).to eq(['bar', Gopher::Rendering::Text])
     end
   end
 
-  describe "render" do
-    it "should raise error if no such template" do
-      expect{@s.render('xyzzy')}.to raise_error(Gopher::TemplateNotFound)
+  describe 'render' do
+    it 'raises error if no such template' do
+      expect { @s.render('xyzzy') }.to raise_error(Gopher::TemplateNotFound)
     end
 
-    it "has access to params obj" do
-      @s.params = "xyz"
+    it 'has access to params obj' do
+      @s.params = 'xyz'
       @s.menu :foo do
         @params
       end
 
-      expect(@s.render(:foo)).to eq("xyz")
+      expect(@s.render(:foo)).to eq('xyz')
     end
 
-    it "has access to request obj" do
-      @s.request = "abc"
+    it 'has access to request obj' do
+      @s.request = 'abc'
       @s.menu :foo do
         @request
       end
 
-      expect(@s.render(:foo)).to eq("abc")
+      expect(@s.render(:foo)).to eq('abc')
     end
 
-    it "rendering text access to request obj" do
-      @s.request = "abc"
+    it 'rendering text access to request obj' do
+      @s.request = 'abc'
       @s.text :foo do
         @request
       end
 
-      expect(@s.render(:foo)).to eq("abc")
+      expect(@s.render(:foo)).to eq('abc')
     end
   end
 
-  describe "not_found_template" do
-    before(:each) do
+  describe 'not_found_template' do
+    before do
       @s.reset!
     end
 
-    it "should use custom template if provided" do
-      @s.not_found do ; end
+    it 'uses custom template if provided' do
+      @s.not_found do
+      end
       expect(@s.not_found_template).to eq(:not_found)
     end
 
-    it "should use default otherwise" do
+    it 'uses default otherwise' do
       expect(@s.not_found_template).to eq(:'internal/not_found')
     end
   end

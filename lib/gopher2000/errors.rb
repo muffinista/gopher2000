@@ -1,5 +1,6 @@
-module Gopher
+# frozen_string_literal: true
 
+module Gopher
   # base error class
   class GopherError < StandardError; end
 

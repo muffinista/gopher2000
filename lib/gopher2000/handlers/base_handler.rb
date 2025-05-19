@@ -1,5 +1,6 @@
-module Gopher
+# frozen_string_literal: true
 
+module Gopher
   #
   # namespace for custom handlers
   #

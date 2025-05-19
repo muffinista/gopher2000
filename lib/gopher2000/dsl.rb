@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), '..', 'gopher2000')
 
 module Gopher
@@ -19,17 +21,15 @@ module Gopher
     end
 
     def application=(app)
-      if !app.is_a?(Gopher::Application)
-        load app
-      else
+      if app.is_a?(Gopher::Application)
         # @todo properly test this
         #        @@application = app
         #        @@application.reset!
         puts app.inspect
         Gopher._application = app
+      else
+        load app
       end
-
-
     end
 
     # set a config value
@@ -42,13 +42,13 @@ module Gopher
     # specify a route
     # @param [String] path path of the route
     # @yield block that will respond to the request
-    def route(path, &block)
-      application.route(path, &block)
+    def route(path, &)
+      application.route(path, &)
     end
 
     # specify a default route
-    def default_route(&block)
-      application.default_route(&block)
+    def default_route(&)
+      application.default_route(&)
     end
 
     # mount a folder for browsing
@@ -65,31 +65,31 @@ module Gopher
         opts = opts.merge(other_opts)
       end
 
-      application.mount(route, opts.merge({:path => folder}))
+      application.mount(route, opts.merge({ path: folder }))
     end
 
     # specify a menu template
     # @param [Symbol] name of the template
     # @yield block which renders the template
-    def menu(name, &block)
-      application.menu(name, &block)
+    def menu(name, &)
+      application.menu(name, &)
     end
 
     # specify a text template
     # @param [Symbol] name of the template
     # @yield block which renders the template
-    def text(name, &block)
-      application.text(name, &block)
+    def text(name, &)
+      application.text(name, &)
     end
 
-#    def template(name, &block)
-#      application.template(name, &block)
-#    end
+    #    def template(name, &block)
+    #      application.template(name, &block)
+    #    end
 
     # specify some helpers for your app
     # @yield block which defines the helper methods
-    def helpers(&block)
-      application.helpers(&block)
+    def helpers(&)
+      application.helpers(&)
     end
 
     # watch the specified script for changes
@@ -107,22 +107,20 @@ module Gopher
     #   run on a different host/port, etc.
     #
     def run(script, opts = {})
-
       load script
 
       #
       # apply options after loading the script so that anything specified on the command-line
       # will take precedence over defaults specified in the script
       #
-      opts.each { |k, v|
+      opts.each do |k, v|
         set k, v
-      }
-
-      if application.config[:debug] == true
-        puts "watching #{script} for changes"
-        watch script
       end
 
+      return unless application.config[:debug] == true
+
+      puts "watching #{script} for changes"
+      watch script
     end
   end
 end

@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 #
 # gopher app for retrieving the weather
@@ -6,7 +7,6 @@
 
 require 'weather-underground'
 require 'gopher'
-
 
 set :host, '0.0.0.0'
 set :port, 7070
@@ -17,7 +17,6 @@ set :port, 7070
 route '/' do
   render :index
 end
-
 
 #
 # main index for the server
@@ -31,9 +30,7 @@ menu :index do
 
   # ask for some input
   input 'Please enter your zipcode', '/lookup'
-
 end
-
 
 #
 # actions have access to the request object, and can grab the following data:
@@ -64,5 +61,5 @@ menu :forecast do |f, location|
     br
   end
   br
-  text "** Powered by Gopher 2000 **"
+  text '** Powered by Gopher 2000 **'
 end

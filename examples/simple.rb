@@ -1,22 +1,22 @@
 #!/usr/bin/env ruby
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
 
 #
 # Simple gopher example
 #
 
-require "rubygems"
-require "bundler/setup"
+require 'rubygems'
+require 'bundler/setup'
 require 'gopher2000'
 
 set :host, '0.0.0.0'
 set :port, 7070
 
 # you can specify a destination for access log, for stats/etc
-set :access_log, "/tmp/access.log"
+set :access_log, '/tmp/access.log'
 
 route '/gopher' do
-  "Greetings from Gopher 2000!" # You can output any text you want here
+  'Greetings from Gopher 2000!' # You can output any text you want here
 end
 
 route '/prettytext' do
@@ -27,7 +27,7 @@ end
 # special text output rendering
 #
 text :prettytext do
-  @text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ullamcorper dictum euismod. Sed accumsan sem id quam rutrum eu hendrerit quam adipiscing. Fusce consequat accumsan eros, ac elementum eros molestie et. Vestibulum aliquet varius nulla nec rhoncus. Vivamus felis ipsum, commodo sit amet eleifend eu, lacinia et est. Nullam dolor sapien, luctus eu rhoncus non, ullamcorper vitae nibh. Proin viverra luctus dapibus. Integer aliquam, ante id consectetur vulputate, nibh sapien aliquet nisl, in porttitor massa elit a lectus. Maecenas nec diam nec nulla fringilla feugiat. Nulla facilisi. Proin odio libero, viverra at blandit eget, mattis id dui. Aliquam sed leo leo. Pellentesque eros ante, viverra in accumsan sit amet, pellentesque nec massa."
+  @text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ullamcorper dictum euismod. Sed accumsan sem id quam rutrum eu hendrerit quam adipiscing. Fusce consequat accumsan eros, ac elementum eros molestie et. Vestibulum aliquet varius nulla nec rhoncus. Vivamus felis ipsum, commodo sit amet eleifend eu, lacinia et est. Nullam dolor sapien, luctus eu rhoncus non, ullamcorper vitae nibh. Proin viverra luctus dapibus. Integer aliquam, ante id consectetur vulputate, nibh sapien aliquet nisl, in porttitor massa elit a lectus. Maecenas nec diam nec nulla fringilla feugiat. Nulla facilisi. Proin odio libero, viverra at blandit eget, mattis id dui. Aliquam sed leo leo. Pellentesque eros ante, viverra in accumsan sit amet, pellentesque nec massa.'
 
   # nicely wrapped text
   block @text
@@ -38,8 +38,6 @@ text :prettytext do
   # smaller line-width
   block @text, 30
 end
-
-
 
 #
 # main route
@@ -83,7 +81,6 @@ end
 #
 mount '/files' => '/home/username/files', :filter => '*.jpg'
 
-
 #
 # actions have access to the request object, which has the following attributes:
 #
@@ -107,7 +104,7 @@ route '/time' do
 end
 
 route '/about' do
-  "Gopher 2000 -- World Domination via Text Protocols"
+  'Gopher 2000 -- World Domination via Text Protocols'
 end
 
 #
@@ -117,9 +114,9 @@ route '/request/:x/:y' do
   render :request_with_params
 end
 
-#menu :request_with_params do |params|
+# menu :request_with_params do |params|
 #  text params.inspect
-#end
+# end
 
 #
 # both the incoming params, and the request object are available when rendering
@@ -136,14 +133,14 @@ menu :hello do |name|
   text "Hello, #{name}!"
 end
 
-route "/junk" do
+route '/junk' do
   garble
 end
 
-route "/slow" do
-  "i am not fast"
+route '/slow' do
+  'i am not fast'
 end
 
 helpers do
-  def garble; "hhdhd"; end
+  def garble = 'hhdhd'
 end

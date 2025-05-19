@@ -1,3 +1,8 @@
+# frozen_string_literal: true
+
+#
+# Codebase to run a gopher server
+#
 module Gopher
   module Types
     # https://en.wikipedia.org/wiki/Gopher_(protocol)#Item_types
@@ -30,28 +35,27 @@ module Gopher
 
   class << self
     attr_accessor :_application
+
     def set_application(app)
-      if !app.is_a?(Gopher::Application)
-        load app
+      if app.is_a?(Gopher::Application)
+        @application = app
+        @application.reset!
       else
-        @@application = app
-        @@application.reset!
+        load app
       end
     end
   end
 
-  
   #
   # main application class for a gopher server. holds all the
   # methods/data required to interact with clients.
   #
   class Application
-
     # The output pattern we will use to generate access logs
     ACCESS_LOG_PATTERN = "%d\t%m\n"
 
-    @@access_log = nil
-    @@debug_log = nil
+    @access_log = nil
+    @debug_log = nil
 
     @routes = []
     @menus = {}
@@ -59,7 +63,6 @@ module Gopher
     @scripts ||= []
 
     attr_accessor :menus, :text_templates, :routes, :config, :scripts, :last_reload, :params, :request
-
 
     #
     # reset the app. clear out any routes, templates, config values,
@@ -71,9 +74,9 @@ module Gopher
       self.text_templates = {}
       self.scripts ||= []
       self.config ||= {
-        :debug => false,
-        :host => "0.0.0.0",
-        :port => 70
+        debug: false,
+        host: '0.0.0.0',
+        port: 70
       }
 
       register_defaults
@@ -109,7 +112,6 @@ module Gopher
       config[:debug] == true
     end
 
-
     #
     # check if our script has been updated since the last reload
     #
@@ -126,7 +128,8 @@ module Gopher
       reload_check = should_reload?
       self.last_reload = Time.now
 
-      return if !reload_check
+      return unless reload_check
+
       reset!
 
       self.scripts.each do |f|
@@ -135,13 +138,15 @@ module Gopher
       end
     end
 
-
     #
     # mount a directory for browsing via gopher
     #
-    # @param [Hash] path A hash specifying the path your route will answer to, and the filesystem path to use '/route' => '/home/path/etc'
-    # @param [Hash] opts a hash of options for the mount. Primarily this is a filter, which will restrict the list files outputted. example: :filter => '*.jpg'
-	# @param [Class] klass The class that should be used to handle this mount. You could write and use a custom handler if desired
+    # @param [Hash] path A hash specifying the path your route will answer to, and the
+    # filesystem path to use '/route' => '/home/path/etc'
+    # @param [Hash] opts a hash of options for the mount. Primarily this is a filter, which
+    # will restrict the list files outputted. example: :filter => '*.jpg'
+    # @param [Class] klass The class that should be used to handle this mount. You could
+    # write and use a custom handler if desired
     #
     # @example mount the directory '/home/user/foo' at the gopher path '/files', and only show JPG files:
     #   mount '/files' => '/home/user/foo', :filter => '*.jpg'
@@ -163,7 +168,6 @@ module Gopher
       end
     end
 
-
     #
     # define a route.
     # @param [String] path the path your route will answer to. This is basically a URI path
@@ -179,16 +183,15 @@ module Gopher
     #     render :template
     #   end
     #
-    def route(path, &block)
+    def route(path, &)
       selector = Gopher::Application.sanitize_selector(path)
-      sig = compile!(selector, &block)
+      sig = compile!(selector, &)
 
       debug_log("Add route for #{selector}")
 
       self.routes ||= []
       self.routes << sig
     end
-
 
     #
     # specify a default route to handle requests if no other route exists
@@ -199,8 +202,8 @@ module Gopher
     #     render :template
     #   end
     #
-    def default_route(&block)
-      @default_route = Application.generate_method("DEFAULT_ROUTE", &block)
+    def default_route(&)
+      @default_route = Application.generate_method('DEFAULT_ROUTE', &)
     end
 
     #
@@ -209,31 +212,26 @@ module Gopher
     # @param [String] selector the selector path of the incoming request
     #
     def lookup(selector)
-      unless routes.nil?
-		    routes.each do |pattern, keys, block|
-          if match = pattern.match(selector)
-            match = match.to_a
-            url = match.shift
-            
-            params = to_params_hash(keys, match)
+      routes&.each do |pattern, keys, block|
+        next unless (match = pattern.match(selector))
 
-            #
-            # @todo think about this
-            #
-            @params = params
+        match = match.to_a
+        match.shift
 
-            return params, block
-          end
-        end
+        params = to_params_hash(keys, match)
+
+        #
+        # @todo think about this
+        #
+        @params = params
+
+        return params, block
       end
 
-      unless @default_route.nil?
-        return {}, @default_route
-      end
+      return {}, @default_route unless @default_route.nil?
 
       raise Gopher::NotFoundError
     end
-
 
     #
     # find and run the first route which matches the incoming request
@@ -245,7 +243,7 @@ module Gopher
       response = Response.new
       @request = req
 
-      if ! @request.valid?
+      if !@request.valid?
         response.body = handle_invalid_request
         response.code = :error
       elsif @request.url?
@@ -261,11 +259,11 @@ module Gopher
           #
           response.body = block.bind(self).call
           response.code = :success
-        rescue Gopher::NotFoundError => e
+        rescue Gopher::NotFoundError
           debug_log("#{@request.selector} -- not found")
           response.body = handle_not_found
           response.code = :missing
-        rescue Exception => e
+        rescue StandardError => e
           debug_log("#{@request.selector} -- error")
           debug_log(e.inspect)
           debug_log(e.backtrace)
@@ -323,9 +321,12 @@ module Gopher
     # access to the methods defined in Gopher::Rendering::Text for
     # wrapping strings, adding simple headers, etc.
     #
-    # @param [String/Symbol] name the name of the template. This is what identifies the template when making a call to render
+    # @param [String/Symbol] name the name of the template. This is what identifies
+    # the template when making a call to render
     #
-    # @yield a block which will output the menu. This block is executed within an instance of Gopher::Rendering::Text and will have access to all of its methods.
+    # @yield a block which will output the menu. This block is executed within an
+    # instance of Gopher::Rendering::Text and will have access to all of its methods.
+    #
     # @example simple example
     #   text :hello do
     #     big_header "Hello There!"
@@ -339,8 +340,8 @@ module Gopher
     #
     # specify a template to be used for missing requests
     #
-    def not_found(&block)
-      menu :not_found, &block
+    def not_found(&)
+      menu(:not_found, &)
     end
 
     #
@@ -350,13 +351,12 @@ module Gopher
     #
     def find_template(t)
       x = menus[t]
-      if x
-        return x, Gopher::Rendering::Menu
-      end
+      return x, Gopher::Rendering::Menu if x
+
       x = text_templates[t]
-      if x
-        return x, Gopher::Rendering::Text
-      end
+      return unless x
+
+      [x, Gopher::Rendering::Text]
     end
 
     #
@@ -365,7 +365,7 @@ module Gopher
     # @param [Array] arguments optional arguments to be passed to template
     # @return result of rendering
     #
-    def render(template, *arguments)
+    def render(template, *)
       #
       # find the right renderer we need
       #
@@ -377,7 +377,7 @@ module Gopher
       ctx.params = @params
       ctx.request = @request
 
-      ctx.instance_exec(*arguments, &block)
+      ctx.instance_exec(*, &block)
     end
 
     #
@@ -397,7 +397,6 @@ module Gopher
       menus.include?(:error) ? :error : :'internal/error'
     end
 
-
     #
     # get the id of the template that will be used when rendering an html page
     # @return name of error template
@@ -405,7 +404,7 @@ module Gopher
     def url_template
       menus.include?(:html) ? :html : :'internal/url'
     end
-    
+
     #
     # get the id of the template that will be used when rendering an
     # invalid request
@@ -414,7 +413,6 @@ module Gopher
     def invalid_request_template
       menus.include?(:invalid_request) ? :invalid_request : :'internal/invalid_request'
     end
-
 
     #
     # Add helpers to the Base renedering class, which allows them to be called
@@ -427,16 +425,16 @@ module Gopher
     #    include(*extensions) if extensions.any?
     #  end
     #
-    # target - What class should receive the helpers -- defaults to Gopher::Rendering::Base, which will make it available when rendering
+    # target - What class should receive the helpers -- defaults to Gopher::Rendering::Base,
+    # which will make it available when rendering
     # block -- a block which declares the helpers you want. for example:
     #
     # helpers do
     #  def foo; "FOO"; end
     # end
-    def helpers(target = Gopher::Application, &block)
-      target.class_eval(&block)
+    def helpers(target = Gopher::Application, &)
+      target.class_eval(&)
     end
-
 
     #
     # should we use non-blocking operations? for now, defaults to false if in debug mode,
@@ -444,26 +442,25 @@ module Gopher
     # Gopher servers in production)
     #
     def non_blocking?
-      config.key?(:non_blocking) ? config[:non_blocking] : ! debug_mode?
+      config.key?(:non_blocking) ? config[:non_blocking] : !debug_mode?
     end
-
 
     #
     # add a glob to the end of this string, if there's not one already
     #
     def globify(p)
-      p =~ /\*/ ? p : "#{p}/?*".gsub("//", "/")
+      p =~ /\*/ ? p : "#{p}/?*".gsub('//', '/')
     end
 
     #
     # compile a route
     #
-    def compile!(path, &block)
+    def compile!(path, &)
       method_name = path
-      route_method = Application.generate_method(method_name, &block)
+      route_method = Application.generate_method(method_name, &)
       pattern, keys = compile path
 
-      [ pattern, keys, route_method ]
+      [pattern, keys, route_method]
     end
 
     #
@@ -474,55 +471,51 @@ module Gopher
     #
     def compile(path)
       keys = []
-      pattern = path.to_str.gsub(/[^\?\%\\\/\:\*\w]/) { |c| encoded(c) }
+      pattern = path.to_str.gsub(%r{[^?%\\/:*\w]}) { |c| encoded(c) }
       pattern.gsub!(/((:\w+)|\*)/) do |match|
-        if match == "*"
+        if match == '*'
           keys << 'splat'
-          "(.*?)"
+          '(.*?)'
         else
-          keys << $2[1..-1]
-          "([^/?#]+)"
+          keys << ::Regexp.last_match(2)[1..]
+          '([^/?#]+)'
         end
       end
       [/^#{pattern}$/, keys]
     end
 
-
     class << self
+      #
+      # Sanitizes a gopher selector
+      #
+      def sanitize_selector(raw)
+        "/#{raw}"
+          .strip # Strip whitespace
+          .sub(%r{/$}, '') # Strip last rslash
+          .sub(%r{^/*}, '/') # Strip extra lslashes
+          .gsub(/\.+/, '.') # Don't want consecutive dots!
+      end
 
-	    #
-	    # Sanitizes a gopher selector
-	    #
-	    def sanitize_selector(raw)
-		    "/#{raw}".dup.
-		      strip. # Strip whitespace
-		      sub(/\/$/, ''). # Strip last rslash
-		      sub(/^\/*/, '/'). # Strip extra lslashes
-		      gsub(/\.+/, '.') # Don't want consecutive dots!
-	    end
-      
-	    #
       # generate a method which we will use to run routes. this is
       # based on #generate_method as used by sinatra.
       # @see https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb
       # @param [String] method_name name to use for the method
       # @yield block to use for the method
-      def generate_method(method_name, &block)
-        define_method(method_name, &block)
+      def generate_method(method_name, &)
+        define_method(method_name, &)
         method = instance_method method_name
         remove_method method_name
         method
       end
     end
-    
+
     #
     # output a debugging message
     #
     def debug_log(x)
-      @@debug_logger ||= ::Logging.logger(STDERR)
-      @@debug_logger.debug x
+      @debug_logger ||= ::Logging.logger($stderr)
+      @debug_logger.debug x
     end
-
 
     protected
 
@@ -539,28 +532,28 @@ module Gopher
       end
 
       menu :'internal/invalid_request' do
-        error "invalid request"
+        error 'invalid request'
       end
 
       menu :'internal/url' do
-        output = <<-EOHTML
-<html>
-  <head>
-    <meta http-equiv="refresh" content="5;URL=#{@request.url}">
-  </head>
-  <body>
-    <p>
-      You are following a link from gopher to a website. If your browser supports it, you will be
-      automatically taken to the web site shortly.  If you do not get
-      sent there, please click <a href="#{@request.url}">here</a>.
-   </p>
-   <p>
-     The URL linked is: <a href="#{@request.url}">#{@request.url}</a>.
-   </p>
-   <p>Have a nice day!</p>
-  </body>
-</html>
-EOHTML
+        output = <<~EOHTML
+          <html>
+            <head>
+              <meta http-equiv="refresh" content="5;URL=#{@request.url}">
+            </head>
+            <body>
+              <p>
+                You are following a link from gopher to a website. If your browser supports it, you will be
+                automatically taken to the web site shortly.  If you do not get
+                sent there, please click <a href="#{@request.url}">here</a>.
+             </p>
+             <p>
+               The URL linked is: <a href="#{@request.url}">#{@request.url}</a>.
+             </p>
+             <p>Have a nice day!</p>
+            </body>
+          </html>
+        EOHTML
         output
       end
     end
@@ -581,14 +574,12 @@ EOHTML
       render invalid_request_template
     end
 
-
-
     #
     # where should we store access logs? if nil, don't store them at all
     # @return logfile path
     #
     def access_log_dest
-      config.has_key?(:access_log) ? config[:access_log] : nil
+      config.key?(:access_log) ? config[:access_log] : nil
     end
 
     #
@@ -598,14 +589,14 @@ EOHTML
       return if access_log_dest.nil?
 
       log = ::Logging.logger['access_log']
-      pattern = ::Logging.layouts.pattern(:pattern => ACCESS_LOG_PATTERN)
+      pattern = ::Logging.layouts.pattern(pattern: ACCESS_LOG_PATTERN)
 
       log.add_appenders(
         ::Logging.appenders.rolling_file(access_log_dest,
-          :level => :debug,
-          :age => 'daily',
-          :layout => pattern)
-        )
+                                         level: :debug,
+                                         age: 'daily',
+                                         layout: pattern)
+      )
 
       log
     end
@@ -616,24 +607,21 @@ EOHTML
     def access_log(request, response)
       return if access_log_dest.nil?
 
-      @@access_logger ||= init_access_log
-      code = response.respond_to?(:code) ? response.code.to_s : "success"
+      @access_logger ||= init_access_log
+      code = response.respond_to?(:code) ? response.code.to_s : 'success'
       size = response.respond_to?(:size) ? response.size : response.length
       output = [request.ip_address, request.selector, request.input, code.to_s, size].join("\t")
 
-      @@access_logger.debug output
+      @access_logger.debug output
     end
-
 
     #
     # zip up two arrays of keys and values from an incoming request
     #
-    def to_params_hash(keys,values)
+    def to_params_hash(keys, values)
       hash = {}
-      keys.size.times { |i| hash[ keys[i].to_sym ] = values[i] }
+      keys.size.times { |i| hash[keys[i].to_sym] = values[i] }
       hash
     end
-
-
   end
 end

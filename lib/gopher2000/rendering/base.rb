@@ -1,10 +1,10 @@
-module Gopher
+# frozen_string_literal: true
 
+module Gopher
   #
   # namespace for classes that render output for the app
   #
   module Rendering
-
     require 'artii'
 
     # "A CR LF denotes the end of the item." RFC 1436
@@ -12,7 +12,7 @@ module Gopher
     LINE_ENDING = "\r\n"
 
     DEFAULT_ENCODING = 'UTF-8'
-    
+
     #
     # base class for rendering output. this class provides methods
     # that can be used when rendering both text and gopher menus
@@ -20,9 +20,9 @@ module Gopher
     class Base < AbstractRenderer
       attr_accessor :result, :spacing, :width, :request, :params, :application
 
-      def initialize(app=nil)
+      def initialize(app = nil)
         @application = app
-        @result = ""
+        @result = ''
         @spacing = 1
 
         # default to 70 per RFC1436 3.9
@@ -35,7 +35,7 @@ module Gopher
       # @param [String] string text to add to the output
       #
       def <<(string)
-        @result << clean_line(string.to_s)
+        @result += clean_line(string.to_s)
       end
 
       #
@@ -44,7 +44,7 @@ module Gopher
       #   then adds any required spacing
       #
       def text(text)
-        self << text.force_encoding(DEFAULT_ENCODING)
+        self << text # .force_encoding(DEFAULT_ENCODING)
         add_spacing
       end
 
@@ -72,7 +72,7 @@ module Gopher
       # Add some empty lines to the output
       # @param [Integer] n how many lines to add
       #
-      def br(n=1)
+      def br(n = 1)
         self << (LINE_ENDING * n)
       end
 
@@ -84,20 +84,19 @@ module Gopher
       # @param [Integer] width the desired width of the block -- defaults to the
       #   current output width
       #
-      def block(text, width=@width)
-
+      def block(text, width = @width)
         # this is a hack - recombine lines, then re-split on newlines
         # doing this because word_wrap is returning an array of lines, but
         # those lines have newlines in them where we should wrap
         #
         lines = word_wrap(text, width)
-                  .join("\n").split("\n")
+                .join("\n").split("\n")
 
         lines.each do |line|
-          text line.lstrip.rstrip
+          text line.strip
         end
 
-        self.to_s
+        to_s
       end
 
       #
@@ -114,16 +113,16 @@ module Gopher
       # You can get a list of fonts from the artii source code or
       # http://www.figlet.org/examples.html
       # https://github.com/miketierney/artii/tree/master/lib/figlet/fonts
-      
+
       # @param [String] str the text you want to use for your figlet
       # @param [String] font name of the font. Defaults to 'big'.
       #
       def figlet(str, font = 'big')
-        a = Artii::Base.new(:font => font)
+        a = Artii::Base.new(font: font)
         a.asciify(str).split("\n").each do |l|
           text l
         end
-        self.to_s
+        to_s
       end
 
       #
@@ -138,14 +137,10 @@ module Gopher
       #
       def header(str, under = '=', edge = false)
         w = @width
-        if edge
-          w -= 2
-        end
+        w -= 2 if edge
 
         tmp = str.center(w)
-        if edge
-          tmp = "#{under}#{tmp}#{under}"
-        end
+        tmp = "#{under}#{tmp}#{under}" if edge
 
         text(tmp)
         underline(@width, under)
@@ -157,7 +152,7 @@ module Gopher
       # @param [String] under - the desired underline character
       #
       def small_header(str, under = '=')
-        str = " " + str + " "
+        str = " #{str} "
         text(str)
         underline(str.length, under)
       end
@@ -183,10 +178,9 @@ module Gopher
       #   output width.
       # @param [String] char the character to output
       #
-      def underline(length=@width, char='=')
+      def underline(length = @width, char = '=')
         text(char * length)
       end
-
 
       #
       # return the output as a string
@@ -197,12 +191,13 @@ module Gopher
       end
 
       protected
+
       #
       # borrowed and modified from ActionView -- wrap text at specified width
       # returning an array of lines for now in case we want to do nifty processing with them
       #
       # File actionpack/lib/action_view/helpers/text_helper.rb, line 217
-      def word_wrap(text, width=70*args)
+      def word_wrap(text, width = 70 * args)
         text.split("\n").collect do |line|
           line.length > width ? line.gsub(/(.{1,#{width}})(\s+|$)/, "\\1\n").strip : line
         end
@@ -218,10 +213,11 @@ module Gopher
       # early. The client should strip extra periods at
       # the beginning of the line.
       def clean_line(line)
-        line.match?(/^\./) ? ['.', line].join('') : line
+        line.match?(/^\./) ? ['.', line].join : line
       end
-      
+
       private
+
       def add_spacing
         br(@spacing)
       end

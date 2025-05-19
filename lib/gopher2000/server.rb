@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require "nio"
-require "socket"
+require 'nio'
+require 'socket'
 
 module Gopher
-
   #
   # main class which will listen on a specified port, and pass requests to an Application class
   #
@@ -22,7 +21,7 @@ module Gopher
       @host = host
       @port = port
     end
- 
+
     #
     # @return [String] name of the host specified in our config
     #
@@ -44,11 +43,10 @@ module Gopher
       @app.config[:env] || 'development'
     end
 
-
     def accept
       socket = @server.accept
-      _, port, host = socket.peeraddr
-      
+      socket.peeraddr
+
       monitor = @selector.register(socket, :r)
       monitor.value = proc { read(socket) }
     end
@@ -56,16 +54,16 @@ module Gopher
     def read(socket)
       Dispatcher.new(app, socket).read!
     rescue EOFError
-      _, port, host = socket.peeraddr
+      socket.peeraddr
     ensure
       @selector.deregister(socket)
       socket.close
     end
-    
+
     #
     # main app loop. called via at_exit block defined in DSL
     #
-    def run!(background=true)
+    def run!(background: true)
       if background
         @thread = Thread.new { run_server }
       else
@@ -76,29 +74,29 @@ module Gopher
     def stop
       @status = :stop
     end
-    
-    def run_server      
+
+    def run_server
       @selector = NIO::Selector.new
       warn "Listening on #{host}:#{port}"
       @server = TCPServer.new(host, port)
-      
-      monitor = @selector.register(@server, :r)
-      monitor.value = proc { accept }
+
+      accept_monitor = @selector.register(@server, :r)
+      accept_monitor.value = proc { accept }
 
       @status = :run
 
-      Signal.trap("INT") {
+      Signal.trap('INT') do
         warm "It's a trap!"
         exit! if @status == :stop
         @status = :stop
-      }
-      Signal.trap("TERM") {
+      end
+      Signal.trap('TERM') do
         warn "It's a trap!"
         @status = :stop
-      }
+      end
 
-      # todo this could probably be a thread with a loop
-      while @status == :run do
+      # TODO: this could probably be a thread with a loop
+      while @status == :run
         #
         # check if we should reload any scripts before moving along
         #
@@ -114,19 +112,17 @@ module Gopher
       #    STDERR.puts "Not blocking on requests"
       #  end
     end
-    
-
 
     #
     # don't try and parse arguments if someone already has done that
     #
-    if ARGV.any? && ! defined?(OptionParser)
+    if ARGV.any? && !defined?(OptionParser)
       require 'optparse'
-      OptionParser.new { |op|
-        op.on('-p port',   'set the port (default is 70)')                { |val| set :port, Integer(val) }
+      OptionParser.new do |op|
+        op.on('-p port',   'set the port (default is 70)') { |val| set :port, Integer(val) }
         op.on('-o addr',   'set the host (default is 0.0.0.0)')             { |val| set :host, val }
         op.on('-e env',    'set the environment (default is development)')  { |val| set :env, val.to_sym }
-      }.parse!(ARGV.dup)
+      end.parse!(ARGV.dup)
     end
   end
 end

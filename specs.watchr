@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Run me with:
 #
 # $ watchr specs.watchr
@@ -10,7 +12,7 @@ def all_spec_files
 end
 
 def run_spec_matching(thing_to_match)
-	puts "run #{thing_to_match}"
+  puts "run #{thing_to_match}"
   matches = all_spec_files.grep(/#{thing_to_match}/i)
   if matches.empty?
     puts "Sorry, thanks for playing, but there were no matches for #{thing_to_match}"
@@ -32,8 +34,8 @@ end
 # --------------------------------------------------
 # Watchr Rules
 # --------------------------------------------------
-watch('^spec/(.*)_spec\.rb')  { |m| run_spec_matching(m[1]) }
-watch("^lib/gopher2000/(.*)\.rb") { |m| run_all_specs }
+watch('^spec/(.*)_spec\.rb') { |m| run_spec_matching(m[1]) }
+watch('^lib/gopher2000/(.*).rb') { |_m| run_all_specs }
 
 watch('^spec/spec_helper\.rb') { run_all_spec }
 
@@ -46,8 +48,8 @@ def no_int_for_you
 end
 
 Signal.trap 'INT' do
-  if @sent_an_int then
-    puts " A second INT? Ok, I get the message. Shutting down now."
+  if @sent_an_int
+    puts ' A second INT? Ok, I get the message. Shutting down now.'
     exit
   else
     puts " Did you just send me an INT? Ugh. I'll quit for real if you do it again."

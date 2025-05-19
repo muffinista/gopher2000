@@ -1,8 +1,10 @@
-ENV['gopher_test'] = "1"
+# frozen_string_literal: true
+
+ENV['gopher_test'] = '1'
 
 require 'simplecov'
 SimpleCov.start do
-  add_filter "/spec/"
+  add_filter '/spec/'
 end
 
 require 'bundler/setup'
@@ -12,9 +14,7 @@ require "#{File.dirname(__FILE__)}/../lib/gopher2000/rspec.rb"
 
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
-
-
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 #
 # http://www.rosskaff.com/2010/12/behavior-driven-event-driven-eventmachine-rspec/
@@ -31,21 +31,20 @@ class FakeSocketClient
   end
 
   def receive_data(data)
-    #puts "RECV: #{data}"
+    # puts "RECV: #{data}"
     @data << data
     if @state == :new
-      @onopen.call if @onopen
+      @onopen&.call
       @state = :open
-    else
-      @onmessage.call(data) if @onmessage
+    elsif @onmessage
+      @onmessage&.call(data)
     end
   end
 
   def unbind
-    @onclose.call if @onclose
+    @onclose&.call
   end
 end
-
 
 class FakeSocketServer < FakeSocketClient
   attr_accessor :application
@@ -57,14 +56,14 @@ class SimpleClient
   def initialize(host, port)
     raise StandardError, 'no host!' if host.nil?
     raise StandardError, 'no port!' if port.nil?
-    
+
     @socket = TCPSocket.open(host, port)
   end
-  
+
   def send(data)
     @socket.puts(data)
   end
-  
+
   def read
     @response = @socket.gets(nil)
   end
@@ -74,12 +73,12 @@ class SimpleClient
   end
 
   def lines
-    @response.split(/\r\n/)
+    @response.split("\r\n")
   end
-  
+
   def menu
     lines.map do |l|
-      type_and_text, selector, host, port = l.split(/\t/)
+      type_and_text, selector, host, port = l.split("\t")
 
       if type_and_text
         type = type_and_text[0]
@@ -89,7 +88,6 @@ class SimpleClient
         text = nil
       end
 
-      
       {
         type: type,
         text: text,
