@@ -11,6 +11,7 @@ require 'gopher2000'
 
 set :host, '0.0.0.0'
 set :port, 7070
+set :non_blocking, true
 
 # you can specify a destination for access log, for stats/etc
 set :access_log, '/tmp/access.log'

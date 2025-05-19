@@ -69,6 +69,18 @@ describe Gopher::Server do
     expect(client.read).to eq("hi\r\n.\r\n")
   end
 
+  it 'works in blocking mode' do
+    @application.fake_response = @response
+    allow(@application).to receive(:non_blocking?).and_return(true)
+
+    start_server
+
+    client = SimpleClient.new(@host, @port)
+    client.send("123\n")
+
+    expect(client.read).to eq("hi\r\n.\r\n")
+  end
+
   it 'handles Gopher::Response results' do
     @application.fake_response = @response
 

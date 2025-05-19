@@ -60,7 +60,7 @@ describe Gopher::Rendering::Base do
       expect(@ctx.small_header('pie')).to eq(" pie \r\n=====\r\n")
     end
   end
-  
+
   describe 'header' do
     it 'outputs centered, underlined text' do
       @ctx.width(7)

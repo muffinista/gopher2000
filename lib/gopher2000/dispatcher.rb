@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'socket'
+require 'pry'
 
 module Gopher
   #
@@ -20,11 +21,11 @@ module Gopher
     # @return ip address
     #
     def remote_ip
-      @socket.peeraddr.last
+      @socket&.peeraddr&.last
     end
 
     def read!
-      receive_data @socket.read_nonblock(4096)
+      receive_data(@app.non_blocking? ? @socket.recv_nonblock(4096) : @socket.recv(4096))
     end
 
     #
@@ -81,8 +82,7 @@ module Gopher
 
     # @todo handle blocking?
     def send_data(payload)
-      @socket.write_nonblock(payload)
-      #      @socket.write(payload)
+      @app.non_blocking? ? @socket.write_nonblock(payload) : @socket.write(payload)
     end
 
     #

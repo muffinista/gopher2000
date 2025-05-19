@@ -86,7 +86,7 @@ module Gopher
       @status = :run
 
       Signal.trap('INT') do
-        warm "It's a trap!"
+        warn "It's a trap!"
         exit! if @status == :stop
         @status = :stop
       end
