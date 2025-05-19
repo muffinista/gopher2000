@@ -10,9 +10,6 @@ gem 'rake'
 group :development do
   gem 'pry'
 
-  # There's a god example script stashed away in the repo
-  gem 'god'
-
   gem 'rubocop', '~> 1.75'
 
   gem 'rubocop-rake', '~> 0.7.1'
