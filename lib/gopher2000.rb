@@ -3,12 +3,6 @@
 require 'stringio'
 require 'logging'
 
-begin
-  require 'pry'
-rescue StandardError
-  nil
-end
-
 #
 # Define everything needed to run a gopher server
 #
