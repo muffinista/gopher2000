@@ -23,9 +23,6 @@ module Gopher
     def application=(app)
       if app.is_a?(Gopher::Application)
         # @todo properly test this
-        #        @@application = app
-        #        @@application.reset!
-        puts app.inspect
         Gopher._application = app
       else
         load app

@@ -80,7 +80,7 @@ end
 #
 # mounting a directory
 #
-mount '/files' => '/home/username/files', :filter => '*.jpg'
+mount '/files' => "#{File.dirname(__FILE__)}/files", :filter => '*.txt'
 
 #
 # actions have access to the request object, which has the following attributes:
@@ -114,10 +114,6 @@ end
 route '/request/:x/:y' do
   render :request_with_params
 end
-
-# menu :request_with_params do |params|
-#  text params.inspect
-# end
 
 #
 # both the incoming params, and the request object are available when rendering

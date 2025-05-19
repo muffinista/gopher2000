@@ -5,6 +5,7 @@ ENV['gopher_test'] = '1'
 require 'simplecov'
 SimpleCov.start do
   add_filter '/spec/'
+  add_filter '/examples/'
 end
 
 require 'bundler/setup'
@@ -96,5 +97,9 @@ class SimpleClient
         port: port
       }
     end
+  end
+
+  def to_s
+    @response.nil? ? super : @response
   end
 end

@@ -11,7 +11,7 @@ module Gopher
     def selectors_matching(expected, menu: client.menu)
       menu.select do |item|
         (expected[:type].nil? || (item[:type] == expected[:type])) &&
-          (expected[:text].nil? || (item[:text] == expected[:text])) &&
+          (expected[:text].nil? || (item[:text] == expected[:text] || (expected[:text].is_a?(Regexp) && expected[:text].match?(item[:text])))) &&
           (expected[:selector].nil? || (item[:selector] == expected[:selector])) &&
           (expected[:host].nil? || (item[:host] == expected[:host])) &&
           (expected[:port].nil? || (item[:port] == expected[:port]))
@@ -20,13 +20,21 @@ module Gopher
 
     RSpec::Matchers.define :have_content do |expected|
       match do |actual|
-        actual.response.include?(expected)
+        actual.response&.include?(expected)
+      end
+
+      failure_message do |actual|
+        "expected output to contain #{expected}\n\n#{actual}"
       end
     end
 
     RSpec::Matchers.define :have_selector do |expected|
       match do |actual|
         selectors_matching(expected, menu: actual.menu).count == 1
+      end
+
+      failure_message do |actual|
+        "expected menu to contain #{expected}\n\n#{actual.menu.join("\n")}"
       end
     end
   end
@@ -59,26 +67,33 @@ module Gopher
     #
     # Send the specified payload to the gopher server
     #
-    def request(payload)
+    def request(payload, search: nil)
       boot_application
-      client.send payload
+
+      @response = nil
+      client.send search.nil? ? payload : [payload, search].join("\t")
     end
 
     # follow the given selector on the current page
-    def follow(selector)
+    def follow(selector, search: nil)
+      @response = nil
+
       selector = { text: selector } if selector.is_a?(String)
       sel = selectors_matching(selector).first
 
       @client = SimpleClient.new(@host, @port)
-      @client.send(sel[:selector])
+      payload = search.nil? ? sel[:selector] : [sel[:selector], search].join("\t")
+      @client.send(payload)
     end
 
     #
     # read the response from the last request
     #
     def response
+      return @response unless @response.nil?
+
       client.read
-      client
+      @response = client
     end
   end
 end
