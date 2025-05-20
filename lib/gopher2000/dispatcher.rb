@@ -16,6 +16,10 @@ module Gopher
       @socket = socket
     end
 
+    def logger
+      @app.logger
+    end
+    
     #
     # get the IP address of the client
     # @return ip address
@@ -35,12 +39,15 @@ module Gopher
     # @return Response object
     #
     def receive_data(data)
+      logger.debug "==== receive_data"
       @buf = [@buf, data].compact.join
       first_line = true
 
       ip_address = remote_ip
       while (line = @buf.slice!(/(.*)\r?\n/))
+        logger.debug line
         is_proxy = first_line && line.match?(/^PROXY TCP[4,6] /)
+
         receive_line(line, ip_address) unless is_proxy
         ip_address = line.split(/ /)[2] if is_proxy
 
@@ -50,6 +57,7 @@ module Gopher
 
     # Invoked with lines received over the network
     def receive_line(line, ip_address)
+      logger.debug "Handle request: #{line} #{ip_address}"
       call! Request.new(line, ip_address)
     end
 

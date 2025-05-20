@@ -43,18 +43,26 @@ module Gopher
       @app.config[:env] || 'development'
     end
 
+    def logger
+      @app.logger
+    end
+
     def accept
+      logger.debug "Accepting new connection!"
       socket = @server.accept
-      socket.peeraddr
+      _, port, host = socket.peeraddr
+      logger.debug "#{host}:#{port} connected"
 
       monitor = @selector.register(socket, :r)
       monitor.value = proc { read(socket) }
     end
 
     def read(socket)
+      logger.debug "Reading from socket!"
       Dispatcher.new(app, socket).read!
     rescue EOFError
-      socket.peeraddr
+      _, port, host = socket.peeraddr
+      logger.debug "#{host}:#{port} disconnected"
     ensure
       @selector.deregister(socket)
       socket.close
@@ -77,7 +85,7 @@ module Gopher
 
     def run_server
       @selector = NIO::Selector.new
-      warn "Listening on #{host}:#{port}"
+      logger.warn "Listening on #{host}:#{port}"
       @server = TCPServer.new(host, port)
 
       accept_monitor = @selector.register(@server, :r)
@@ -95,7 +103,7 @@ module Gopher
         @status = :stop
       end
 
-      # TODO: this could probably be a thread with a loop
+      logger.debug "Entering loop"
       while @status == :run
         #
         # check if we should reload any scripts before moving along
@@ -104,7 +112,8 @@ module Gopher
 
         @selector.select(1) { |monitor| monitor.value.call }
       end
-
+      logger.debug "Exiting loop"
+      
       @server.close
 
       #  STDERR.puts "start server at #{host} #{port}"
