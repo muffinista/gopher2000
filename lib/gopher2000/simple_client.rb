@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'socket'
+
 #
 # This is a very simple Gopher client, it just opens
 # up a socket and sends the command. It has some simple
@@ -12,15 +14,17 @@ class SimpleClient
     raise StandardError, 'no host!' if host.nil?
     raise StandardError, 'no port!' if port.nil?
 
-    @socket = TCPSocket.open(host, port)
+    @socket = TCPSocket.new(host, port)
   end
 
   def send(data)
-    @socket.puts(data)
+    # ensure we send a newline
+    data = "#{data}\n" unless data.match?(/\n$/)
+    @socket.write(data)
   end
 
   def read
-    @response = @socket.gets(nil)
+    @response = @socket.read(nil)
   end
 
   def close

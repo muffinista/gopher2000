@@ -59,11 +59,13 @@ module Gopher
 
     def read(socket)
       logger.debug "Reading from socket!"
+      _, port, host = socket.peeraddr
+
       Dispatcher.new(app, socket).read!
     rescue EOFError
-      _, port, host = socket.peeraddr
       logger.debug "#{host}:#{port} disconnected"
     ensure
+      logger.debug "#{host}:#{port} cleaning up"
       @selector.deregister(socket)
       socket.close
     end
@@ -86,6 +88,10 @@ module Gopher
     def run_server
       @selector = NIO::Selector.new
       logger.warn "Listening on #{host}:#{port}"
+      if @app.non_blocking?
+        logger.warn "Not blocking on requests"
+      end
+
       @server = TCPServer.new(host, port)
 
       accept_monitor = @selector.register(@server, :r)
@@ -115,11 +121,7 @@ module Gopher
       logger.debug "Exiting loop"
       
       @server.close
-
-      #  STDERR.puts "start server at #{host} #{port}"
-      #  if @app.non_blocking?
-      #    STDERR.puts "Not blocking on requests"
-      #  end
+      @status = :stopped
     end
 
     #

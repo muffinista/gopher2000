@@ -14,8 +14,17 @@ end
 def start_server
   @server = Gopher::Server.new(@application)
   @thread = @server.run!
+  wait_for_server
 
-  while @server.status != :run do; end
+end
+
+def wait_for_server
+  while @server.status != :run do; sleep 0.1; end
+end
+
+def wait_for_server_to_stop
+  return if @server.nil?
+  while @server.status != :stopped do; sleep 0.1; end
 end
 
 describe Gopher::Server do
@@ -42,6 +51,7 @@ describe Gopher::Server do
   after do
     @server&.stop
     @thread&.join
+    wait_for_server_to_stop
   end
 
   it 'returns host' do
@@ -57,19 +67,19 @@ describe Gopher::Server do
     expect(@application.env).to eql(@environment)
   end
 
-  it 'works in non-blocking mode' do
+  it 'works in blocking mode' do
     @application.fake_response = @response
     allow(@application).to receive(:non_blocking?).and_return(false)
 
     start_server
 
     client = SimpleClient.new(@host, @port)
-    client.send("123\n")
+    client.send("123\r\n")
 
     expect(client.read).to eq("hi\r\n.\r\n")
   end
 
-  it 'works in blocking mode' do
+  it 'works in non-blocking mode' do
     @application.fake_response = @response
     allow(@application).to receive(:non_blocking?).and_return(true)
 

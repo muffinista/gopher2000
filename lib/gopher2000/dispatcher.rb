@@ -29,7 +29,19 @@ module Gopher
     end
 
     def read!
-      receive_data(@app.non_blocking? ? @socket.recv_nonblock(4096) : @socket.recv(4096))
+      incoming = if @app.non_blocking?
+                   begin
+                     @socket.read_nonblock(4096)
+                   rescue Errno::EAGAIN
+                     logger.debug "EAGAIN on read"
+                     IO.select([@socket])
+                     
+                     retry
+                   end
+                 else
+                   @socket.readpartial(4096)
+                 end
+      receive_data(incoming)
     end
 
     #
@@ -45,7 +57,7 @@ module Gopher
 
       ip_address = remote_ip
       while (line = @buf.slice!(/(.*)\r?\n/))
-        logger.debug line
+        # logger.debug line
         is_proxy = first_line && line.match?(/^PROXY TCP[4,6] /)
 
         receive_line(line, ip_address) unless is_proxy
@@ -90,7 +102,25 @@ module Gopher
 
     # @todo handle blocking?
     def send_data(payload)
-      @app.non_blocking? ? @socket.write_nonblock(payload) : @socket.write(payload)
+      logger.debug "Write data back to socket"
+      if @app.non_blocking?
+        size = payload.size
+        begin
+          loop do
+            bytes = @socket.write_nonblock(payload)
+            logger.debug "Wrote #{bytes} bytes"
+            break if bytes >= size
+            payload.slice!(0, bytes)
+            IO.select(nil, [client])
+          end
+        rescue Errno::EAGAIN
+          logger.debug "EAGAIN on write"
+          IO.select(nil, [client])
+          retry
+        end
+      else
+        @socket.write(payload)
+      end
     end
 
     #
