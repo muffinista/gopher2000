@@ -51,6 +51,11 @@ module Gopher
     # @return Response object
     #
     def receive_data(data)
+      if data.length > 1000
+        logger.warn "Input too long, exiting!"
+        return
+      end
+
       logger.debug "==== receive_data"
       @buf = [@buf, data].compact.join
       first_line = true
