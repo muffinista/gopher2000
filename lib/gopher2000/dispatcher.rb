@@ -1,37 +1,70 @@
+# frozen_string_literal: true
+
 require 'socket'
+require 'pry'
 
 module Gopher
-
   #
   # Handle communication between Server and the actual gopher Application
   #
-  class Dispatcher < EventMachine::Connection
-
+  class Dispatcher
     # the Application we are running
     attr_accessor :app
 
+    def initialize(app, socket)
+      @app = app
+      @socket = socket
+    end
+
+    def logger
+      @app.logger
+    end
+    
     #
     # get the IP address of the client
     # @return ip address
     #
     def remote_ip
-      Socket.unpack_sockaddr_in(get_peername).last
+      @socket&.peeraddr&.last
     end
 
+    def read!
+      incoming = if @app.non_blocking?
+                   begin
+                     @socket.read_nonblock(4096)
+                   rescue Errno::EAGAIN
+                     logger.debug "EAGAIN on read"
+                     IO.select([@socket])
+                     
+                     retry
+                   end
+                 else
+                   @socket.readpartial(4096)
+                 end
+      receive_data(incoming)
+    end
 
     #
-    # called by EventMachine when there's an incoming request
+    # called with the raw data of an incoming request
     #
-    # @param [String] selector incoming selector
+    # @param [String] data raw data, should be a selector
     # @return Response object
     #
-    def receive_data data
-      (@buf ||= '') << data
+    def receive_data(data)
+      if data.length > 1000
+        logger.warn "Input too long, exiting!"
+        return
+      end
+
+      logger.debug "==== receive_data"
+      @buf = [@buf, data].compact.join
       first_line = true
 
       ip_address = remote_ip
-      while line = @buf.slice!(/(.*)\r?\n/)
+      while (line = @buf.slice!(/(.*)\r?\n/))
+        # logger.debug line
         is_proxy = first_line && line.match?(/^PROXY TCP[4,6] /)
+
         receive_line(line, ip_address) unless is_proxy
         ip_address = line.split(/ /)[2] if is_proxy
 
@@ -41,32 +74,18 @@ module Gopher
 
     # Invoked with lines received over the network
     def receive_line(line, ip_address)
+      logger.debug "Handle request: #{line} #{ip_address}"
       call! Request.new(line, ip_address)
     end
-    
+
     #
     # generate a request object from an incoming selector, and dispatch it to the app
     # @param [Request] request Request object to handle
     # @return Response object
     #
     def call!(request)
-      operation = proc {
-        app.dispatch(request)
-      }
-      callback = proc {|result|
-        send_response result
-        close_connection_after_writing
-      }
-
-      #
-      # if we don't want to block on slow calls, use EM#defer
-      # @see http://eventmachine.rubyforge.org/EventMachine.html#M000486
-      #
-      if app.non_blocking?
-        EventMachine.defer( operation, callback )
-      else
-        callback.call(operation.call)
-      end
+      result = app.dispatch(request)
+      send_response result
     end
 
     #
@@ -79,10 +98,33 @@ module Gopher
       when String then send_data(response + end_of_transmission)
       when StringIO then send_data(response.read + end_of_transmission)
       when File
-        while chunk = response.read(8192) do
+        while (chunk = response.read(8192))
           send_data(chunk)
         end
         response.close
+      end
+    end
+
+    # @todo handle blocking?
+    def send_data(payload)
+      logger.debug "Write data back to socket"
+      if @app.non_blocking?
+        size = payload.size
+        begin
+          loop do
+            bytes = @socket.write_nonblock(payload)
+            logger.debug "Wrote #{bytes} bytes"
+            break if bytes >= size
+            payload.slice!(0, bytes)
+            IO.select(nil, [client])
+          end
+        rescue Errno::EAGAIN
+          logger.debug "EAGAIN on write"
+          IO.select(nil, [client])
+          retry
+        end
+      else
+        @socket.write(payload)
       end
     end
 
@@ -91,8 +133,7 @@ module Gopher
     #
     # @return valid string to mark end of transmission as specified in RFC1436
     def end_of_transmission
-      [Gopher::Rendering::LINE_ENDING, ".", Gopher::Rendering::LINE_ENDING].join
+      [Gopher::Rendering::LINE_ENDING, '.', Gopher::Rendering::LINE_ENDING].join
     end
-
   end
 end

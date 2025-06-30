@@ -1,40 +1,42 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), '/spec_helper')
 
 describe Gopher::Request do
-  it 'should split raw request' do
-    request = Gopher::Request.new("foo\tbar")
-    expect(request.selector).to eq("/foo")
-    expect(request.input).to eq("bar")
+  it 'splits raw request' do
+    request = described_class.new("foo\tbar")
+    expect(request.selector).to eq('/foo')
+    expect(request.input).to eq('bar')
   end
 
-  it "normalizes by adding a slash to the front" do
-    request = Gopher::Request.new("foo")
-    expect(request.selector).to eq("/foo")
+  it 'normalizes by adding a slash to the front' do
+    request = described_class.new('foo')
+    expect(request.selector).to eq('/foo')
   end
 
-  it "should be ok with just selector" do
-    request = Gopher::Request.new("/foo")
-    expect(request.selector).to eq("/foo")
-    expect(request.input).to eq(nil)
+  it 'is ok with just selector' do
+    request = described_class.new('/foo')
+    expect(request.selector).to eq('/foo')
+    expect(request.input).to be_nil
   end
 
-  it "should accept ip_address" do
-    request = Gopher::Request.new("foo", "bar")
-    expect(request.ip_address).to eq("bar")
+  it 'accepts ip_address' do
+    request = described_class.new('foo', 'bar')
+    expect(request.ip_address).to eq('bar')
   end
 
-  it "valid? == true for valid selectors" do
-    request = Gopher::Request.new("x" * 254, "bar")
-    expect(request.valid?).to eq(true)
+  it 'valid? == true for valid selectors' do
+    request = described_class.new('x' * 254, 'bar')
+    expect(request.valid?).to be(true)
   end
 
-  it "valid? == false for invalid selectors" do
-    request = Gopher::Request.new("x" * 255, "bar")
-    expect(request.valid?).to eq(false)
+  it 'valid? == false for invalid selectors' do
+    request = described_class.new('x' * 255, 'bar')
+    expect(request.valid?).to be(false)
   end
 
   it 'detects urls' do
-    request = Gopher::Request.new("URL:http://github.com/muffinista/gopher2000")
+    request = described_class.new('URL:http://github.com/muffinista/gopher2000')
     expect(request).to be_url
     expect(request.url).to eql('http://github.com/muffinista/gopher2000')
   end

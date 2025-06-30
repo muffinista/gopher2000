@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), '/spec_helper')
 
 class MockApplication < Gopher::Application
@@ -14,58 +16,64 @@ class MockApplication < Gopher::Application
 end
 
 describe Gopher::Application do
-  before(:each) do
+  before do
     @server = MockApplication.new
   end
 
-  describe "lookup" do
-    it "should work with simple route" do
-      @server.route '/about' do; end
-      @request = Gopher::Request.new("/about")
+  describe 'lookup' do
+    it 'works with simple route' do
+      @server.route '/about' do
+      end
+      @request = Gopher::Request.new('/about')
 
-      keys, block = @server.lookup(@request.selector)
+      keys, = @server.lookup(@request.selector)
       expect(keys).to eq({})
     end
 
-    it "should translate path" do
-      @server.route '/about/:foo/:bar' do;  end
-      @request = Gopher::Request.new("/about/x/y")
+    it 'translates path' do
+      @server.route '/about/:foo/:bar' do
+      end
+      @request = Gopher::Request.new('/about/x/y')
 
-      keys, block = @server.lookup(@request.selector)
-      expect(keys).to eq({:foo => 'x', :bar => 'y'})
+      keys, = @server.lookup(@request.selector)
+      expect(keys).to eq({ foo: 'x', bar: 'y' })
     end
 
-    it "should return default route if no other route found, and default is defined" do
+    it 'returns default route if no other route found, and default is defined' do
       @server.default_route do
-        "DEFAULT ROUTE"
+        'DEFAULT ROUTE'
       end
-      @request = Gopher::Request.new("/about/x/y")
+      @request = Gopher::Request.new('/about/x/y')
       @response = @server.dispatch(@request)
-      expect(@response.body).to eq("DEFAULT ROUTE")
+      expect(@response.body).to eq('DEFAULT ROUTE')
       expect(@response.code).to eq(:success)
     end
 
-    it "should respond with error if no route found" do
-      @server.route '/about/:foo/:bar' do;  end
-      @request = Gopher::Request.new("/junk/x/y")
+    it 'responds with error if no route found' do
+      @server.route '/about/:foo/:bar' do
+      end
+      @request = Gopher::Request.new('/junk/x/y')
 
       @response = @server.dispatch(@request)
       expect(@response.code).to eq(:missing)
       expect(@response.body).to contain_any_error
     end
 
-    it "should respond with error if invalid request" do
-      @server.route '/about/:foo/:bar' do;  end
-      @request = Gopher::Request.new("x" * 256)
+    it 'responds with error if invalid request' do
+      @server.route '/about/:foo/:bar' do
+      end
+      @request = Gopher::Request.new('x' * 256)
 
       @response = @server.dispatch(@request)
       expect(@response.code).to eq(:error)
       expect(@response.body).to contain_any_error
     end
 
-    it "should respond with error if there's an exception" do
-      @server.route '/x' do; raise Exception; end
-      @request = Gopher::Request.new("/x")
+    it "responds with error if there's an exception" do
+      @server.route '/x' do
+        raise StandardError
+      end
+      @request = Gopher::Request.new('/x')
 
       @response = @server.dispatch(@request)
       expect(@response.code).to eq(:error)
@@ -73,57 +81,58 @@ describe Gopher::Application do
     end
   end
 
-  describe "dispatch" do
-    before(:each) do
-      #@server.should_receive(:lookup).and_return({})
+  describe 'dispatch' do
+    before do
+      # @server.should_receive(:lookup).and_return({})
       @server.route '/about' do
         'GOPHERTRON'
       end
 
-      @request = Gopher::Request.new("/about")
+      @request = Gopher::Request.new('/about')
     end
 
-    it "should run the block" do
+    it 'runs the block' do
       @response = @server.dispatch(@request)
-      expect(@response.body).to eq("GOPHERTRON")
+      expect(@response.body).to eq('GOPHERTRON')
     end
   end
 
-  describe "dispatch, with params" do
-    before(:each) do
+  describe 'dispatch, with params' do
+    before do
       @server.route '/about/:x/:y' do
-        params.to_a.join("/")
+        params.to_a.join('/')
       end
 
-      @request = Gopher::Request.new("/about/a/b")
+      @request = Gopher::Request.new('/about/a/b')
     end
 
-    it "should use incoming params" do
+    it 'uses incoming params' do
       @response = @server.dispatch(@request)
-      expect(@response.body).to eq("x/a/y/b")
+      expect(@response.body).to eq('x/a/y/b')
     end
   end
 
-  describe "dispatch to mount" do
-    before(:each) do
-      @h = double(Gopher::Handlers::DirectoryHandler)
+  describe 'dispatch to mount' do
+    before do
+      @h = instance_double(Gopher::Handlers::DirectoryHandler)
       expect(@h).to receive(:application=).with(@server)
-      expect(Gopher::Handlers::DirectoryHandler).to receive(:new).with({:bar => :baz, :mount_point => "/foo"}).and_return(@h)
+      expect(Gopher::Handlers::DirectoryHandler).to receive(:new).with({ bar: :baz,
+                                                                         mount_point: '/foo' }).and_return(@h)
 
-      @server.mount "/foo", :bar => :baz
+      @server.mount '/foo', bar: :baz
     end
 
-    it "should work for root path" do
-      @request = Gopher::Request.new("/foo")
-      expect(@h).to receive(:call).with({:splat => ""}, @request)
+    it 'works for root path' do
+      @request = Gopher::Request.new('/foo')
+      expect(@h).to receive(:call).with({ splat: '' }, @request)
 
       @response = @server.dispatch(@request)
       expect(@response.code).to eq(:success)
     end
 
-    it "should work for subdir" do
-      @request = Gopher::Request.new("/foo/bar")
-      expect(@h).to receive(:call).with({:splat => "bar"}, @request)
+    it 'works for subdir' do
+      @request = Gopher::Request.new('/foo/bar')
+      expect(@h).to receive(:call).with({ splat: 'bar' }, @request)
 
       @response = @server.dispatch(@request)
       expect(@response.code).to eq(:success)
@@ -135,30 +144,29 @@ describe Gopher::Application do
     let(:request) { Gopher::Request.new(target) }
     let(:response) { @server.dispatch(request) }
 
-    it "should return web page" do
+    it 'returns web page' do
       expect(response.body).to include('<meta http-equiv="refresh" content="5;URL=http://github.com/muffinista/gopher2000">')
     end
   end
 
-  
-  describe "globs" do
-    before(:each) do
+  describe 'globs' do
+    before do
       @server.route '/about/*' do
         params[:splat]
       end
     end
 
-    it "should put wildcard into param[:splat]" do
-      @request = Gopher::Request.new("/about/a/b")
+    it 'puts wildcard into param[:splat]' do
+      @request = Gopher::Request.new('/about/a/b')
       @response = @server.dispatch(@request)
-      expect(@response.body).to eq("a/b")
+      expect(@response.body).to eq('a/b')
     end
   end
 end
 
 RSpec::Matchers.define :contain_any_error do
   match do |actual|
-    actual.split(/\r?\n/).any? do |line| 
+    actual.split(/\r?\n/).any? do |line|
       line.match(/^3.*?\tnull\t\(FALSE\)\t0$/)
     end
   end

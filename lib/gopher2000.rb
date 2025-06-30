@@ -1,4 +1,5 @@
-require 'eventmachine'
+# frozen_string_literal: true
+
 require 'stringio'
 require 'logging'
 
@@ -6,8 +7,8 @@ require 'logging'
 # Define everything needed to run a gopher server
 #
 module Gopher
-  require "gopher2000/version"
-  require "gopher2000/errors"
+  require 'gopher2000/version'
+  require 'gopher2000/errors'
 
   require 'gopher2000/rendering/abstract_renderer'
   require 'gopher2000/rendering/base'

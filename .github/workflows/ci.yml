@@ -7,13 +7,19 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        ruby: [2.5, 2.6, 2.7]
+        ruby-version: ['3.4', '3.3', '3.2', '3.1', '3.0']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Install ubuntu requirements
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y shared-mime-info
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
+      - name: Install dependencies
+        run: bundle install
       - name: rspec
         run: bundle exec rake

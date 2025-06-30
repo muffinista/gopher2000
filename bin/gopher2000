@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 #
 # get rid of errors when running via bundle
@@ -13,28 +14,28 @@ require 'gopher2000'
 # pull in any arguments and set them as env variables
 #
 opts = OptionParser.new
-opts.banner = <<-EOS
+opts.banner = <<~EOBANNER
 
-Run a gopher server!
+  Run a gopher server!
 
-Usage: #{File.basename($0)} [options] [scriptname]
+  Usage: #{File.basename($PROGRAM_NAME)} [options] [scriptname]
 
-EOS
+EOBANNER
 
-opts.separator ""
-opts.separator "Options:"
+opts.separator ''
+opts.separator 'Options:'
 
 params = {
-  :debug => false,
-  :env => :production
+  debug: false,
+  env: :production
 }
 
-opts.on('-d', '--debug', "run in debug mode")    { params[:debug] = true }
-opts.on('-p port',   'set the port (default is 70)')                { |val| params[:port] = Integer(val) }
+opts.on('-d', '--debug', 'run in debug mode') { params[:debug] = true }
+opts.on('-p port',   'set the port (default is 70)') { |val| params[:port] = Integer(val) }
 opts.on('-o addr',   'set the host (default is 0.0.0.0)')             { |val| params[:host] = val }
 opts.on('-e env',    'set the environment (default is development)')  { |val| params[:env] = val.to_sym }
 
-opts.on_tail("-h", "--help", "Show this message") do
+opts.on_tail('-h', '--help', 'Show this message') do
   puts opts
   exit!
 end
@@ -44,7 +45,7 @@ extra = opts.parse!(ARGV)
 script = extra.shift
 
 if script.nil?
-  puts "Sorry, you need to specify a script to run"
+  puts 'Sorry, you need to specify a script to run'
   exit!
 end
 

@@ -1,27 +1,28 @@
-module Gopher
+# frozen_string_literal: true
 
+module Gopher
   #
   # basic class for an incoming request
   #
   class Request
     attr_accessor :selector, :input, :ip_address
 
-    def initialize(raw, ip_addr=nil)
+    def initialize(raw, ip_addr = nil)
       @raw = raw
       @selector, @input = @raw.chomp.split("\t")
-      
-	    @selector = Gopher::Application.sanitize_selector(@selector)
-	    @ip_address = ip_addr
+
+      @selector = Gopher::Application.sanitize_selector(@selector)
+      @ip_address = ip_addr
     end
 
     def url?
-      @raw =~ /^URL\:/
+      @raw =~ /^URL:/
     end
 
     def url
-      @raw.chomp.split("\t").first.gsub(/^URL\:/, '')
+      @raw.chomp.split("\t").first.gsub(/^URL:/, '')
     end
-    
+
     # confirm that this is actually a valid gopher request
     # @return [Boolean] true if the request is valid, false otherwise
     def valid?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pathname'
 
 module Gopher
@@ -6,18 +8,18 @@ module Gopher
     # handle browsing a directory structure/returning files to the client
     #
     class DirectoryHandler < BaseHandler
-
       attr_accessor :path, :filter, :mount_point
 
       #
       # @option opts [String] :filter a subset of files to show to user
       # @option opts [String] :path the base path of the filesystem to work from
-      # @option opts [String] :mount_point the route for this handler -- this will be used to generate paths in the response
+      # @option opts [String] :mount_point the route for this handler -- this will
+      # be used to generate paths in the response
       #
       def initialize(opts = {})
         opts = {
-          :filter => "*.*",
-          :path => Dir.getwd
+          filter: '*.*',
+          path: Dir.getwd
         }.merge(opts)
 
         @path = opts[:path]
@@ -65,13 +67,14 @@ module Gopher
       #
       # handle a request
       #
-      # @param [Hash] params the params as parsed during the dispatching process - the main thing here should be :splat, which will basically be the path requested.
+      # @param [Hash] params the params as parsed during the dispatching process - the
+      # main thing here should be :splat, which will basically be the path requested.
       # @param [Request] request the Request object for this session -- not currently used?
       #
-      def call(params = {}, request = nil)
+      def call(params = {}, _request = nil)
         lookup = request_path(params)
 
-        raise Gopher::InvalidRequest if ! contained?(lookup)
+        raise Gopher::InvalidRequest unless contained?(lookup)
 
         if File.directory?(lookup)
           directory(lookup)
@@ -117,7 +120,6 @@ module Gopher
       def file(f)
         File.new(f)
       end
-
     end
   end
 end

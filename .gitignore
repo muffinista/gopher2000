@@ -3,5 +3,6 @@
 Gemfile.lock
 pkg/*
 
+coverage
 
 *~

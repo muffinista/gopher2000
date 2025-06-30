@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
 
 #
 # Simple gopher example
@@ -18,7 +18,7 @@ end
 # special text output rendering
 #
 text :figlet do
-  @text = "Hello!"
+  @text = 'Hello!'
 
   # nicely wrapped text
   figlet @text

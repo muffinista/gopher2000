@@ -1,4 +1,9 @@
+# frozen_string_literal: true
+
 module Gopher
+  #
+  # Code related to rendering
+  #
   module Rendering
     require 'mimemagic'
 
@@ -19,10 +24,10 @@ module Gopher
       # @param [String] raw text to cleanup
       # @return string that can be used in a gopher menu
       def sanitize_text(raw)
-        raw.
-          rstrip. # Remove excess whitespace
-          gsub(/\t/, ' ' * 8). # Tabs to spaces
-          gsub(/\n/, '') # Get rid of newlines (\r as well?)
+        raw
+          .rstrip # Remove excess whitespace
+          .gsub("\t", ' ' * 8) # Tabs to spaces
+          .gsub("\n", '') # Get rid of newlines (\r as well?)
       end
 
       #
@@ -33,13 +38,13 @@ module Gopher
       # @param [String] selector if this is a link, the path of the route we are linking to
       # @param [String] host for link, defaults to current host
       # @param [String] port for link, defaults to current port
-      def line(type, text, selector, host=nil, port=nil)
+      def line(type, text, selector, host = nil, port = nil)
         text = sanitize_text(text)
 
         host = application.host if host.nil?
         port = application.port if port.nil?
 
-        self << ["#{type}#{text}", selector, host, port].join("\t") + LINE_ENDING
+        self << (["#{type}#{text}", selector, host, port].join("\t") + LINE_ENDING)
       end
 
       #
@@ -47,7 +52,7 @@ module Gopher
       # @param [String] text the text of the line
       # @param [String] type what sort of entry is this? @see http://www.ietf.org/rfc/rfc1436.txt for a list
       #
-      def text(text, type = 'i')
+      def text(text, type = Gopher::Types::INFO)
         line type, text, 'null', NO_HOST, NO_PORT
       end
 
@@ -55,11 +60,11 @@ module Gopher
       # add some empty lines to the menu
       # @param [integer] n how many breaks to add
       #
-      def br(n=1)
+      def br(n = 1)
         1.upto(n) do
-          text 'i', ""
+          text Gopher::Types::INFO, ''
         end
-        self.to_s
+        to_s
       end
 
       #
@@ -67,7 +72,7 @@ module Gopher
       # @param [String] msg text of the message
       #
       def error(msg)
-        text(msg, '3')
+        text(msg, Gopher::Types::ERROR)
       end
 
       #
@@ -77,11 +82,10 @@ module Gopher
       # @param [String] host for link, defaults to current host
       # @param [String] port for link, defaults to current port
       #
-      def directory(name, selector, host=nil, port=nil)
-        line '1', name, selector, host, port
+      def directory(name, selector, host = nil, port = nil)
+        line Gopher::Types::MENU, name, selector, host, port
       end
       alias menu directory
-
 
       #
       # output a menu link
@@ -95,14 +99,8 @@ module Gopher
       # @param [String] port for link, defaults to current port
       # @param [String] real filepath of the link
       # @param [String] selector type. if not specified, we will guess
-      def link(text, selector, host=nil, port=nil, filepath=nil, type=nil)
-        if !type
-          if filepath
-            type = determine_type(filepath)
-          else
-            type = determine_type(selector)
-          end
-        end
+      def link(text, selector, host = nil, port = nil, filepath = nil, type = nil)
+        type ||= determine_type(filepath || selector)
         line type, text, selector, host, port
       end
 
@@ -117,10 +115,10 @@ module Gopher
       # @param [String] host for link, defaults to current host
       # @param [String] port for link, defaults to current port
       # @param [String] real filepath of the link
-      def text_link(text, selector, host=nil, port=nil, filepath=nil)
-        link(text, selector, host, port, filepath, '0')
+      def text_link(text, selector, host = nil, port = nil, filepath = nil)
+        link(text, selector, host, port, filepath, Gopher::Types::TEXT)
       end
-      
+
       # Create an HTTP link entry. This is how this works (via wikipedia)
       #
       # For example, to create a link to http://gopher.quux.org/, the
@@ -134,19 +132,18 @@ module Gopher
       # @param [String] URL of the link
       # @param [String] host for link, defaults to current host
       # @param [String] port for link, defaults to current port
-      def http(text, url, host=nil, port=nil)
-        line "h", text, "URL:#{url}", host, port
+      def http(text, url, host = nil, port = nil)
+        line Gopher::Types::HTML, text, "URL:#{url}", host, port
       end
-      
+
       #
       # output a search entry
       # @param [String] text the text of the link
       # @param [String] selector the path of the selector
-      def search(text, selector, *args)
-        line '7', text, selector, *args
+      def search(text, selector, *)
+        line(Gopher::Types::SEARCH, text, selector, *)
       end
       alias input search
-
 
       #
       # Determines the gopher type for +selector+ based on the
@@ -159,7 +156,7 @@ module Gopher
         mimetype = MimeMagic.by_path(filepath)
 
         # Determine MIME type by contents
-        if !mimetype
+        unless mimetype
           begin
             # Open file
             file = File.open(filepath)
@@ -167,50 +164,52 @@ module Gopher
             # Try to detect MIME type using by recognition of typical characters
             mimetype = MimeMagic.by_magic(file)
 
-            if !mimetype
+            unless mimetype
               file.rewind
 
               # Read up to 1k of file data and look for a "\0\0" sequence (typical for binary files)
-              if file.read(1000).include?("\0\0")
-                mimetype = MimeMagic.new("application/octet-stream")
-              else
-                mimetype = MimeMagic.new("text/plain")
-              end
-              
+              mimetype = if file.read(1000).include?("\0\0")
+                           MimeMagic.new('application/octet-stream')
+                         else
+                           MimeMagic.new('text/plain')
+                         end
+
               file.close
             end
-          rescue SystemCallError,IOError
+          rescue SystemCallError, IOError
             nil
           end
         end
 
-        if !mimetype
-          ext = File.extname(filepath).split(".").last
+        unless mimetype
+          ext = File.extname(filepath).split('.').last
           mimetype = MimeMagic.by_extension(ext)
         end
-        
+
         if !mimetype
-          return '9' # Binary file
-        elsif mimetype.child_of?('application/gzip') || mimetype.child_of?('application/x-bzip') || mimetype.child_of?('application/zip')
-          return '5' # archive
+          Gopher::Types::BINARY # Binary file
+        elsif mimetype.child_of?('application/gzip') ||
+              mimetype.child_of?('application/x-bzip') ||
+              mimetype.child_of?('application/zip')
+          Gopher::Types::ARCHIVE # archive
         elsif mimetype.child_of?('image/gif')
-          return 'g' # GIF image
+          Gopher::Types::GIF # GIF image
         elsif mimetype.child_of?('text/x-uuencode')
-          return '6' # UUEncode encoded file
+          Gopher::Types::UUENCODED # UUEncode encoded file
         elsif mimetype.child_of?('application/mac-binhex40')
-          return '4' # BinHex encoded file
+          Gopher::Types::BINHEX # BinHex encoded file
         elsif mimetype.child_of?('text/html') || mimetype.child_of?('application/xhtml+xml')
-          return 'h' # HTML file
-        elsif mimetype.mediatype == 'text'    || mimetype.child_of?('text/plain')
-          return '0' # General text file
+          Gopher::Types::HTML # HTML file
+        elsif mimetype.mediatype == 'text' || mimetype.child_of?('text/plain')
+          Gopher::Types::TEXT # General text file
         elsif mimetype.mediatype == 'image'
-          return 'I' # General image file
+          Gopher::Types::IMAGE # General image file
         elsif mimetype.mediatype == 'audio'
-          return 's' # General audio file
+          Gopher::Types::AUDIO # General audio file
         elsif mimetype.mediatype == 'video'
-          return 'v' # General video file
+          Gopher::Types::VIDEO # General video file
         else
-          return '9' # Binary file
+          Gopher::Types::BINARY # Binary file
         end
       end
     end

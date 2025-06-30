@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
 
 #
 # NYAN cat in gopherspace
@@ -11,9 +11,8 @@ set :host, '0.0.0.0'
 set :port, 7070
 
 route '/nyan' do
-
-@cats = [
-" +      o     +              o
+  @cats = [
+    " +      o     +              o
      +             o     +       +
  o          +
      o  +           +        +
@@ -28,7 +27,7 @@ route '/nyan' do
      o           +
  +      +     o        o      +   ",
 
-"     o  +           +        +
+    "     o  +           +        +
  o          +                    o
      o                 +
  +      o     +              o
@@ -43,7 +42,7 @@ route '/nyan' do
      +         +
         +           o        +    ",
 
-  "░░▓▓░░░░░░░░▓▓░░
+    "░░▓▓░░░░░░░░▓▓░░
 ░▓▒▒▓░░░░░░▓▒▒▓░
 ░▓▒▒▒▓░░░░▓▒▒▒▓░
 ░▓▒▒▒▒▓▓▓▓▒▒▒▒▓░
@@ -56,7 +55,7 @@ route '/nyan' do
 ░▓▒▒▒▓▓▓▓▓▓▓▒▒▓░
 ░░▓▒▒▒▒▒▒▒▒▒▒▓░░
 ░░░▓▓▓▓▓▓▓▓▓▓░░░"
-]
+  ]
 
   @cats.sample
 end
