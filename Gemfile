@@ -19,8 +19,7 @@ group :development do
   gem 'rdoc'
   gem 'redcarpet'
   gem 'rspec'
-  gem 'shoulda-context', '~> 3.0.0.rc1'
-  gem 'shoulda-matchers', '~> 6.5.0'
+  gem 'shoulda-matchers', '~> 7.0.1'
   gem 'simplecov', '~> 0.22.0'
   gem 'yard'
 

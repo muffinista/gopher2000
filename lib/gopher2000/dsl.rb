@@ -48,6 +48,11 @@ module Gopher
       application.default_route(&)
     end
 
+    # specify a before_action
+    def before_action(&)
+      application.before_action(&)
+    end
+
     # mount a folder for browsing
     def mount(path, opts = {})
       route, folder = path.first

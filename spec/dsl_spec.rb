@@ -53,6 +53,15 @@ describe Gopher::DSL do
       end
     end
 
+    describe 'before_action' do
+      it 'passes to the app' do
+        expect(@app).to receive(:before_action)
+        @server.before_action do
+          'hi'
+        end
+      end
+    end
+
     describe 'mount' do
       it 'passes a route, path, and some opts to the app' do
         expect(@app).to receive(:mount).with('/foo', { path: '/bar' })

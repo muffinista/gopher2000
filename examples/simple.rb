@@ -16,6 +16,11 @@ set :non_blocking, true
 # you can specify a destination for access log, for stats/etc
 set :access_log, '/tmp/access.log'
 
+#before_action do |selector, params|
+#  puts "HELLO!!!"
+#  return selector, {'foo' => 'bar'}
+#end
+
 route '/gopher' do
   'Greetings from Gopher 2000!' # You can output any text you want here
 end
