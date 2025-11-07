@@ -34,5 +34,16 @@ module Gopher
         "expected menu to contain #{expected}\n\n#{actual.menu.join("\n")}"
       end
     end
+
+    RSpec::Matchers.define :contain_any_error do
+      match do |actual|
+        actual.split(/\r?\n/).any? do |line|
+          line.match(/^3.*?\tnull\t\(FALSE\)\t0$/)
+        end
+      end
+    end
+
   end
 end
+
+

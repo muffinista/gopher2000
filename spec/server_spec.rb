@@ -63,8 +63,15 @@ describe Gopher::Server do
     expect(@application.port).to eql(@port)
   end
 
-  it 'returns environment' do
-    expect(@application.env).to eql(@environment)
+  context 'env' do
+    it 'returns environment' do
+      expect(@application.env).to eql(@environment)
+    end
+
+    it 'returns default env' do
+      @application.config[:env] = nil
+      expect(@application.env).to eql('development')
+    end
   end
 
   it 'works in blocking mode' do

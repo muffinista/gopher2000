@@ -2,10 +2,7 @@
 
 require File.join(File.dirname(__FILE__), '/spec_helper')
 
-class MockServer < Gopher::Application
-  #  attr_accessor :routes
-  #  include Gopher::Routing
-end
+class MockServer < Gopher::Application; end
 
 describe Gopher::Application do
   before do
@@ -19,6 +16,16 @@ describe Gopher::Application do
       end
       _, block = @router.lookup('sfssfdfsfsd')
       expect(block.class).to eql(UnboundMethod)
+    end
+  end
+
+  describe 'before_action' do
+    it 'adds to list' do
+      expect(@router.before_actions).to be_empty
+      @router.before_action do
+        'hi'
+      end
+      expect(@router.before_actions.first.class).to eql(UnboundMethod)
     end
   end
 

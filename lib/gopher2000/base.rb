@@ -58,11 +58,12 @@ module Gopher
     @debug_log = nil
 
     @routes = []
+    @before_actions = []
     @menus = {}
     @text_templates = {}
     @scripts ||= []
 
-    attr_accessor :menus, :text_templates, :routes, :config, :scripts, :last_reload, :params, :request
+    attr_accessor :menus, :text_templates, :routes, :config, :scripts, :last_reload, :params, :request, :before_actions
 
     #
     # reset the app. clear out any routes, templates, config values,
@@ -70,6 +71,7 @@ module Gopher
     #
     def reset!
       self.routes = []
+      self.before_actions = []      
       self.menus = {}
       self.text_templates = {}
       self.scripts ||= []
@@ -193,6 +195,16 @@ module Gopher
       self.routes << sig
     end
 
+    def before_actions
+      @before_actions ||= []
+    end
+    
+    def before_action(&)
+      @before_action_index ||= 0
+      sig = compile!("before_#{@before_action_index+=1}", &)
+      self.before_actions << sig.last
+    end
+    
     #
     # specify a default route to handle requests if no other route exists
     # @yield a block to handle the default route
@@ -212,18 +224,32 @@ module Gopher
     # @param [String] selector the selector path of the incoming request
     #
     def lookup(selector)
+      params = {}
+      
+      before_actions.each do |m|
+        target = m.bind(self)
+        arg_count = target.arity
+        if arg_count == 0
+          target.call
+        elsif arg_count == 1
+          selector, _ = target.call(selector)
+        else
+          selector, params = target.call(selector, params)
+        end
+      end
+
       routes&.each do |pattern, keys, block|
         next unless (match = pattern.match(selector))
 
         match = match.to_a
         match.shift
 
-        params = to_params_hash(keys, match)
+        params = params.merge(to_params_hash(keys, match))
 
         #
         # @todo think about this
         #
-        @params = params
+#        @params = params
 
         return params, block
       end

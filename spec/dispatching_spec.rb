@@ -29,7 +29,7 @@ describe Gopher::Application do
       keys, = @server.lookup(@request.selector)
       expect(keys).to eq({})
     end
-
+    
     it 'translates path' do
       @server.route '/about/:foo/:bar' do
       end
@@ -79,11 +79,51 @@ describe Gopher::Application do
       expect(@response.code).to eq(:error)
       expect(@response.body).to contain_any_error
     end
+
+    it 'rejects long lookups' do
+      @server.route '/about' do
+      end
+      @request = Gopher::Request.new('/0123456789' * 110)
+
+      @response = @server.dispatch(@request)
+      expect(@response.code).to eq(:error)
+      expect(@response.body).to contain_any_error
+    end
+
+    context 'before_action' do
+      it 'works' do
+        @server.before_action do |selector, params|
+          return selector, {'called' => true}
+        end
+        @server.route '/about' do
+        end
+
+        @request = Gopher::Request.new('/about')
+        
+        keys, = @server.lookup(@request.selector)
+        expect(keys['called']).to be true
+      end
+
+      it 'can rewrite selector' do
+        @server.before_action do |selector|
+          return '/xyz'
+        end
+        @server.route '/about' do
+          "ABOUT"
+        end
+        @server.route '/xyz' do
+          "XYZ"
+        end
+
+        @request = Gopher::Request.new('/about')
+        @response = @server.dispatch(@request)
+        expect(@response.body).to eq('XYZ')
+      end
+    end
   end
 
   describe 'dispatch' do
     before do
-      # @server.should_receive(:lookup).and_return({})
       @server.route '/about' do
         'GOPHERTRON'
       end
@@ -160,14 +200,6 @@ describe Gopher::Application do
       @request = Gopher::Request.new('/about/a/b')
       @response = @server.dispatch(@request)
       expect(@response.body).to eq('a/b')
-    end
-  end
-end
-
-RSpec::Matchers.define :contain_any_error do
-  match do |actual|
-    actual.split(/\r?\n/).any? do |line|
-      line.match(/^3.*?\tnull\t\(FALSE\)\t0$/)
     end
   end
 end
