@@ -24,6 +24,10 @@ module Gopher
       @client ||= SimpleClient.new(@host, @port)
     end
 
+    def reset!
+      @client = @response = nil
+    end
+
     #
     # Send the specified payload to the gopher server
     #
