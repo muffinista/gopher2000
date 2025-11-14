@@ -25,6 +25,12 @@ route '/gopher' do
   'Greetings from Gopher 2000!' # You can output any text you want here
 end
 
+route '/counter' do
+  Thread.current[:counter] ||= 0
+  Thread.current[:counter] += 1
+  Thread.current[:counter].to_s  
+end
+
 route '/prettytext' do
   render :prettytext
 end

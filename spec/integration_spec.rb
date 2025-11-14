@@ -15,6 +15,16 @@ describe 'Integration tests', type: :integration do
     expect(response).to have_content('simple gopher example')
   end
 
+  it 'has thread safety' do
+    request '/counter'
+    expect(response).to have_content('1')
+
+    reset!
+    request '/counter'
+    expect(response).to have_content('1')
+  end
+
+  
   it 'has selector' do
     request '/'
     expect(response).to have_selector({ type: Gopher::Types::TEXT, text: 'current time' })

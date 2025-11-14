@@ -84,10 +84,6 @@ module Gopher
       application.text(name, &)
     end
 
-    #    def template(name, &block)
-    #      application.template(name, &block)
-    #    end
-
     # specify some helpers for your app
     # @yield block which defines the helper methods
     def helpers(&)

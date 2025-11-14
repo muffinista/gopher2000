@@ -61,7 +61,9 @@ module Gopher
       logger.debug "Reading from socket!"
       _, port, host = socket.peeraddr
 
-      Dispatcher.new(app, socket).read!
+      Thread.new do
+        Dispatcher.new(app, socket).read!
+      end.join
     rescue EOFError
       logger.debug "#{host}:#{port} disconnected"
     ensure
