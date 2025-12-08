@@ -283,6 +283,7 @@ module Gopher
           #
           # call the block that handles this lookup
           #
+          debug_log "handle with #{block.inspect}"
           response.body = block.bind(self).call
           response.code = :success
         rescue Gopher::NotFoundError

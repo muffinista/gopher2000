@@ -74,7 +74,7 @@ module Gopher
 
     # Invoked with lines received over the network
     def receive_line(line, ip_address)
-      logger.debug "Handle request: #{line} #{ip_address}"
+      logger.debug "Handle request: #{ip_address} #{line}"
       call! Request.new(line, ip_address)
     end
 
@@ -124,6 +124,7 @@ module Gopher
           retry
         end
       else
+        logger.debug "Writing #{payload.size} bytes"
         @socket.write(payload)
       end
     end

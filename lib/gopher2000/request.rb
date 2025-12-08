@@ -29,5 +29,10 @@ module Gopher
       # The Selector string should be no longer than 255 characters. (RFC 1436)
       @selector.length <= 255
     end
+
+    def to_s
+      return 'invalid' unless valid?
+      "#{@ip_address} #{@selector}"
+    end
   end
 end
