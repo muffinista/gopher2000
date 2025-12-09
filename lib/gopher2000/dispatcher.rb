@@ -62,7 +62,7 @@ module Gopher
 
       ip_address = remote_ip
       while (line = @buf.slice!(/(.*)\r?\n/))
-        # logger.debug line
+        logger.debug line
         is_proxy = first_line && line.match?(/^PROXY TCP[4,6] /)
 
         receive_line(line, ip_address) unless is_proxy
