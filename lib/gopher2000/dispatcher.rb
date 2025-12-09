@@ -39,7 +39,11 @@ module Gopher
                      retry
                    end
                  else
-                   @socket.readpartial(4096)
+                   buf = ""
+                   while !buf.match?(/\r?\n/)
+                     buf += @socket.readpartial(4096)
+                   end
+                   buf
                  end
       receive_data(incoming)
     end
@@ -57,7 +61,6 @@ module Gopher
       end
 
       logger.debug "==== receive_data #{data.length}"
-      puts data
       @buf = [@buf, data].compact.join
       first_line = true
 
