@@ -56,7 +56,8 @@ module Gopher
         return
       end
 
-      logger.debug "==== receive_data"
+      logger.debug "==== receive_data #{data.length}"
+      puts data
       @buf = [@buf, data].compact.join
       first_line = true
 
