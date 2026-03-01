@@ -11,7 +11,7 @@ module Gopher
     # @see http://www.faqs.org/rfcs/rfc1436.html
     LINE_ENDING = "\r\n"
 
-    DEFAULT_ENCODING = 'UTF-8'
+    DEFAULT_ENCODING = ENV.fetch('GOPHER_ENCODING', 'UTF-8')
 
     #
     # base class for rendering output. this class provides methods
@@ -44,7 +44,7 @@ module Gopher
       #   then adds any required spacing
       #
       def text(text)
-        self << text # .force_encoding(DEFAULT_ENCODING)
+        self << (text.frozen? ? text : text.force_encoding(DEFAULT_ENCODING))
         add_spacing
       end
 
